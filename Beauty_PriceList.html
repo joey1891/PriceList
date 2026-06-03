@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>뷰티 제품 라이브 단가표 (Supabase 연동)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .table-container { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        th { background-color: #1e293b; color: white; }
+        tr:nth-child(even) { background-color: #f1f5f9; }
+        tr:hover { background-color: #e2e8f0; }
+    </style>
+</head>
+<body class="p-6 md:p-12 text-gray-800">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="flex flex-col md:flex-row justify-between items-end mb-8 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Beauty Product Live Price List</h1>
+                <p class="text-gray-500">데이터 소스: Supabase Database</p>
+                <p class="text-gray-500 text-sm mt-1">결제 조건: 100% in advance | 인코텀즈: FOB BUSAN or ICHEON</p>
+            </div>
+            <div class="mt-4 md:mt-0 text-right">
+                <div class="text-sm font-semibold text-gray-500 mb-1" id="current-date">Today: ...</div>
+                <div class="bg-blue-50 text-blue-700 px-4 py-3 rounded-md border border-blue-200">
+                    <span class="block text-xs uppercase tracking-wide font-bold mb-1">오늘의 실시간 환율 (Live API)</span>
+                    <span class="text-2xl font-black font-mono" id="live-rate">로딩 중...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning / Info -->
+        <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-8">
+            <p class="text-sm text-amber-700">
+                <strong>안내:</strong> 제품 및 가격 정보는 Supabase DB에서 실시간으로 불러오며, 
+                <span class="font-bold">Live KRW Price</span> 열은 오늘의 실시간 환율을 곱하여 자동 계산됩니다.
+            </p>
+        </div>
+
+        <!-- Table Section -->
+        <div class="overflow-x-auto rounded-lg table-container bg-white">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr>
+                        <th class="py-4 px-4 font-semibold text-sm uppercase tracking-wider">Category</th>
+                        <th class="py-4 px-4 font-semibold text-sm uppercase tracking-wider">Product Name</th>
+                        <th class="py-4 px-4 font-semibold text-sm uppercase tracking-wider text-center">CT Qty</th>
+                        <th class="py-4 px-4 font-semibold text-sm uppercase tracking-wider text-right">USD MSRP</th>
+                        <th class="py-4 px-4 font-semibold text-sm uppercase tracking-wider text-right text-blue-300">USD Promo (B2C)</th>
+                        <th class="py-4 px-4 font-semibold text-sm uppercase tracking-wider text-right text-green-300">USD B2B (1-10CT)</th>
+                        <th class="py-4 px-4 font-semibold text-sm uppercase tracking-wider text-right text-amber-300">Live KRW (B2B 1-10CT)</th>
+                    </tr>
+                </thead>
+                <tbody id="price-table-body">
+                    <tr><td colspan="7" class="text-center py-8 text-gray-500">Supabase 데이터를 불러오는 중입니다...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 날짜 세팅
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
+
+        // Supabase 초기화
+        const SUPABASE_URL = 'https://rayhgqcpupwmwpymtkwg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function initDashboard() {
+            try {
+                // 1. 실시간 환율 API 호출
+                let krwRate = 1400; 
+                try {
+                    const exRes = await fetch('https://open.er-api.com/v6/latest/USD');
+                    const exData = await exRes.json();
+                    krwRate = exData.rates.KRW;
+                    document.getElementById('live-rate').textContent = `1 USD = ₩ ` + new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 0 }).format(krwRate);
+                } catch (e) {
+                    document.getElementById('live-rate').textContent = `환율 로딩 실패 (기본 1,400원 적용)`;
+                    console.error("환율 API 오류:", e);
+                }
+
+                // 2. Supabase에서 데이터 호출
+                const { data: dbProducts, error } = await supabaseClient
+                    .from('products')
+                    .select(`
+                        sub_category,
+                        name_en,
+                        ct_quantity,
+                        product_prices (
+                            currency,
+                            b2c_msrp,
+                            b2c_promotion,
+                            b2b_tier1_1_to_10_ct
+                        )
+                    `)
+                    .order('created_at', { ascending: true });
+
+                if (error) throw error;
+
+                // 3. 테이블 렌더링
+                const formatter = new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 0 });
+                const tbody = document.getElementById('price-table-body');
+                tbody.innerHTML = '';
+
+                if (!dbProducts || dbProducts.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-500">Supabase에 저장된 제품 데이터가 없습니다. SQL문을 실행했는지 확인해주세요.</td></tr>`;
+                    return;
+                }
+
+                dbProducts.forEach(p => {
+                    const usdPrice = p.product_prices.find(pr => pr.currency === 'USD') || {};
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-gray-200 text-sm";
+                    
+                    const msrpText = usdPrice.b2c_msrp ? '$' + usdPrice.b2c_msrp : '-';
+                    const b2bUsd = usdPrice.b2b_tier1_1_to_10_ct || 0;
+                    const liveKrwB2b = b2bUsd * krwRate;
+                    const liveKrwText = b2bUsd > 0 ? '₩ ' + formatter.format(liveKrwB2b) : '-';
+
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 text-gray-500 font-medium whitespace-nowrap">${p.sub_category || '-'}</td>
+                        <td class="py-3 px-4 font-bold text-gray-800">${p.name_en || '-'}</td>
+                        <td class="py-3 px-4 text-center text-gray-500">${p.ct_quantity || '-'}</td>
+                        <td class="py-3 px-4 text-right text-gray-500">${msrpText}</td>
+                        <td class="py-3 px-4 text-right font-bold text-blue-600">${usdPrice.b2c_promotion ? '$'+usdPrice.b2c_promotion : '-'}</td>
+                        <td class="py-3 px-4 text-right font-bold text-green-600">${b2bUsd > 0 ? '$'+b2bUsd : '-'}</td>
+                        <td class="py-3 px-4 text-right font-black text-amber-600 bg-amber-50/30">${liveKrwText}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (err) {
+                console.error("Supabase 데이터 로딩 오류:", err);
+                document.getElementById('price-table-body').innerHTML = `
+                    <tr><td colspan="7" class="text-center py-8 text-red-500">
+                        데이터를 불러오는 중 오류가 발생했습니다.<br>
+                        <span class="text-sm">Supabase Table RLS(Row Level Security) 설정이 활성화되어 있다면, 익명(anon) 읽기 권한을 허용했는지 확인해주세요.</span>
+                    </td></tr>
+                `;
+            }
+        }
+
+        initDashboard();
+    </script>
+</body>
+</html>
