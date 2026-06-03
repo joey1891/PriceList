@@ -14,29 +14,30 @@
         
         /* Category Header Styling */
         .category-header { background-color: #334155; color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .sub-category-header { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 0.875rem; letter-spacing: 0.025em; border-bottom: 2px solid #e2e8f0; }
         
         /* Alternate Row Colors */
-        tr:nth-child(even):not(.category-header) { background-color: #f1f5f9; }
-        tr:hover:not(.category-header) { background-color: #e2e8f0; transition: background-color 0.2s ease; }
+        tr:nth-child(even):not(.category-header):not(.sub-category-header) { background-color: #f1f5f9; }
+        tr:hover:not(.category-header):not(.sub-category-header) { background-color: #e2e8f0; transition: background-color 0.2s ease; }
         
         /* Currency Alignment Magic: Symbol on Left, Number on Right */
-        .currency-cell { display: flex; justify-content: space-between; width: 100%; min-width: 60px; }
+        .currency-cell { display: flex; justify-content: space-between; width: 100%; min-width: 65px; }
     </style>
 </head>
 <body class="p-6 md:p-12 text-gray-800">
 
-    <div class="max-w-7xl mx-auto flex flex-col gap-8">
+    <div class="max-w-[90rem] mx-auto flex flex-col gap-8">
         
         <div class="flex flex-col md:flex-row justify-between items-end bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">Beauty Product Live Price List</h1>
-                <p class="text-gray-500">Data Source: Supabase Database</p>
+                <p class="text-gray-500">Exchange Rate Source: Open Exchange Rates API (open.er-api.com)</p>
                 <p class="text-gray-500 text-sm mt-1">Payment: 100% in advance | Incoterms: FOB BUSAN or ICHEON</p>
             </div>
             <div class="mt-4 md:mt-0 text-right">
                 <div class="text-sm font-semibold text-gray-500 mb-1" id="current-date">Today: ...</div>
                 <div class="bg-blue-50 text-blue-700 px-4 py-3 rounded-md border border-blue-200">
-                    <span class="block text-xs uppercase tracking-wide font-bold mb-1">Live Exchange Rate (API)</span>
+                    <span class="block text-xs uppercase tracking-wide font-bold mb-1">Live Exchange Rate (USD/KRW)</span>
                     <span class="text-2xl font-black font-mono" id="live-rate">Loading...</span>
                 </div>
             </div>
@@ -44,7 +45,7 @@
 
         <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded shadow-sm">
             <p class="text-sm text-amber-800">
-                <strong>Notice:</strong> Product and price information is fetched live from the database. 
+                <strong>Notice:</strong> Product and price information is fetched live. 
                 The <span class="font-bold">Live KRW Price</span> column is automatically calculated by multiplying the USD B2B (1-10CT) price with today's live exchange rate.
             </p>
         </div>
@@ -54,6 +55,7 @@
                 <thead>
                     <tr>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider w-1/4">Product Name</th>
+                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">Volume</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">CT Qty</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider">USD MSRP</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-blue-300">Promo (B2C)</th>
@@ -64,7 +66,7 @@
                     </tr>
                 </thead>
                 <tbody id="price-table-body">
-                    <tr><td colspan="8" class="text-center py-10 text-gray-500 italic">Fetching data from Supabase...</td></tr>
+                    <tr><td colspan="9" class="text-center py-10 text-gray-500 italic">Fetching data from server...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -89,6 +91,19 @@
             return `<div class="currency-cell"><span>${symbol}</span><span>${formattedAmount}</span></div>`;
         }
 
+        // Split Product Name and Volume (e.g., "Product Name 30ml" -> "Product Name", "30ml")
+        function extractNameAndVolume(fullName) {
+            if (!fullName) return { name: '-', volume: '-' };
+            
+            // Regex to find trailing volume (e.g., 30ml, 5EA, 15ml 3ea)
+            const match = fullName.match(/(.*?)\s+(\d+\s*[a-zA-Z]+(?:\s*\d+\s*[a-zA-Z]+)?)$/);
+            
+            if (match) {
+                return { name: match[1].trim(), volume: match[2].trim() };
+            }
+            return { name: fullName.trim(), volume: '-' };
+        }
+
         async function initDashboard() {
             try {
                 // 1. Fetch Live Exchange Rate
@@ -103,7 +118,7 @@
                     console.error("Exchange API Error:", e);
                 }
 
-                // 2. Fetch Data from Supabase (Including all B2B Tiers)
+                // 2. Fetch Data from Supabase
                 const { data: dbProducts, error } = await supabaseClient
                     .from('products')
                     .select(`
@@ -127,25 +142,31 @@
                 tbody.innerHTML = '';
 
                 if (!dbProducts || dbProducts.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-10 text-red-500">No product data found in Supabase. Please ensure SQL queries were executed correctly.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="9" class="text-center py-10 text-red-500">No product data found in database.</td></tr>`;
                     return;
                 }
 
-                // 3. Categorize Products (Face vs Hair)
-                const faceProducts = dbProducts.filter(p => p.sub_category && p.sub_category.toLowerCase().includes('face'));
-                const hairProducts = dbProducts.filter(p => p.sub_category && p.sub_category.toLowerCase().includes('hair'));
+                // 3. Filter Categories
+                const faceDevices = dbProducts.filter(p => p.sub_category === 'Device-face');
+                const faceCosmetics = dbProducts.filter(p => p.sub_category === 'Product-face');
+                const hairDevices = dbProducts.filter(p => p.sub_category === 'Device-hair');
+                const hairCosmetics = dbProducts.filter(p => p.sub_category === 'Product-hair');
 
-                // Render Function for Categories
-                function renderCategory(title, products) {
+                // Helper functions to render rows
+                function renderHeader(title, isMain) {
+                    const tr = document.createElement('tr');
+                    if (isMain) {
+                        tr.className = 'category-header';
+                        tr.innerHTML = `<td colspan="9" class="py-3 px-4">${title}</td>`;
+                    } else {
+                        tr.className = 'sub-category-header';
+                        tr.innerHTML = `<td colspan="9" class="py-2 px-6">└ ${title}</td>`;
+                    }
+                    tbody.appendChild(tr);
+                }
+
+                function renderProducts(products) {
                     if (products.length === 0) return;
-
-                    // Add Category Header Row
-                    const headerTr = document.createElement('tr');
-                    headerTr.className = 'category-header';
-                    headerTr.innerHTML = `<td colspan="8" class="py-2 px-4">${title}</td>`;
-                    tbody.appendChild(headerTr);
-
-                    // Add Product Rows
                     products.forEach(p => {
                         const usdPrice = p.product_prices.find(pr => pr.currency === 'USD') || {};
                         const tr = document.createElement('tr');
@@ -154,11 +175,14 @@
                         const b2b1 = usdPrice.b2b_tier1_1_to_10_ct;
                         const b2b2 = usdPrice.b2b_tier2_10_to_30_ct;
                         const b2b3 = usdPrice.b2b_tier3_30_to_70_ct;
-                        
                         const liveKrwB2b = (b2b1 && b2b1 > 0) ? b2b1 * krwRate : null;
 
+                        // Split Name and Volume
+                        const { name, volume } = extractNameAndVolume(p.name_en);
+
                         tr.innerHTML = `
-                            <td class="py-3 px-4 font-bold text-gray-800">${p.name_en || '-'}</td>
+                            <td class="py-3 px-6 font-bold text-gray-800">${name}</td>
+                            <td class="py-3 px-4 text-center font-medium text-gray-500">${volume}</td>
                             <td class="py-3 px-4 text-center text-gray-500">${p.ct_quantity || '-'}</td>
                             <td class="py-3 px-4 text-gray-500">${formatCurrency('$', usdPrice.b2c_msrp)}</td>
                             <td class="py-3 px-4 font-bold text-blue-600">${formatCurrency('$', usdPrice.b2c_promotion)}</td>
@@ -171,16 +195,35 @@
                     });
                 }
 
-                // Execute Render
-                renderCategory('FACE CATEGORY', faceProducts);
-                renderCategory('HAIR CATEGORY', hairProducts);
+                // 4. Build Table Order
+                // FACE
+                renderHeader('FACE CATEGORY', true);
+                if (faceDevices.length > 0) {
+                    renderHeader('DEVICE', false);
+                    renderProducts(faceDevices);
+                }
+                if (faceCosmetics.length > 0) {
+                    renderHeader('COSMETIC', false);
+                    renderProducts(faceCosmetics);
+                }
+
+                // HAIR
+                renderHeader('HAIR CATEGORY', true);
+                if (hairDevices.length > 0) {
+                    renderHeader('DEVICE', false);
+                    renderProducts(hairDevices);
+                }
+                if (hairCosmetics.length > 0) {
+                    renderHeader('COSMETIC', false);
+                    renderProducts(hairCosmetics);
+                }
 
             } catch (err) {
-                console.error("Supabase Data Load Error:", err);
+                console.error("Data Load Error:", err);
                 document.getElementById('price-table-body').innerHTML = `
-                    <tr><td colspan="8" class="text-center py-10 text-red-500">
+                    <tr><td colspan="9" class="text-center py-10 text-red-500">
                         Failed to load data.<br>
-                        <span class="text-sm">Please check your Row Level Security (RLS) policies in Supabase.</span>
+                        <span class="text-sm">Please check your Row Level Security (RLS) policies or Database connection.</span>
                     </td></tr>
                 `;
             }
