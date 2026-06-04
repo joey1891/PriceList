@@ -3,12 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beauty Product Live Price List</title>
+    <title>Confidential - Beauty Product Live Price List</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        /* Lock Screen Styles */
+        #lock-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #f1f5f9;
+            display: flex; flex-direction: column; justify-content: center; items-center: center;
+            z-index: 50; transition: opacity 0.3s ease;
+        }
+        
+        /* Main Content hidden initially */
+        #main-content { display: none; opacity: 0; transition: opacity 0.5s ease; }
+
         .table-container { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
         th { background-color: #1e293b; color: white; }
         
@@ -20,16 +32,40 @@
         tr:nth-child(even):not(.category-header):not(.sub-category-header) { background-color: #f1f5f9; }
         tr:hover:not(.category-header):not(.sub-category-header) { background-color: #e2e8f0; transition: background-color 0.2s ease; }
         
-        /* Currency Alignment Magic: Symbol on Left, Number on Right */
+        /* Currency Alignment Magic */
         .currency-cell { display: flex; justify-content: space-between; width: 100%; min-width: 65px; }
     </style>
 </head>
-<body class="p-6 md:p-12 text-gray-800">
+<body class="text-gray-800">
 
-    <div class="max-w-[90rem] mx-auto flex flex-col gap-8">
+    <div id="lock-screen" class="flex items-center justify-center">
+        <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-sm w-full text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900 mb-1">CONFIDENTIAL</h2>
+            <p class="text-sm text-gray-500 mb-6">Please enter the password to access the document.</p>
+            
+            <form id="login-form" onsubmit="event.preventDefault(); checkPassword();">
+                <input type="password" id="pwd-input" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 mb-4 text-center tracking-widest" placeholder="Password" required>
+                <p id="error-msg" class="text-xs text-red-500 mb-4 hidden">Incorrect password.</p>
+                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded transition duration-150 ease-in-out">
+                    Access Document
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-content" class="p-6 md:p-12 max-w-[90rem] mx-auto flex flex-col gap-8">
         
         <div class="flex flex-col md:flex-row justify-between items-end bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div>
+                <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md text-xs font-medium bg-red-100 text-red-800 mb-3">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                    CONFIDENTIAL
+                </span>
                 <h1 class="text-3xl font-bold text-gray-900 mb-2">Beauty Product Live Price List</h1>
                 <p class="text-gray-500">Exchange Rate Source: Open Exchange Rates API (open.er-api.com)</p>
                 <p class="text-gray-500 text-sm mt-1">Payment: 100% in advance | Incoterms: FOB BUSAN or ICHEON</p>
@@ -78,26 +114,47 @@
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
 
-        // Supabase Initialization
+        // --- PASSWORD PROTECTION LOGIC ---
+        function checkPassword() {
+            const pwd = document.getElementById('pwd-input').value;
+            const errorMsg = document.getElementById('error-msg');
+            
+            // Set password here (0905)
+            if (pwd === "0905") {
+                // Hide lock screen
+                document.getElementById('lock-screen').style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById('lock-screen').style.display = "none";
+                    // Show main content
+                    const mainContent = document.getElementById('main-content');
+                    mainContent.style.display = "flex";
+                    setTimeout(() => { mainContent.style.opacity = "1"; }, 50);
+                    
+                    // Initialize Dashboard only after successful login
+                    initDashboard();
+                }, 300);
+            } else {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('pwd-input').value = "";
+                document.getElementById('pwd-input').focus();
+            }
+        }
+
+        // --- SUPABASE & DASHBOARD LOGIC ---
         const SUPABASE_URL = 'https://rayhgqcpupwmwpymtkwg.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Currency Formatting Helper
         function formatCurrency(symbol, amount) {
             if (amount === null || amount === undefined || amount === 0) return '<div class="text-center w-full text-gray-400">-</div>';
             const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(amount);
             return `<div class="currency-cell"><span>${symbol}</span><span>${formattedAmount}</span></div>`;
         }
 
-        // Split Product Name and Volume (e.g., "Product Name 30ml" -> "Product Name", "30ml")
         function extractNameAndVolume(fullName) {
             if (!fullName) return { name: '-', volume: '-' };
-            
-            // Regex to find trailing volume (e.g., 30ml, 5EA, 15ml 3ea)
             const match = fullName.match(/(.*?)\s+(\d+\s*[a-zA-Z]+(?:\s*\d+\s*[a-zA-Z]+)?)$/);
-            
             if (match) {
                 return { name: match[1].trim(), volume: match[2].trim() };
             }
@@ -106,7 +163,7 @@
 
         async function initDashboard() {
             try {
-                // 1. Fetch Live Exchange Rate
+                // Fetch Live Exchange Rate
                 let krwRate = 1400; 
                 try {
                     const exRes = await fetch('https://open.er-api.com/v6/latest/USD');
@@ -118,7 +175,7 @@
                     console.error("Exchange API Error:", e);
                 }
 
-                // 2. Fetch Data from Supabase
+                // Fetch Data from Supabase
                 const { data: dbProducts, error } = await supabaseClient
                     .from('products')
                     .select(`
@@ -146,13 +203,12 @@
                     return;
                 }
 
-                // 3. Filter Categories
+                // Filter Categories
                 const faceDevices = dbProducts.filter(p => p.sub_category === 'Device-face');
                 const faceCosmetics = dbProducts.filter(p => p.sub_category === 'Product-face');
                 const hairDevices = dbProducts.filter(p => p.sub_category === 'Device-hair');
                 const hairCosmetics = dbProducts.filter(p => p.sub_category === 'Product-hair');
 
-                // Helper functions to render rows
                 function renderHeader(title, isMain) {
                     const tr = document.createElement('tr');
                     if (isMain) {
@@ -177,7 +233,6 @@
                         const b2b3 = usdPrice.b2b_tier3_30_to_70_ct;
                         const liveKrwB2b = (b2b1 && b2b1 > 0) ? b2b1 * krwRate : null;
 
-                        // Split Name and Volume
                         const { name, volume } = extractNameAndVolume(p.name_en);
 
                         tr.innerHTML = `
@@ -195,41 +250,25 @@
                     });
                 }
 
-                // 4. Build Table Order
-                // FACE
+                // Build Table
                 renderHeader('FACE CATEGORY', true);
-                if (faceDevices.length > 0) {
-                    renderHeader('DEVICE', false);
-                    renderProducts(faceDevices);
-                }
-                if (faceCosmetics.length > 0) {
-                    renderHeader('COSMETIC', false);
-                    renderProducts(faceCosmetics);
-                }
+                if (faceDevices.length > 0) { renderHeader('DEVICE', false); renderProducts(faceDevices); }
+                if (faceCosmetics.length > 0) { renderHeader('COSMETIC', false); renderProducts(faceCosmetics); }
 
-                // HAIR
                 renderHeader('HAIR CATEGORY', true);
-                if (hairDevices.length > 0) {
-                    renderHeader('DEVICE', false);
-                    renderProducts(hairDevices);
-                }
-                if (hairCosmetics.length > 0) {
-                    renderHeader('COSMETIC', false);
-                    renderProducts(hairCosmetics);
-                }
+                if (hairDevices.length > 0) { renderHeader('DEVICE', false); renderProducts(hairDevices); }
+                if (hairCosmetics.length > 0) { renderHeader('COSMETIC', false); renderProducts(hairCosmetics); }
 
             } catch (err) {
                 console.error("Data Load Error:", err);
                 document.getElementById('price-table-body').innerHTML = `
                     <tr><td colspan="9" class="text-center py-10 text-red-500">
                         Failed to load data.<br>
-                        <span class="text-sm">Please check your Row Level Security (RLS) policies or Database connection.</span>
+                        <span class="text-sm">Please check your database connection.</span>
                     </td></tr>
                 `;
             }
         }
-
-        initDashboard();
     </script>
 </body>
 </html>
