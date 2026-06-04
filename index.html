@@ -14,7 +14,7 @@
         #lock-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #f1f5f9;
-            display: flex; flex-direction: column; justify-content: center; items-center: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 50; transition: opacity 0.3s ease;
         }
         
@@ -34,6 +34,10 @@
         
         /* Currency Alignment Magic */
         .currency-cell { display: flex; justify-content: space-between; width: 100%; min-width: 65px; }
+
+        /* Medical Table specifics */
+        .med-cell-bordered { border-right: 1px solid #e2e8f0; }
+        .med-cell-bottom { border-bottom: 1px solid #e2e8f0; }
     </style>
 </head>
 <body class="text-gray-800">
@@ -58,7 +62,7 @@
         </div>
     </div>
 
-    <div id="main-content" class="p-6 md:p-12 max-w-[90rem] mx-auto flex flex-col gap-8">
+    <div id="main-content" class="p-6 md:p-12 max-w-[95rem] mx-auto flex flex-col gap-8">
         
         <div class="flex flex-col md:flex-row justify-between items-end bg-white p-6 rounded-lg shadow-sm border border-gray-200">
             <div>
@@ -93,7 +97,7 @@
             </div>
         </div>
 
-        <div class="overflow-x-auto rounded-lg table-container bg-white">
+        <div class="overflow-x-auto rounded-lg table-container bg-white border border-gray-300">
             <table class="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                     <tr>
@@ -101,7 +105,7 @@
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">Volume</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">Quantity</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">CT Qty</th>
-                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">USD MSRP</th>
+                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">MSRP</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center text-blue-300">Promo (B2C)</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center text-green-300">B2B (1-10CT)</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center text-green-300">B2B (10-30CT)</th>
@@ -113,6 +117,47 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="mt-8 mb-2 flex justify-between items-end">
+            <h2 class="text-2xl font-bold text-gray-900 border-l-4 border-slate-800 pl-3">Medical Aesthetic Product Line</h2>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg table-container bg-white border border-gray-300 mb-8">
+            <table class="w-full text-left border-collapse whitespace-nowrap">
+                <thead>
+                    <!-- Main grouped headers -->
+                    <tr>
+                        <th rowspan="2" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle">Cat.</th>
+                        <th rowspan="2" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle">Brand</th>
+                        <th rowspan="2" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle">Item</th>
+                        <th rowspan="2" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle">Ingredients</th>
+                        <th rowspan="2" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle">Type</th>
+                        <th rowspan="2" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle">specs</th>
+                        <th colspan="2" class="py-2 px-4 font-semibold text-sm tracking-wider text-center border-b border-r border-slate-600 bg-slate-700">Clinic</th>
+                        <th colspan="4" class="py-2 px-4 font-semibold text-sm tracking-wider text-center border-b border-r border-slate-600 bg-slate-700">Distributor</th>
+                        <th colspan="3" class="py-2 px-4 font-semibold text-sm tracking-wider text-center border-b border-slate-600 bg-slate-700">OEM</th>
+                    </tr>
+                    <!-- Sub headers with combined Tier/Percentage -->
+                    <tr>
+                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight">MSRP<br><span class="text-slate-300">100%</span></th>
+                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight">Promotion<br><span class="text-slate-300">80%</span></th>
+                        
+                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight">1,000<br><span class="text-slate-300 font-normal">40%</span></th>
+                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight">3,000<br><span class="text-slate-300 font-normal">37%</span></th>
+                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight">5,000<br><span class="text-slate-300 font-normal">34%</span></th>
+                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight">10,000<br><span class="text-slate-300 font-normal">31%</span></th>
+                        
+                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight">10,000<br><span class="text-slate-300 font-normal">28%</span></th>
+                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight">30,000<br><span class="text-slate-300 font-normal">25%</span></th>
+                        <th class="py-2 px-2 text-center text-xs bg-slate-700 leading-tight">50,000<br><span class="text-slate-300 font-normal">22%</span></th>
+                    </tr>
+                </thead>
+                <tbody id="medical-table-body" class="text-sm">
+                    <tr><td colspan="15" class="text-center py-10 text-gray-500 italic">Fetching medical aesthetic data from server...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="-mt-6 text-sm text-gray-500 font-medium">*Head of Division's Discretion: Max. 5% FOC</div>
         
     </div>
 
@@ -153,11 +198,13 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- GLOBAL STATE FOR CURRENCY TOGGLE ---
+        // --- GLOBAL STATE & STATIC DATA ---
         let currentCurrency = 'USD';
         let globalKrwRate = 1400;
         let globalUniqueProducts = [];
+        let globalMedicalProducts = [];
 
+        // --- STREAMING_CHUNK:Currency Toggle & Number Formatting... ---
         function setCurrency(currency) {
             currentCurrency = currency;
             document.getElementById('unit-display').textContent = `[Unit: ${currency}]`;
@@ -173,12 +220,12 @@
                 btnUsd.className = "px-3 py-1 rounded-md text-sm font-bold text-gray-500 hover:text-gray-700 transition-all";
             }
             
-            renderTableData();
+            renderTableData();          // Update Main live table
+            renderMedicalTableData();   // Update Medical hardcoded table
         }
 
         function formatCurrency(amount) {
             if (amount === null || amount === undefined || amount === 0) return '<div class="text-center w-full text-gray-400">-</div>';
-            // 달러는 최대 소수점 2자리, 원화(KRW)는 소수점 없이 표기
             const fractionDigits = currentCurrency === 'KRW' ? 0 : 2;
             const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: fractionDigits }).format(amount);
             return `<div class="text-center w-full">${formattedAmount}</div>`;
@@ -191,36 +238,24 @@
             let volume = '-';
             let qty = '-';
 
-            // 단위(EA, ea, PCS 등)를 모두 소문자로 통일하는 함수 추가
             const formatQty = (q) => q.trim().toLowerCase();
 
-            // 정규식을 통해 Volume과 Quantity 분리 추출 (예: 50ml x 5ea, 50ml 5ea 등)
             const volQtyMatch = fullName.match(/(.*?)\s+(\d+\.?\d*\s*(?:ml|g|oz|kg|l|fl\.oz))\s*(?:x|\*|X)?\s*(\d+\s*(?:ea|pcs|p|sheets|pads|매|개))$/i);
-            if (volQtyMatch) {
-                return { name: volQtyMatch[1].trim(), volume: volQtyMatch[2].trim(), qty: formatQty(volQtyMatch[3]) };
-            }
+            if (volQtyMatch) return { name: volQtyMatch[1].trim(), volume: volQtyMatch[2].trim(), qty: formatQty(volQtyMatch[3]) };
 
-            // Volume만 있는 경우 (예: 50ml)
             const volMatch = fullName.match(/(.*?)\s+(\d+\.?\d*\s*(?:ml|g|oz|kg|l|fl\.oz))$/i);
-            if (volMatch) {
-                return { name: volMatch[1].trim(), volume: volMatch[2].trim(), qty: '-' };
-            }
+            if (volMatch) return { name: volMatch[1].trim(), volume: volMatch[2].trim(), qty: '-' };
 
-            // Quantity만 있는 경우 (예: 5ea)
             const qtyMatch = fullName.match(/(.*?)\s+(\d+\s*(?:ea|pcs|p|sheets|pads|매|개))$/i);
-            if (qtyMatch) {
-                return { name: qtyMatch[1].trim(), volume: '-', qty: formatQty(qtyMatch[2]) };
-            }
+            if (qtyMatch) return { name: qtyMatch[1].trim(), volume: '-', qty: formatQty(qtyMatch[2]) };
 
-            // 그 외의 경우 (기존 방식 유지 - 알 수 없는 영문/숫자 조합)
             const genericMatch = fullName.match(/(.*?)\s+(\d+\s*[a-zA-Z]+(?:\s*(?:x|\*|X)?\s*\d+\s*[a-zA-Z]+)?)$/);
-            if (genericMatch) {
-                return { name: genericMatch[1].trim(), volume: genericMatch[2].trim(), qty: '-' };
-            }
+            if (genericMatch) return { name: genericMatch[1].trim(), volume: genericMatch[2].trim(), qty: '-' };
 
             return { name, volume, qty };
         }
 
+        // --- STREAMING_CHUNK:Fetching live API & DB Data... ---
         async function initDashboard() {
             try {
                 // Fetch Live Exchange Rate
@@ -252,31 +287,41 @@
                     `)
                     .order('created_at', { ascending: true });
 
+                // Fetch Medical Aesthetic Data
+                const { data: dbMedProducts, error: medError } = await supabaseClient
+                    .from('medical_aesthetic_products')
+                    .select('*')
+                    .order('sort_order', { ascending: true });
+
                 if (error) throw error;
+                if (medError) throw medError;
 
                 const tbody = document.getElementById('price-table-body');
                 tbody.innerHTML = '';
 
                 if (!dbProducts || dbProducts.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="9" class="text-center py-10 text-red-500">No product data found in database.</td></tr>`;
+                    // Render medical table regardless
+                    renderMedicalTableData();
                     return;
                 }
 
-                // --- 제품 중복 제거 로직 추가 ---
+                // Remove Duplicates based on name_en
                 const uniqueProductsMap = new Map();
                 dbProducts.forEach(product => {
-                    // name_en을 키로 사용하여 첫 번째로 발견된 제품만 맵에 저장합니다.
                     if (product.name_en && !uniqueProductsMap.has(product.name_en)) {
                         uniqueProductsMap.set(product.name_en, product);
                     }
                 });
                 
-                // 중복이 제거된 제품 배열을 생성합니다.
                 globalUniqueProducts = Array.from(uniqueProductsMap.values());
-                // ---------------------------------
+                if (dbMedProducts) {
+                    globalMedicalProducts = dbMedProducts;
+                }
 
-                // 테이블 렌더링 함수 호출
+                // Initial Renders
                 renderTableData();
+                renderMedicalTableData();
 
             } catch (err) {
                 console.error("Data Load Error:", err);
@@ -289,6 +334,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Rendering DOM Table Functions... ---
         function renderTableData() {
             const tbody = document.getElementById('price-table-body');
             tbody.innerHTML = '';
@@ -298,7 +344,6 @@
                 return;
             }
 
-            // Filter Categories
             const faceDevices = globalUniqueProducts.filter(p => p.sub_category === 'Device-face');
             const faceCosmetics = globalUniqueProducts.filter(p => p.sub_category === 'Product-face');
             const hairDevices = globalUniqueProducts.filter(p => p.sub_category === 'Device-hair');
@@ -347,14 +392,22 @@
                     const tr = document.createElement('tr');
                     tr.className = "border-b border-gray-200 text-sm";
                     
-                    // 현재 선택된 통화가 KRW일 경우 환율을 곱함
                     const rate = currentCurrency === 'KRW' ? globalKrwRate : 1;
 
-                    const b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
-                    const b2c_promotion = usdPrice.b2c_promotion ? usdPrice.b2c_promotion * rate : null;
-                    const b2b1 = usdPrice.b2b_tier1_1_to_10_ct ? usdPrice.b2b_tier1_1_to_10_ct * rate : null;
-                    const b2b2 = usdPrice.b2b_tier2_10_to_30_ct ? usdPrice.b2b_tier2_10_to_30_ct * rate : null;
-                    const b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
+                    let b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
+                    let b2c_promotion = usdPrice.b2c_promotion ? usdPrice.b2c_promotion * rate : null;
+                    let b2b1 = usdPrice.b2b_tier1_1_to_10_ct ? usdPrice.b2b_tier1_1_to_10_ct * rate : null;
+                    let b2b2 = usdPrice.b2b_tier2_10_to_30_ct ? usdPrice.b2b_tier2_10_to_30_ct * rate : null;
+                    let b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
+
+                    // KRW로 변환 시 백원 단위에서 반올림 (천원 단위로 표기)
+                    if (currentCurrency === 'KRW') {
+                        b2c_msrp = b2c_msrp ? Math.round(b2c_msrp / 1000) * 1000 : null;
+                        b2c_promotion = b2c_promotion ? Math.round(b2c_promotion / 1000) * 1000 : null;
+                        b2b1 = b2b1 ? Math.round(b2b1 / 1000) * 1000 : null;
+                        b2b2 = b2b2 ? Math.round(b2b2 / 1000) * 1000 : null;
+                        b2b3 = b2b3 ? Math.round(b2b3 / 1000) * 1000 : null;
+                    }
 
                     const { name, volume, qty } = extractNameVolumeQty(p.name_en);
 
@@ -378,15 +431,8 @@
                 });
             }
             
-            // 코스메틱 제품군을 세부 카테고리별로 분할하여 렌더링
             function renderCategorizedCosmetics(cosmetics) {
-                const groups = {
-                    'AMPOULE BOOSTER': [],
-                    'AMPOULE': [],
-                    'MASK': [],
-                    'CREAM': [],
-                    'SHAMPOO': []
-                };
+                const groups = { 'AMPOULE BOOSTER': [], 'AMPOULE': [], 'MASK': [], 'CREAM': [], 'SHAMPOO': [] };
                 
                 cosmetics.forEach(p => {
                     const type = getCosmeticType(p.name_en);
@@ -401,20 +447,113 @@
                 });
             }
 
-            // Build Table
             renderHeader('FACE CATEGORY', 1);
             if (faceDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(faceDevices); }
-            if (faceCosmetics.length > 0) { 
-                renderHeader('COSMETIC', 2); 
-                renderCategorizedCosmetics(faceCosmetics); 
-            }
+            if (faceCosmetics.length > 0) { renderHeader('COSMETIC', 2); renderCategorizedCosmetics(faceCosmetics); }
 
             renderHeader('HAIR CATEGORY', 1);
             if (hairDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(hairDevices); }
-            if (hairCosmetics.length > 0) { 
-                renderHeader('COSMETIC', 2); 
-                renderCategorizedCosmetics(hairCosmetics); 
+            if (hairCosmetics.length > 0) { renderHeader('COSMETIC', 2); renderCategorizedCosmetics(hairCosmetics); }
+        }
+
+        // --- STREAMING_CHUNK:Rendering Dynamic Medical Table... ---
+        function renderMedicalTableData() {
+            const tbody = document.getElementById('medical-table-body');
+            tbody.innerHTML = '';
+
+            const filteredData = globalMedicalProducts.filter(p => p.currency === currentCurrency);
+
+            if (!filteredData || filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="15" class="text-center py-10 text-red-500">No medical aesthetic data found in database.</td></tr>`;
+                return;
             }
+
+            // Calculate Rowspans dynamically for specific columns to match the image UI
+            let spans = { category: [], brand: [], item: [], ingredients: [], type: [] };
+            let fields = ['category', 'brand', 'item', 'ingredients', 'type'];
+            
+            filteredData.forEach(() => fields.forEach(f => spans[f].push(1)));
+
+            for (let i = filteredData.length - 1; i > 0; i--) {
+                for (let f of fields) {
+                    let match = true;
+                    for (let prev of fields) {
+                        if (filteredData[i][prev] !== filteredData[i-1][prev]) {
+                            match = false; break;
+                        }
+                        if (prev === f) break; 
+                    }
+                    if (match) {
+                        spans[f][i-1] += spans[f][i];
+                        spans[f][i] = 0; 
+                    }
+                }
+            }
+
+            // Helper to insert custom line breaks exactly like the design
+            const insertLineBreaks = (text) => {
+                if (!text) return '-';
+                return text.replace('Skin Booster', 'Skin<br>Booster')
+                           .replace('Wound Care', 'Wound<br>Care')
+                           .replace('Crystal Plus', 'Crystal<br>Plus')
+                           .replace('Chitosan-based /', 'Chitosan-<br>based /')
+                           .replace('Chitosan-based', 'Chitosan-<br>based')
+                           .replace('Chitosan+dECM', 'Chitosan+<br>dECM')
+                           .replace('6 vial/B 3cc * 3cc', '6 vial/B<br>3cc * 3cc')
+                           .replace('2 vial/B (3.3cc)', '2 vial/B<br>(3.3cc)')
+                           .replace('6 vial/B (3.3cc)', '6 vial/B<br>(3.3cc)');
+            };
+
+            const fmt = (val) => {
+                if (val === null || val === undefined) return '<span class="text-gray-400 italic">sample</span>';
+                return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val);
+            };
+
+            filteredData.forEach((row, index) => {
+                let tr = document.createElement('tr');
+                tr.className = "med-cell-bottom hover:bg-slate-50 transition-colors bg-white";
+                
+                // Add top border when a new main category starts
+                if (index > 0 && spans['category'][index] > 0) {
+                    tr.classList.add('border-t-2', 'border-gray-200');
+                }
+
+                let html = '';
+                
+                const renderCell = (field, classes) => {
+                    if (spans[field][index] > 0) {
+                        html += `<td rowspan="${spans[field][index]}" class="py-3 px-4 text-center med-cell-bordered align-middle ${classes}">${insertLineBreaks(row[field])}</td>`;
+                    }
+                };
+
+                renderCell('category', 'font-bold text-gray-700 bg-white');
+                renderCell('brand', 'font-medium bg-white');
+                renderCell('item', 'bg-white');
+                renderCell('ingredients', 'text-xs bg-white');
+                renderCell('type', 'bg-white');
+                
+                html += `<td class="py-3 px-4 text-center med-cell-bordered text-xs">${insertLineBreaks(row.specs)}</td>`;
+                
+                // Sample Logic for MSRP & Promo
+                if (row.clinic_msrp === null) {
+                    html += `<td colspan="2" class="py-3 px-3 text-center font-medium text-gray-400 italic med-cell-bordered">sample</td>`;
+                } else {
+                    html += `<td class="py-3 px-3 text-right font-medium">${fmt(row.clinic_msrp)}</td>`;
+                    html += `<td class="py-3 px-3 text-right font-medium text-blue-600 med-cell-bordered">${fmt(row.clinic_promotion)}</td>`;
+                }
+
+                html += `<td class="py-3 px-3 text-right font-medium bg-gray-50">${fmt(row.dist_1000)}</td>`;
+                html += `<td class="py-3 px-3 text-right font-medium bg-gray-50">${fmt(row.dist_3000)}</td>`;
+                html += `<td class="py-3 px-3 text-right font-medium bg-gray-50">${fmt(row.dist_5000)}</td>`;
+                html += `<td class="py-3 px-3 text-right font-medium bg-gray-50 med-cell-bordered">${fmt(row.dist_10000)}</td>`;
+                
+                html += `<td class="py-3 px-3 text-right font-medium bg-blue-50/30">${fmt(row.oem_10000)}</td>`;
+                html += `<td class="py-3 px-3 text-right font-medium bg-blue-50/30">${fmt(row.oem_30000)}</td>`;
+                html += `<td class="py-3 px-3 text-right font-medium bg-blue-50/30">${fmt(row.oem_50000)}</td>`;
+
+                tr.innerHTML = html;
+                tbody.appendChild(tr);
+            });
         }
     </script>
 </body>
