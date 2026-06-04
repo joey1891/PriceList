@@ -1,3 +1,4 @@
+<!-- ... existing code ... -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,15 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confidential - MEDIFAB Product Live Price List</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #111827; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
         
         /* Lock Screen Styles */
         #lock-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 50; transition: opacity 0.3s ease;
         }
@@ -21,156 +23,154 @@
         /* Main Content hidden initially */
         #main-content { display: none; opacity: 0; transition: opacity 0.5s ease; }
 
-        .table-container { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-        th.main-th { background-color: #1e293b; color: white; }
+        .table-container { 
+            border: 1px solid #e5e7eb;
+            border-radius: 0; /* sharper edges for premium feel */
+        }
         
-        /* Category Header Styling */
-        .category-header { background-color: #334155; color: white; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-        .sub-category-header { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 0.875rem; letter-spacing: 0.025em; border-bottom: 2px solid #e2e8f0; }
+        th.main-th { background-color: #111827; color: white; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem; }
         
-        /* Alternate Row Colors */
-        .cosmetic-table tr:nth-child(even):not(.category-header):not(.sub-category-header) { background-color: #f1f5f9; }
-        .cosmetic-table tr:hover:not(.category-header):not(.sub-category-header) { background-color: #e2e8f0; transition: background-color 0.2s ease; }
+        /* Alternate Row Colors - Softer for premium feel */
+        .cosmetic-table tr:nth-child(even):not(.category-header):not(.sub-category-header) { background-color: #fafafa; }
+        .cosmetic-table tr:hover:not(.category-header):not(.sub-category-header) { background-color: #f3f4f6; transition: background-color 0.2s ease; }
         
         /* Currency Alignment Magic */
         .currency-cell { display: flex; justify-content: space-between; width: 100%; min-width: 65px; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white">
 
     <!-- Lock Screen -->
     <div id="lock-screen" class="flex items-center justify-center">
-        <div class="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-sm w-full text-center">
-            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                </svg>
-            </div>
-            <h2 class="text-xl font-bold text-gray-900 mb-1">CONFIDENTIAL</h2>
-            <p class="text-sm text-gray-500 mb-6">Please enter the password to access the document.</p>
+        <div class="bg-white p-10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 max-w-sm w-full text-center">
+            <h2 class="text-2xl font-extrabold text-gray-900 mb-2 font-montserrat tracking-widest uppercase">MEDIFAB</h2>
+            <div class="w-8 h-0.5 bg-gray-900 mx-auto mb-6"></div>
+            <p class="text-sm text-gray-500 mb-8 font-medium">Classified Document Access</p>
             
             <form id="login-form" onsubmit="event.preventDefault(); checkPassword();">
-                <input type="password" id="pwd-input" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500 mb-4 text-center tracking-widest" placeholder="Password" required>
-                <p id="error-msg" class="text-xs text-red-500 mb-4 hidden">Incorrect password.</p>
-                <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded transition duration-150 ease-in-out">
-                    Access Document
+                <input type="password" id="pwd-input" class="w-full px-4 py-3 border-b-2 border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-900 focus:outline-none transition-colors mb-4 text-center tracking-widest font-mono" placeholder="ENTER PASSWORD" required>
+                <p id="error-msg" class="text-xs text-red-500 mb-4 hidden font-medium">Authentication failed.</p>
+                <button type="submit" class="w-full bg-gray-900 hover:bg-black text-white font-semibold tracking-widest text-sm py-3 px-4 uppercase transition duration-200 ease-in-out">
+                    Access System
                 </button>
             </form>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div id="main-content" class="p-6 md:p-12 max-w-[95rem] mx-auto flex flex-col gap-8">
+    <div id="main-content" class="p-6 md:p-12 max-w-[95rem] mx-auto flex flex-col gap-10">
         
         <!-- Header Section -->
-        <div class="flex flex-col md:flex-row justify-between items-end bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div class="flex flex-col md:flex-row justify-between items-end pb-6 border-b-2 border-gray-900">
             <div>
-                <span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-md text-xs font-medium bg-red-100 text-red-800 mb-3">
+                <span class="inline-flex items-center gap-1.5 py-1 px-2 mb-4 border border-gray-900 text-[10px] font-bold tracking-widest text-gray-900 uppercase">
                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
-                    CONFIDENTIAL
+                    Confidential
                 </span>
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">MEDIFAB Product Live Price List</h1>
-                <p class="text-gray-500">Exchange Rate Source: Open Exchange Rates API (open.er-api.com)</p>
-                <p class="text-gray-500 text-sm mt-1">Payment: 100% in advance | Incoterms: FOB BUSAN or ICHEON</p>
+                <h1 class="text-4xl font-extrabold text-gray-900 mb-2 font-montserrat tracking-tight">MEDIFAB GLOBAL</h1>
+                <h2 class="text-xl text-gray-500 font-montserrat tracking-wide mb-4">Product Live Price List</h2>
+                <div class="text-xs text-gray-400 uppercase tracking-widest space-y-1">
+                    <p>Exchange Rate Source: Open Exchange Rates API</p>
+                    <p>Payment: 100% in advance | Incoterms: FOB BUSAN or ICHEON</p>
+                </div>
             </div>
-            <div class="mt-4 md:mt-0 text-right">
-                <div class="text-sm font-semibold text-gray-500 mb-1" id="current-date">Today: ...</div>
-                <div class="bg-blue-50 text-blue-700 px-4 py-3 rounded-md border border-blue-200">
-                    <span class="block text-xs uppercase tracking-wide font-bold mb-1">Live Exchange Rate (USD/KRW)</span>
-                    <span class="text-2xl font-black font-mono" id="live-rate">Loading...</span>
+            <div class="mt-6 md:mt-0 text-right">
+                <div class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2" id="current-date">Today: ...</div>
+                <div class="bg-gray-50 px-5 py-4 border border-gray-200">
+                    <span class="block text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Live Exchange Rate (USD/KRW)</span>
+                    <span class="text-2xl font-light font-montserrat tracking-tight text-gray-900" id="live-rate">Loading...</span>
                 </div>
             </div>
         </div>
 
-        <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded shadow-sm flex justify-between items-center">
-            <p class="text-sm text-amber-800">
-                <strong>Notice:</strong> Product and price information is fetched live from the database. 
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-gray-50 p-4 border border-gray-200">
+            <p class="text-sm text-gray-600">
+                <strong class="text-gray-900 font-montserrat">NOTICE</strong> &nbsp;|&nbsp; Product and price information is fetched live from the secure database.
             </p>
             <div class="flex items-center gap-4">
-                <span class="text-sm font-bold text-gray-600 tracking-wide" id="unit-display">[Unit: USD]</span>
-                <div class="bg-gray-200 p-1 rounded-lg flex inline-flex">
-                    <button id="btn-usd" onclick="setCurrency('USD')" class="px-3 py-1 rounded-md text-sm font-bold bg-white shadow-sm text-gray-800 transition-all">USD</button>
-                    <button id="btn-krw" onclick="setCurrency('KRW')" class="px-3 py-1 rounded-md text-sm font-bold text-gray-500 hover:text-gray-700 transition-all">KRW</button>
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest" id="unit-display">[Unit: USD]</span>
+                <div class="bg-gray-200 p-1 flex inline-flex">
+                    <button id="btn-usd" onclick="setCurrency('USD')" class="px-4 py-1.5 text-xs font-bold bg-white shadow-sm text-gray-900 transition-all uppercase tracking-wider">USD</button>
+                    <button id="btn-krw" onclick="setCurrency('KRW')" class="px-4 py-1.5 text-xs font-bold text-gray-500 hover:text-gray-900 transition-all uppercase tracking-wider">KRW</button>
                 </div>
             </div>
         </div>
 
         <!-- 1. Cosmetic Product Line -->
-        <div class="mt-4 flex justify-between items-end">
-            <h2 class="text-2xl font-bold text-gray-900">Beauty Device / Cosmetic Product Line</h2>
+        <div class="mt-2 flex justify-between items-end">
+            <h2 class="text-xl font-bold text-gray-900 font-montserrat uppercase tracking-wider">Beauty Device / Cosmetic Product Line</h2>
         </div>
-        <div class="overflow-x-auto rounded-lg table-container bg-white">
+        <div class="overflow-x-auto table-container bg-white mb-4">
             <table class="w-full text-left border-collapse whitespace-nowrap cosmetic-table">
                 <thead>
                     <tr>
-                        <th class="main-th py-4 px-4 font-semibold text-sm tracking-wider w-1/4">Product Name</th>
-                        <th class="main-th py-4 px-4 font-semibold text-sm tracking-wider text-center">Volume</th>
-                        <th class="main-th py-4 px-4 font-semibold text-sm tracking-wider text-center">Quantity</th>
-                        <th class="main-th py-4 px-4 font-semibold text-sm tracking-wider text-center">CT Qty</th>
-                        <th class="main-th py-4 px-4 font-semibold text-sm tracking-wider text-center">USD MSRP</th>
-                        <th class="main-th py-4 px-4 font-semibold text-sm tracking-wider text-center text-blue-300">Promo (B2C)</th>
-                        <th class="main-th py-4 px-4 font-semibold text-sm tracking-wider text-center text-green-300">B2B (1-10CT)</th>
-                        <th class="main-th py-4 px-4 font-semibold text-sm tracking-wider text-center text-green-300">B2B (10-30CT)</th>
-                        <th class="main-th py-4 px-4 font-semibold text-sm tracking-wider text-center text-green-300">B2B (30-70CT)</th>
+                        <th class="main-th py-3 px-4 font-semibold">Product Name</th>
+                        <th class="main-th py-3 px-4 font-semibold text-center">Volume</th>
+                        <th class="main-th py-3 px-4 font-semibold text-center">Quantity</th>
+                        <th class="main-th py-3 px-4 font-semibold text-center">CT Qty</th>
+                        <th class="main-th py-3 px-4 font-semibold text-center border-l border-gray-700">MSRP</th>
+                        <th class="main-th py-3 px-4 font-semibold text-center text-gray-300">Promo (B2C)</th>
+                        <th class="main-th py-3 px-4 font-semibold text-center border-l border-gray-700">B2B (1-10CT)</th>
+                        <th class="main-th py-3 px-4 font-semibold text-center">B2B (10-30CT)</th>
+                        <th class="main-th py-3 px-4 font-semibold text-center">B2B (30-70CT)</th>
                     </tr>
                 </thead>
                 <tbody id="price-table-body">
-                    <tr><td colspan="9" class="text-center py-10 text-gray-500 italic">Fetching cosmetic data from server...</td></tr>
+                    <tr><td colspan="9" class="text-center py-10 text-gray-400 font-light text-sm italic">Fetching cosmetic data from server...</td></tr>
                 </tbody>
             </table>
         </div>
 
         <!-- 2. Medical Aesthetic Product Line -->
-        <div class="mt-10 mb-2 flex justify-between items-end">
-            <h2 class="text-2xl font-bold text-gray-900">Medical Aesthetic Product Line</h2>
+        <div class="mt-8 flex justify-between items-end">
+            <h2 class="text-xl font-bold text-gray-900 font-montserrat uppercase tracking-wider">Medical Aesthetic Product Line</h2>
         </div>
-        <div class="overflow-x-auto rounded-lg table-container bg-white border border-gray-300 mb-12">
+        <div class="overflow-x-auto table-container bg-white mb-12">
             <table class="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                     <!-- Main grouped headers -->
                     <tr>
-                        <th rowspan="3" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle bg-[#1e293b] text-white">Cat.</th>
-                        <th rowspan="3" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle bg-[#1e293b] text-white">Brand</th>
-                        <th rowspan="3" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle bg-[#1e293b] text-white">Item</th>
-                        <th rowspan="3" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle bg-[#1e293b] text-white">Ingredients</th>
-                        <th rowspan="3" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle bg-[#1e293b] text-white">Type</th>
-                        <th rowspan="3" class="py-3 px-4 font-semibold text-sm tracking-wider text-center border-r border-slate-600 align-middle bg-[#1e293b] text-white">specs</th>
-                        <th colspan="2" class="py-2 px-4 font-semibold text-sm tracking-wider text-center border-b border-r border-slate-600 bg-slate-700 text-white">Clinic</th>
-                        <th colspan="4" class="py-2 px-4 font-semibold text-sm tracking-wider text-center border-b border-r border-slate-600 bg-slate-700 text-white">Distributor</th>
-                        <th colspan="3" class="py-2 px-4 font-semibold text-sm tracking-wider text-center border-b border-slate-600 bg-slate-700 text-white">OEM</th>
+                        <th rowspan="3" class="main-th py-3 px-4 text-center align-middle border-b border-gray-800">Cat.</th>
+                        <th rowspan="3" class="main-th py-3 px-4 text-center align-middle border-b border-gray-800">Brand</th>
+                        <th rowspan="3" class="main-th py-3 px-4 text-center align-middle border-b border-gray-800">Item</th>
+                        <th rowspan="3" class="main-th py-3 px-4 text-center align-middle border-b border-gray-800">Ingredients</th>
+                        <th rowspan="3" class="main-th py-3 px-4 text-center align-middle border-b border-gray-800">Type</th>
+                        <th rowspan="3" class="main-th py-3 px-4 text-center align-middle border-b border-gray-800">specs</th>
+                        <th colspan="2" class="main-th py-2 px-4 text-center border-l border-gray-700 border-b border-gray-800 bg-gray-900">Clinic</th>
+                        <th colspan="4" class="main-th py-2 px-4 text-center border-l border-gray-700 border-b border-gray-800 bg-gray-900">Distributor</th>
+                        <th colspan="3" class="main-th py-2 px-4 text-center border-l border-gray-700 border-b border-gray-800 bg-gray-900">OEM</th>
                     </tr>
                     <!-- Sub headers -->
                     <tr>
-                        <th class="py-2 px-2 text-center text-xs border-b border-r border-slate-600 bg-slate-700 text-white leading-tight">MSRP</th>
-                        <th class="py-2 px-2 text-center text-xs border-b border-r border-slate-600 bg-slate-700 text-white leading-tight">Promotion</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-l border-b border-gray-700 bg-gray-800 text-gray-300 uppercase tracking-widest">MSRP</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-b border-gray-700 bg-gray-800 text-white uppercase tracking-widest">Promo</th>
                         
-                        <th class="py-2 px-2 text-center text-xs border-b border-r border-slate-600 bg-slate-700 text-white leading-tight">1,000</th>
-                        <th class="py-2 px-2 text-center text-xs border-b border-r border-slate-600 bg-slate-700 text-white leading-tight">3,000</th>
-                        <th class="py-2 px-2 text-center text-xs border-b border-r border-slate-600 bg-slate-700 text-white leading-tight">5,000</th>
-                        <th class="py-2 px-2 text-center text-xs border-b border-r border-slate-600 bg-slate-700 text-white leading-tight">10,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-l border-b border-gray-700 bg-gray-800 text-gray-300 uppercase tracking-widest">1,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-b border-gray-700 bg-gray-800 text-gray-300 uppercase tracking-widest">3,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-b border-gray-700 bg-gray-800 text-gray-300 uppercase tracking-widest">5,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-b border-gray-700 bg-gray-800 text-gray-300 uppercase tracking-widest">10,000</th>
                         
-                        <th class="py-2 px-2 text-center text-xs border-b border-r border-slate-600 bg-slate-700 text-white leading-tight">10,000</th>
-                        <th class="py-2 px-2 text-center text-xs border-b border-r border-slate-600 bg-slate-700 text-white leading-tight">30,000</th>
-                        <th class="py-2 px-2 text-center text-xs border-b bg-slate-700 text-white leading-tight">50,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-l border-b border-gray-700 bg-gray-800 text-gray-300 uppercase tracking-widest">10,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-b border-gray-700 bg-gray-800 text-gray-300 uppercase tracking-widest">30,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-b border-gray-700 bg-gray-800 text-gray-300 uppercase tracking-widest">50,000</th>
                     </tr>
-                    <!-- Percentage headers (별도의 행으로 분리) -->
+                    <!-- Percentage headers -->
                     <tr>
-                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight text-slate-300 font-normal">100%</th>
-                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight text-slate-300 font-normal">80%</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-l border-gray-700 bg-gray-800 text-gray-400 font-normal">100%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-800 text-gray-100 font-bold">80%</th>
                         
-                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight text-slate-300 font-normal">40%</th>
-                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight text-slate-300 font-normal">37%</th>
-                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight text-slate-300 font-normal">34%</th>
-                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight text-slate-300 font-normal">31%</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-l border-gray-700 bg-gray-800 text-gray-400 font-normal">40%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-800 text-gray-400 font-normal">37%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-800 text-gray-400 font-normal">34%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-800 text-gray-400 font-normal">31%</th>
                         
-                        <!-- OEM 변경된 비율 적용 및 강조 색상 -->
-                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight text-amber-300 font-bold">30%</th>
-                        <th class="py-2 px-2 text-center text-xs border-r border-slate-600 bg-slate-700 leading-tight text-amber-300 font-bold">28%</th>
-                        <th class="py-2 px-2 text-center text-xs bg-slate-700 leading-tight text-amber-300 font-bold">25%</th>
+                        <th class="py-2 px-2 text-center text-[10px] border-l border-gray-700 bg-gray-800 text-white font-bold">30%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-800 text-white font-bold">28%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-800 text-white font-bold">25%</th>
                     </tr>
                 </thead>
                 <tbody id="medical-table-body" class="text-sm bg-white">
-                    <tr><td colspan="15" class="text-center py-10 text-gray-500 italic">Fetching medical data from server...</td></tr>
+                    <tr><td colspan="15" class="text-center py-10 text-gray-400 font-light text-sm italic">Fetching medical data from server...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -223,11 +223,11 @@
             const btnKrw = document.getElementById('btn-krw');
             
             if (currency === 'USD') {
-                btnUsd.className = "px-3 py-1 rounded-md text-sm font-bold bg-white shadow-sm text-gray-800 transition-all";
-                btnKrw.className = "px-3 py-1 rounded-md text-sm font-bold text-gray-500 hover:text-gray-700 transition-all";
+                btnUsd.className = "px-4 py-1.5 text-xs font-bold bg-white shadow-sm text-gray-900 transition-all uppercase tracking-wider";
+                btnKrw.className = "px-4 py-1.5 text-xs font-bold text-gray-400 hover:text-gray-900 transition-all uppercase tracking-wider";
             } else {
-                btnKrw.className = "px-3 py-1 rounded-md text-sm font-bold bg-white shadow-sm text-gray-800 transition-all";
-                btnUsd.className = "px-3 py-1 rounded-md text-sm font-bold text-gray-500 hover:text-gray-700 transition-all";
+                btnKrw.className = "px-4 py-1.5 text-xs font-bold bg-white shadow-sm text-gray-900 transition-all uppercase tracking-wider";
+                btnUsd.className = "px-4 py-1.5 text-xs font-bold text-gray-400 hover:text-gray-900 transition-all uppercase tracking-wider";
             }
             
             renderTableData();          // Update Cosmetic table
@@ -235,12 +235,11 @@
         }
 
         function formatCurrency(amount, roundKrwToThousands = false) {
-            if (amount === null || amount === undefined || amount === 0) return '<div class="text-center w-full text-gray-400">-</div>';
+            if (amount === null || amount === undefined || amount === 0) return '<div class="text-center w-full text-gray-300">-</div>';
             
             let displayAmount = amount;
             const fractionDigits = currentCurrency === 'KRW' ? 0 : 2;
 
-            // KRW 변환 시 백원 단위에서 반올림 처리 (천원 단위 표기)
             if (currentCurrency === 'KRW' && roundKrwToThousands) {
                 displayAmount = Math.round(displayAmount / 1000) * 1000;
             }
@@ -249,7 +248,6 @@
             return `<div class="text-center w-full">${formattedAmount}</div>`;
         }
 
-        // 별도의 Medical 테이블 포매터 (Medical 테이블은 DB에 저장된 값을 그대로 소수점 없이 표출)
         function formatMedCurrency(amount) {
             if (amount === null || amount === undefined) return '<span class="text-gray-400">sample</span>';
             const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(amount);
@@ -280,7 +278,6 @@
 
         async function initDashboard() {
             try {
-                // 1. Fetch Exchange Rate
                 try {
                     const exRes = await fetch('https://open.er-api.com/v6/latest/USD');
                     const exData = await exRes.json();
@@ -291,7 +288,6 @@
                     console.error("Exchange API Error:", e);
                 }
 
-                // 2. Fetch Cosmetic Products
                 const { data: dbProducts, error: prodErr } = await supabaseClient
                     .from('products')
                     .select(`
@@ -301,7 +297,6 @@
                     .order('created_at', { ascending: true });
                 if (prodErr) throw prodErr;
 
-                // 제품 중복 제거
                 const uniqueProductsMap = new Map();
                 if (dbProducts) {
                     dbProducts.forEach(product => {
@@ -312,7 +307,6 @@
                 }
                 globalUniqueProducts = Array.from(uniqueProductsMap.values());
 
-                // 3. Fetch Medical Aesthetic Products
                 const { data: dbMedicals, error: medErr } = await supabaseClient
                     .from('medical_aesthetic_products')
                     .select('*')
@@ -320,7 +314,6 @@
                 if (medErr) throw medErr;
                 globalMedicalProducts = dbMedicals || [];
 
-                // 4. Render Both Tables
                 renderTableData();
                 renderMedicalTableData();
 
@@ -360,22 +353,22 @@
             function renderHeader(title, level) {
                 const tr = document.createElement('tr');
                 if (level === 1) { 
-                    tr.className = 'category-header';
-                    tr.innerHTML = `<td colspan="9" class="py-3 px-4">${title}</td>`;
+                    tr.className = 'category-header bg-white';
+                    tr.innerHTML = `<td colspan="9" class="py-5 px-4 font-montserrat font-bold text-lg text-gray-900 border-b-2 border-gray-900 uppercase tracking-widest">${title}</td>`;
                 } else if (level === 2) { 
-                    tr.className = 'sub-category-header bg-slate-200 text-slate-800 font-bold text-[15px] tracking-widest shadow-sm';
-                    tr.innerHTML = `<td colspan="9" class="py-3 px-5 border-y-2 border-slate-300">
+                    tr.className = 'sub-category-header bg-gray-50 border-y border-gray-200';
+                    tr.innerHTML = `<td colspan="9" class="py-3 px-5">
                         <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-                            <span>${title}</span>
+                            <div class="w-1.5 h-4 bg-gray-900"></div>
+                            <span class="text-gray-900 font-bold text-sm tracking-widest uppercase">${title}</span>
                         </div>
                     </td>`;
                 } else if (level === 3) { 
-                    tr.className = 'bg-slate-50 border-y border-slate-200';
+                    tr.className = 'bg-white border-b border-gray-100';
                     tr.innerHTML = `<td colspan="9" class="py-2.5 px-8">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm"></div>
-                            <span class="font-bold text-slate-700 text-sm tracking-widest">${title}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-400 text-[10px]">◆</span>
+                            <span class="font-semibold text-gray-600 text-xs tracking-widest uppercase">${title}</span>
                         </div>
                     </td>`;
                 }
@@ -387,12 +380,11 @@
                 products.forEach(p => {
                     const usdPrice = p.product_prices.find(pr => pr.currency === 'USD') || {};
                     const tr = document.createElement('tr');
-                    tr.className = "border-b border-gray-200 text-sm";
+                    tr.className = "border-b border-gray-100 text-sm hover:bg-gray-50 transition-colors";
                     
                     const rate = currentCurrency === 'KRW' ? globalKrwRate : 1;
                     const isKrw = currentCurrency === 'KRW';
 
-                    // true 파라미터를 넘겨서 KRW일 경우 백원 단위에서 반올림 연산을 수행
                     const b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
                     const b2c_promotion = usdPrice.b2c_promotion ? usdPrice.b2c_promotion * rate : null;
                     const b2b1 = usdPrice.b2b_tier1_1_to_10_ct ? usdPrice.b2b_tier1_1_to_10_ct * rate : null;
@@ -403,19 +395,19 @@
 
                     tr.innerHTML = `
                         <td class="py-3 pl-12 pr-6">
-                            <div class="flex items-center gap-2">
-                                <span class="text-slate-400 text-lg leading-none mb-1">↳</span>
-                                <span class="font-bold text-slate-800">${name}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-gray-300 text-sm">|</span>
+                                <span class="font-semibold text-gray-800">${name}</span>
                             </div>
                         </td>
-                        <td class="py-3 px-4 text-center font-medium text-gray-500">${volume}</td>
-                        <td class="py-3 px-4 text-center font-medium text-gray-500">${qty}</td>
-                        <td class="py-3 px-4 text-center text-gray-500">${p.ct_quantity || '-'}</td>
-                        <td class="py-3 px-4 text-gray-500">${formatCurrency(b2c_msrp, isKrw)}</td>
-                        <td class="py-3 px-4 font-bold text-blue-600">${formatCurrency(b2c_promotion, isKrw)}</td>
-                        <td class="py-3 px-4 font-bold text-green-600 bg-green-50/20">${formatCurrency(b2b1, isKrw)}</td>
-                        <td class="py-3 px-4 font-bold text-green-600 bg-green-50/20">${formatCurrency(b2b2, isKrw)}</td>
-                        <td class="py-3 px-4 font-bold text-green-600 bg-green-50/20">${formatCurrency(b2b3, isKrw)}</td>
+                        <td class="py-3 px-4 text-center text-gray-500 text-xs">${volume}</td>
+                        <td class="py-3 px-4 text-center text-gray-500 text-xs">${qty}</td>
+                        <td class="py-3 px-4 text-center text-gray-500 text-xs">${p.ct_quantity || '-'}</td>
+                        <td class="py-3 px-4 text-gray-500 border-l border-gray-100">${formatCurrency(b2c_msrp, isKrw)}</td>
+                        <td class="py-3 px-4 font-bold text-gray-900 bg-gray-50/50">${formatCurrency(b2c_promotion, isKrw)}</td>
+                        <td class="py-3 px-4 font-medium text-gray-700 border-l border-gray-100">${formatCurrency(b2b1, isKrw)}</td>
+                        <td class="py-3 px-4 font-medium text-gray-700">${formatCurrency(b2b2, isKrw)}</td>
+                        <td class="py-3 px-4 font-medium text-gray-700">${formatCurrency(b2b3, isKrw)}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -451,15 +443,13 @@
             const tbody = document.getElementById('medical-table-body');
             tbody.innerHTML = '';
 
-            // 선택된 통화(KRW or USD)에 해당하는 데이터만 필터링
             const filteredData = globalMedicalProducts.filter(d => d.currency === currentCurrency);
 
             if (!filteredData || filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="15" class="text-center py-10 text-gray-500 italic">No medical data available for ${currentCurrency}.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="15" class="text-center py-10 text-gray-400 font-light text-sm italic">No medical data available for ${currentCurrency}.</td></tr>`;
                 return;
             }
 
-            // --- Rowspan 자동 계산 로직 ---
             function calcSpans(key) {
                 let spanArr = [];
                 let currentVal = null;
@@ -478,7 +468,7 @@
                 let result = [];
                 spanArr.forEach(c => {
                     result.push(c);
-                    for(let i = 0; i < c - 1; i++) result.push(0); // 0 = td를 숨김 처리
+                    for(let i = 0; i < c - 1; i++) result.push(0);
                 });
                 return result;
             }
@@ -491,41 +481,40 @@
 
             filteredData.forEach((p, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-200 hover:bg-slate-50 transition-colors";
+                tr.className = "border-b border-gray-100 hover:bg-gray-50 transition-colors text-xs";
                 
                 let html = '';
                 
-                if (catSpans[idx] > 0) html += `<td rowspan="${catSpans[idx]}" class="py-3 px-4 text-center border-r border-gray-300 font-semibold text-gray-700 align-middle">${p.category || ''}</td>`;
-                if (brandSpans[idx] > 0) html += `<td rowspan="${brandSpans[idx]}" class="py-3 px-4 text-center border-r border-gray-300 text-gray-600 align-middle">${p.brand || ''}</td>`;
-                if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center border-r border-gray-300 font-medium text-gray-800 align-middle">${p.item || ''}</td>`;
-                if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center border-r border-gray-300 text-gray-600 align-middle">${p.ingredients || ''}</td>`;
-                if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center border-r border-gray-300 text-gray-600 align-middle">${p.type || ''}</td>`;
+                if (catSpans[idx] > 0) html += `<td rowspan="${catSpans[idx]}" class="py-3 px-4 text-center font-bold text-gray-900 tracking-wider uppercase align-middle">${p.category || ''}</td>`;
+                if (brandSpans[idx] > 0) html += `<td rowspan="${brandSpans[idx]}" class="py-3 px-4 text-center font-semibold text-gray-500 uppercase tracking-widest align-middle">${p.brand || ''}</td>`;
+                if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center font-bold text-gray-900 align-middle">${p.item || ''}</td>`;
+                if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center text-gray-500 align-middle">${p.ingredients || ''}</td>`;
+                if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center text-gray-500 align-middle">${p.type || ''}</td>`;
                 
-                // specs는 합치지 않고 개별 출력
-                html += `<td class="py-3 px-4 text-center border-r border-gray-300 text-gray-600">${p.specs || ''}</td>`;
+                html += `<td class="py-3 px-4 text-center text-gray-600 font-medium">${p.specs || ''}</td>`;
 
                 html += `
-                    <td class="py-3 px-3 text-center border-r border-gray-200 text-gray-700">${formatMedCurrency(p.clinic_msrp)}</td>
-                    <td class="py-3 px-3 text-center border-r border-gray-300 font-medium text-blue-700">${formatMedCurrency(p.clinic_promotion)}</td>
-                    <td class="py-3 px-3 text-center border-r border-gray-200 text-gray-700">${formatMedCurrency(p.dist_1000)}</td>
-                    <td class="py-3 px-3 text-center border-r border-gray-200 text-gray-700">${formatMedCurrency(p.dist_3000)}</td>
-                    <td class="py-3 px-3 text-center border-r border-gray-200 text-gray-700">${formatMedCurrency(p.dist_5000)}</td>
-                    <td class="py-3 px-3 text-center border-r border-gray-300 text-gray-700">${formatMedCurrency(p.dist_10000)}</td>
-                    <td class="py-3 px-3 text-center border-r border-gray-200 font-semibold text-amber-700">${formatMedCurrency(p.oem_10000)}</td>
-                    <td class="py-3 px-3 text-center border-r border-gray-200 font-semibold text-amber-700">${formatMedCurrency(p.oem_30000)}</td>
-                    <td class="py-3 px-3 text-center font-semibold text-amber-700">${formatMedCurrency(p.oem_50000)}</td>
+                    <td class="py-3 px-3 text-center border-l border-gray-100 text-gray-500">${formatMedCurrency(p.clinic_msrp)}</td>
+                    <td class="py-3 px-3 text-center font-bold text-gray-900 bg-gray-50/50">${formatMedCurrency(p.clinic_promotion)}</td>
+                    <td class="py-3 px-3 text-center border-l border-gray-100 text-gray-600">${formatMedCurrency(p.dist_1000)}</td>
+                    <td class="py-3 px-3 text-center text-gray-600">${formatMedCurrency(p.dist_3000)}</td>
+                    <td class="py-3 px-3 text-center text-gray-600">${formatMedCurrency(p.dist_5000)}</td>
+                    <td class="py-3 px-3 text-center text-gray-600">${formatMedCurrency(p.dist_10000)}</td>
+                    <td class="py-3 px-3 text-center border-l border-gray-100 font-semibold text-gray-800">${formatMedCurrency(p.oem_10000)}</td>
+                    <td class="py-3 px-3 text-center font-semibold text-gray-800">${formatMedCurrency(p.oem_30000)}</td>
+                    <td class="py-3 px-3 text-center font-semibold text-gray-800">${formatMedCurrency(p.oem_50000)}</td>
                 `;
                 
                 tr.innerHTML = html;
                 tbody.appendChild(tr);
             });
             
-            // Add FOC Note
             const noteTr = document.createElement('tr');
-            noteTr.innerHTML = `<td colspan="15" class="py-2.5 px-4 text-xs text-gray-500 text-left bg-slate-50 border-t border-gray-300 font-medium">*Head of Division's Discretion: Max. 5% FOC</td>`;
+            noteTr.innerHTML = `<td colspan="15" class="py-3 px-4 text-[11px] text-gray-400 text-left bg-white border-t border-gray-100 font-medium uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
             tbody.appendChild(noteTr);
         }
 
     </script>
 </body>
 </html>
+<!-- ... existing code ... -->
