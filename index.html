@@ -82,8 +82,15 @@
         <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded shadow-sm">
             <p class="text-sm text-amber-800">
                 <strong>Notice:</strong> Product and price information is fetched live. 
-                The <span class="font-bold">Live KRW Price</span> column is automatically calculated by multiplying the USD B2B (1-10CT) price with today's live exchange rate.
             </p>
+        </div>
+
+        <div class="flex justify-end items-center mb-2 mt-2 gap-4">
+            <span class="text-sm font-bold text-gray-600 tracking-wide" id="unit-display">[Unit: USD]</span>
+            <div class="bg-gray-200 p-1 rounded-lg flex inline-flex">
+                <button id="btn-usd" onclick="setCurrency('USD')" class="px-3 py-1 rounded-md text-sm font-bold bg-white shadow-sm text-gray-800 transition-all">USD</button>
+                <button id="btn-krw" onclick="setCurrency('KRW')" class="px-3 py-1 rounded-md text-sm font-bold text-gray-500 hover:text-gray-700 transition-all">KRW</button>
+            </div>
         </div>
 
         <div class="overflow-x-auto rounded-lg table-container bg-white">
@@ -94,16 +101,15 @@
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">Volume</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">Quantity</th>
                         <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">CT Qty</th>
-                        <th class="py-4 px-4 font-semibold text-sm tracking-wider">USD MSRP</th>
-                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-blue-300">Promo (B2C)</th>
-                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-green-300">B2B (1-10CT)</th>
-                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-green-300">B2B (10-30CT)</th>
-                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-green-300">B2B (30-70CT)</th>
-                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-amber-300">Live KRW (1-10CT)</th>
+                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center">USD MSRP</th>
+                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center text-blue-300">Promo (B2C)</th>
+                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center text-green-300">B2B (1-10CT)</th>
+                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center text-green-300">B2B (10-30CT)</th>
+                        <th class="py-4 px-4 font-semibold text-sm tracking-wider text-center text-green-300">B2B (30-70CT)</th>
                     </tr>
                 </thead>
                 <tbody id="price-table-body">
-                    <tr><td colspan="10" class="text-center py-10 text-gray-500 italic">Fetching data from server...</td></tr>
+                    <tr><td colspan="9" class="text-center py-10 text-gray-500 italic">Fetching data from server...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -147,10 +153,35 @@
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        function formatCurrency(symbol, amount) {
+        // --- GLOBAL STATE FOR CURRENCY TOGGLE ---
+        let currentCurrency = 'USD';
+        let globalKrwRate = 1400;
+        let globalUniqueProducts = [];
+
+        function setCurrency(currency) {
+            currentCurrency = currency;
+            document.getElementById('unit-display').textContent = `[Unit: ${currency}]`;
+            
+            const btnUsd = document.getElementById('btn-usd');
+            const btnKrw = document.getElementById('btn-krw');
+            
+            if (currency === 'USD') {
+                btnUsd.className = "px-3 py-1 rounded-md text-sm font-bold bg-white shadow-sm text-gray-800 transition-all";
+                btnKrw.className = "px-3 py-1 rounded-md text-sm font-bold text-gray-500 hover:text-gray-700 transition-all";
+            } else {
+                btnKrw.className = "px-3 py-1 rounded-md text-sm font-bold bg-white shadow-sm text-gray-800 transition-all";
+                btnUsd.className = "px-3 py-1 rounded-md text-sm font-bold text-gray-500 hover:text-gray-700 transition-all";
+            }
+            
+            renderTableData();
+        }
+
+        function formatCurrency(amount) {
             if (amount === null || amount === undefined || amount === 0) return '<div class="text-center w-full text-gray-400">-</div>';
-            const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(amount);
-            return `<div class="currency-cell"><span>${symbol}</span><span>${formattedAmount}</span></div>`;
+            // 달러는 최대 소수점 2자리, 원화(KRW)는 소수점 없이 표기
+            const fractionDigits = currentCurrency === 'KRW' ? 0 : 2;
+            const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: fractionDigits }).format(amount);
+            return `<div class="text-center w-full">${formattedAmount}</div>`;
         }
 
         function extractNameVolumeQty(fullName) {
@@ -160,10 +191,13 @@
             let volume = '-';
             let qty = '-';
 
+            // 단위(EA, ea, PCS 등)를 모두 소문자로 통일하는 함수 추가
+            const formatQty = (q) => q.trim().toLowerCase();
+
             // 정규식을 통해 Volume과 Quantity 분리 추출 (예: 50ml x 5ea, 50ml 5ea 등)
             const volQtyMatch = fullName.match(/(.*?)\s+(\d+\.?\d*\s*(?:ml|g|oz|kg|l|fl\.oz))\s*(?:x|\*|X)?\s*(\d+\s*(?:ea|pcs|p|sheets|pads|매|개))$/i);
             if (volQtyMatch) {
-                return { name: volQtyMatch[1].trim(), volume: volQtyMatch[2].trim(), qty: volQtyMatch[3].trim() };
+                return { name: volQtyMatch[1].trim(), volume: volQtyMatch[2].trim(), qty: formatQty(volQtyMatch[3]) };
             }
 
             // Volume만 있는 경우 (예: 50ml)
@@ -175,7 +209,7 @@
             // Quantity만 있는 경우 (예: 5ea)
             const qtyMatch = fullName.match(/(.*?)\s+(\d+\s*(?:ea|pcs|p|sheets|pads|매|개))$/i);
             if (qtyMatch) {
-                return { name: qtyMatch[1].trim(), volume: '-', qty: qtyMatch[2].trim() };
+                return { name: qtyMatch[1].trim(), volume: '-', qty: formatQty(qtyMatch[2]) };
             }
 
             // 그 외의 경우 (기존 방식 유지 - 알 수 없는 영문/숫자 조합)
@@ -190,12 +224,11 @@
         async function initDashboard() {
             try {
                 // Fetch Live Exchange Rate
-                let krwRate = 1400; 
                 try {
                     const exRes = await fetch('https://open.er-api.com/v6/latest/USD');
                     const exData = await exRes.json();
-                    krwRate = exData.rates.KRW;
-                    document.getElementById('live-rate').textContent = `1 USD = ₩ ` + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(krwRate);
+                    globalKrwRate = exData.rates.KRW;
+                    document.getElementById('live-rate').textContent = `1 USD = ₩ ` + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(globalKrwRate);
                 } catch (e) {
                     document.getElementById('live-rate').textContent = `Rate Load Failed (Default: ₩1,400)`;
                     console.error("Exchange API Error:", e);
@@ -225,7 +258,7 @@
                 tbody.innerHTML = '';
 
                 if (!dbProducts || dbProducts.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-red-500">No product data found in database.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="9" class="text-center py-10 text-red-500">No product data found in database.</td></tr>`;
                     return;
                 }
 
@@ -239,135 +272,148 @@
                 });
                 
                 // 중복이 제거된 제품 배열을 생성합니다.
-                const uniqueProducts = Array.from(uniqueProductsMap.values());
+                globalUniqueProducts = Array.from(uniqueProductsMap.values());
                 // ---------------------------------
 
-                // Filter Categories (이제 중복 제거된 배열 사용)
-                const faceDevices = uniqueProducts.filter(p => p.sub_category === 'Device-face');
-                const faceCosmetics = uniqueProducts.filter(p => p.sub_category === 'Product-face');
-                const hairDevices = uniqueProducts.filter(p => p.sub_category === 'Device-hair');
-                const hairCosmetics = uniqueProducts.filter(p => p.sub_category === 'Product-hair');
-
-                function getCosmeticType(name) {
-                    const lowerName = name.toLowerCase();
-                    // 이름에 'ampoule'과 'booster'가 모두 포함되어 있으면 Ampoule Booster로 분류
-                    if ((lowerName.includes('ampoule') && lowerName.includes('booster')) || lowerName.includes('ampoule booster')) return 'AMPOULE BOOSTER';
-                    if (lowerName.includes('ampoule')) return 'AMPOULE';
-                    if (lowerName.includes('mask')) return 'MASK';
-                    if (lowerName.includes('cream')) return 'CREAM';
-                    // 기존 OTHER 분류를 모두 샴푸(SHAMPOO)로 변경
-                    return 'SHAMPOO';
-                }
-
-                function renderHeader(title, level) {
-                    const tr = document.createElement('tr');
-                    if (level === 1) { // 메인 카테고리 (FACE, HAIR)
-                        tr.className = 'category-header';
-                        tr.innerHTML = `<td colspan="10" class="py-3 px-4">${title}</td>`;
-                    } else if (level === 2) { // 서브 카테고리 (DEVICE, COSMETIC) - 더욱 명확하게 디자인 변경
-                        tr.className = 'sub-category-header bg-slate-200 text-slate-800 font-bold text-[15px] tracking-widest shadow-sm';
-                        tr.innerHTML = `<td colspan="10" class="py-3 px-5 border-y-2 border-slate-300">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
-                                </svg>
-                                <span>${title}</span>
-                            </div>
-                        </td>`;
-                    } else if (level === 3) { // 코스메틱 내부 중분류 (Ampoule, Mask 등) 더욱 명확하게 변경
-                        tr.className = 'bg-slate-50 border-y border-slate-200';
-                        tr.innerHTML = `<td colspan="10" class="py-2.5 px-8">
-                            <div class="flex items-center gap-2.5">
-                                <div class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm"></div>
-                                <span class="font-bold text-slate-700 text-sm tracking-widest">${title}</span>
-                            </div>
-                        </td>`;
-                    }
-                    tbody.appendChild(tr);
-                }
-
-                function renderProducts(products) {
-                    if (products.length === 0) return;
-                    products.forEach(p => {
-                        const usdPrice = p.product_prices.find(pr => pr.currency === 'USD') || {};
-                        const tr = document.createElement('tr');
-                        tr.className = "border-b border-gray-200 text-sm";
-                        
-                        const b2b1 = usdPrice.b2b_tier1_1_to_10_ct;
-                        const b2b2 = usdPrice.b2b_tier2_10_to_30_ct;
-                        const b2b3 = usdPrice.b2b_tier3_30_to_70_ct;
-                        const liveKrwB2b = (b2b1 && b2b1 > 0) ? b2b1 * krwRate : null;
-
-                        const { name, volume, qty } = extractNameVolumeQty(p.name_en);
-
-                        tr.innerHTML = `
-                            <td class="py-3 pl-12 pr-6">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-slate-400 text-lg leading-none mb-1">↳</span>
-                                    <span class="font-bold text-slate-800">${name}</span>
-                                </div>
-                            </td>
-                            <td class="py-3 px-4 text-center font-medium text-gray-500">${volume}</td>
-                            <td class="py-3 px-4 text-center font-medium text-gray-500">${qty}</td>
-                            <td class="py-3 px-4 text-center text-gray-500">${p.ct_quantity || '-'}</td>
-                            <td class="py-3 px-4 text-gray-500">${formatCurrency('$', usdPrice.b2c_msrp)}</td>
-                            <td class="py-3 px-4 font-bold text-blue-600">${formatCurrency('$', usdPrice.b2c_promotion)}</td>
-                            <td class="py-3 px-4 font-bold text-green-600 bg-green-50/20">${formatCurrency('$', b2b1)}</td>
-                            <td class="py-3 px-4 font-bold text-green-600 bg-green-50/20">${formatCurrency('$', b2b2)}</td>
-                            <td class="py-3 px-4 font-bold text-green-600 bg-green-50/20">${formatCurrency('$', b2b3)}</td>
-                            <td class="py-3 px-4 font-black text-amber-700 bg-amber-50/50">${formatCurrency('₩', liveKrwB2b)}</td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
-                }
-                
-                // 코스메틱 제품군을 세부 카테고리별로 분할하여 렌더링
-                function renderCategorizedCosmetics(cosmetics) {
-                    const groups = {
-                        'AMPOULE BOOSTER': [],
-                        'AMPOULE': [],
-                        'MASK': [],
-                        'CREAM': [],
-                        'SHAMPOO': [] // 기존 OTHER을 SHAMPOO로 변경
-                    };
-                    
-                    cosmetics.forEach(p => {
-                        const type = getCosmeticType(p.name_en);
-                        if(groups[type]) groups[type].push(p);
-                    });
-
-                    // 요청하신 순서대로 렌더링 (Ampoule Booster -> Ampoule -> Mask -> Cream -> Shampoo)
-                    ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM', 'SHAMPOO'].forEach(type => {
-                        if (groups[type] && groups[type].length > 0) {
-                            renderHeader(type, 3);
-                            renderProducts(groups[type]);
-                        }
-                    });
-                }
-
-                // Build Table
-                renderHeader('FACE CATEGORY', 1);
-                if (faceDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(faceDevices); }
-                if (faceCosmetics.length > 0) { 
-                    renderHeader('COSMETIC', 2); 
-                    renderCategorizedCosmetics(faceCosmetics); 
-                }
-
-                renderHeader('HAIR CATEGORY', 1);
-                if (hairDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(hairDevices); }
-                if (hairCosmetics.length > 0) { 
-                    renderHeader('COSMETIC', 2); 
-                    renderCategorizedCosmetics(hairCosmetics); 
-                }
+                // 테이블 렌더링 함수 호출
+                renderTableData();
 
             } catch (err) {
                 console.error("Data Load Error:", err);
                 document.getElementById('price-table-body').innerHTML = `
-                    <tr><td colspan="10" class="text-center py-10 text-red-500">
+                    <tr><td colspan="9" class="text-center py-10 text-red-500">
                         Failed to load data.<br>
                         <span class="text-sm">Please check your database connection.</span>
                     </td></tr>
                 `;
+            }
+        }
+
+        function renderTableData() {
+            const tbody = document.getElementById('price-table-body');
+            tbody.innerHTML = '';
+
+            if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-10 text-red-500">No product data found in database.</td></tr>`;
+                return;
+            }
+
+            // Filter Categories
+            const faceDevices = globalUniqueProducts.filter(p => p.sub_category === 'Device-face');
+            const faceCosmetics = globalUniqueProducts.filter(p => p.sub_category === 'Product-face');
+            const hairDevices = globalUniqueProducts.filter(p => p.sub_category === 'Device-hair');
+            const hairCosmetics = globalUniqueProducts.filter(p => p.sub_category === 'Product-hair');
+
+            function getCosmeticType(name) {
+                const lowerName = name.toLowerCase();
+                if ((lowerName.includes('ampoule') && lowerName.includes('booster')) || lowerName.includes('ampoule booster')) return 'AMPOULE BOOSTER';
+                if (lowerName.includes('ampoule')) return 'AMPOULE';
+                if (lowerName.includes('mask')) return 'MASK';
+                if (lowerName.includes('cream')) return 'CREAM';
+                return 'SHAMPOO';
+            }
+
+            function renderHeader(title, level) {
+                const tr = document.createElement('tr');
+                if (level === 1) { 
+                    tr.className = 'category-header';
+                    tr.innerHTML = `<td colspan="9" class="py-3 px-4">${title}</td>`;
+                } else if (level === 2) { 
+                    tr.className = 'sub-category-header bg-slate-200 text-slate-800 font-bold text-[15px] tracking-widest shadow-sm';
+                    tr.innerHTML = `<td colspan="9" class="py-3 px-5 border-y-2 border-slate-300">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                            <span>${title}</span>
+                        </div>
+                    </td>`;
+                } else if (level === 3) { 
+                    tr.className = 'bg-slate-50 border-y border-slate-200';
+                    tr.innerHTML = `<td colspan="9" class="py-2.5 px-8">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm"></div>
+                            <span class="font-bold text-slate-700 text-sm tracking-widest">${title}</span>
+                        </div>
+                    </td>`;
+                }
+                tbody.appendChild(tr);
+            }
+
+            function renderProducts(products) {
+                if (products.length === 0) return;
+                products.forEach(p => {
+                    const usdPrice = p.product_prices.find(pr => pr.currency === 'USD') || {};
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-gray-200 text-sm";
+                    
+                    // 현재 선택된 통화가 KRW일 경우 환율을 곱함
+                    const rate = currentCurrency === 'KRW' ? globalKrwRate : 1;
+
+                    const b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
+                    const b2c_promotion = usdPrice.b2c_promotion ? usdPrice.b2c_promotion * rate : null;
+                    const b2b1 = usdPrice.b2b_tier1_1_to_10_ct ? usdPrice.b2b_tier1_1_to_10_ct * rate : null;
+                    const b2b2 = usdPrice.b2b_tier2_10_to_30_ct ? usdPrice.b2b_tier2_10_to_30_ct * rate : null;
+                    const b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
+
+                    const { name, volume, qty } = extractNameVolumeQty(p.name_en);
+
+                    tr.innerHTML = `
+                        <td class="py-3 pl-12 pr-6">
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400 text-lg leading-none mb-1">↳</span>
+                                <span class="font-bold text-slate-800">${name}</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-center font-medium text-gray-500">${volume}</td>
+                        <td class="py-3 px-4 text-center font-medium text-gray-500">${qty}</td>
+                        <td class="py-3 px-4 text-center text-gray-500">${p.ct_quantity || '-'}</td>
+                        <td class="py-3 px-4 text-gray-500">${formatCurrency(b2c_msrp)}</td>
+                        <td class="py-3 px-4 font-bold text-blue-600">${formatCurrency(b2c_promotion)}</td>
+                        <td class="py-3 px-4 font-bold text-green-600 bg-green-50/20">${formatCurrency(b2b1)}</td>
+                        <td class="py-3 px-4 font-bold text-green-600 bg-green-50/20">${formatCurrency(b2b2)}</td>
+                        <td class="py-3 px-4 font-bold text-green-600 bg-green-50/20">${formatCurrency(b2b3)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+            
+            // 코스메틱 제품군을 세부 카테고리별로 분할하여 렌더링
+            function renderCategorizedCosmetics(cosmetics) {
+                const groups = {
+                    'AMPOULE BOOSTER': [],
+                    'AMPOULE': [],
+                    'MASK': [],
+                    'CREAM': [],
+                    'SHAMPOO': []
+                };
+                
+                cosmetics.forEach(p => {
+                    const type = getCosmeticType(p.name_en);
+                    if(groups[type]) groups[type].push(p);
+                });
+
+                ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM', 'SHAMPOO'].forEach(type => {
+                    if (groups[type] && groups[type].length > 0) {
+                        renderHeader(type, 3);
+                        renderProducts(groups[type]);
+                    }
+                });
+            }
+
+            // Build Table
+            renderHeader('FACE CATEGORY', 1);
+            if (faceDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(faceDevices); }
+            if (faceCosmetics.length > 0) { 
+                renderHeader('COSMETIC', 2); 
+                renderCategorizedCosmetics(faceCosmetics); 
+            }
+
+            renderHeader('HAIR CATEGORY', 1);
+            if (hairDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(hairDevices); }
+            if (hairCosmetics.length > 0) { 
+                renderHeader('COSMETIC', 2); 
+                renderCategorizedCosmetics(hairCosmetics); 
             }
         }
     </script>
