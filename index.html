@@ -114,6 +114,7 @@
                 <!-- Borders removed from th -->
                 <thead>
                     <tr>
+                        <th class="main-th py-3 px-4 text-center">Image</th>
                         <th class="main-th py-3 px-4 text-left">Product Name</th>
                         <th class="main-th py-3 px-4 text-center">Volume</th>
                         <th class="main-th py-3 px-4 text-center">Quantity</th>
@@ -126,7 +127,7 @@
                     </tr>
                 </thead>
                 <tbody id="price-table-body">
-                    <tr><td colspan="9" class="text-center py-10 text-gray-400 font-light text-sm italic">Fetching cosmetic data from server...</td></tr>
+                    <tr><td colspan="10" class="text-center py-10 text-gray-400 font-light text-sm italic">Fetching cosmetic data from server...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -143,6 +144,7 @@
                     <tr>
                         <th rowspan="3" class="py-3 px-4 text-center align-middle">Cat.</th>
                         <th rowspan="3" class="py-3 px-4 text-center align-middle">Brand</th>
+                        <th rowspan="3" class="py-3 px-4 text-center align-middle">Image</th>
                         <th rowspan="3" class="py-3 px-4 text-center align-middle">Item</th>
                         <th rowspan="3" class="py-3 px-4 text-center align-middle">Ingredients</th>
                         <th rowspan="3" class="py-3 px-4 text-center align-middle">Type</th>
@@ -181,7 +183,7 @@
                     </tr>
                 </thead>
                 <tbody id="medical-table-body" class="text-sm bg-white">
-                    <tr><td colspan="15" class="text-center py-10 text-gray-400 font-light text-sm italic">Fetching medical data from server...</td></tr>
+                    <tr><td colspan="16" class="text-center py-10 text-gray-400 font-light text-sm italic">Fetching medical data from server...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -225,6 +227,32 @@
         let globalKrwRate = 1400;
         let globalUniqueProducts = [];
         let globalMedicalProducts = [];
+
+        // Image Mapping
+        const productImageMap = {
+            "Core impact": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/coreimpact.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9jb3JlaW1wYWN0LmpwZyIsImlhdCI6MTc2OTM0NTc0NSwiZXhwIjoxOTI3MDI1NzQ1fQ.ZgtQSrx1wFcoBUOOl4NvEaEwY19WSaPkX__XZaZc23o",
+            "Hyper shot": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/hypershot.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9oeXBlcnNob3Qud2VicCIsImlhdCI6MTc2OTM0NTc4OSwiZXhwIjoxOTI3MDI1Nzg5fQ.4pu-qOCjRdknUBqlMYqCT3Sm1XZ2U-hupV2YymXeUcI",
+            "Root vitality volume shampoo 300ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampoo300ml.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcG9vMzAwbWwuanBnIiwiaWF0IjoxNzY5ODc0MDY0LCJleHAiOjE5Mjc1NTQwNjR9.Q_kA-8HIr6_asLAxPIMVs_i_06Aix0ItovUPyJDZzHM",
+            "Root vitality volume shampoo 100ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampu.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcHUuanBnIiwiaWF0IjoxNzY5ODczMTU2LCJleHAiOjE5Mjc1NTMxNTZ9.rpyILNhH4uQFS67Q9sKgiUDzhX7a_sWLknZvDHbzMog",
+            "Expert shot scalp ampoule 15ml 3ea": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/scalp3ea.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zY2FscDNlYS5qcGciLCJpYXQiOjE3Njk4NzY3ODUsImV4cCI6MTkyNzU1Njc4NX0.0TH3Qhjgx3wmBAhJ7SUoNwwuDXnvNDMTWDC0SmEto5Y",
+            "Expert shot scalp ampoule 3ea": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/scalp3ea.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zY2FscDNlYS5qcGciLCJpYXQiOjE3Njk4NzY3ODUsImV4cCI6MTkyNzU1Njc4NX0.0TH3Qhjgx3wmBAhJ7SUoNwwuDXnvNDMTWDC0SmEto5Y",
+            "Expert shot scalp ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/fe99474f1d21bb4e898bb349b2e5c76a.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mZTk5NDc0ZjFkMjFiYjRlODk4YmIzNDliMmU1Yzc2YS5qcGciLCJpYXQiOjE3NjkzNDk4MDUsImV4cCI6MTkyNzAyOTgwNX0.XUaHM29eBlSzZe1HvBsDXv5e1nhuUg7fKyAHlbVsOjk",
+            "Cellular water ampoule booster": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoulbooster120.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxib29zdGVyMTIwLmpwZyIsImlhdCI6MTc2OTM1MjIxNSwiZXhwIjoxOTI3MDMyMjE1fQ.tp5ESuQR_JrdlskNbpb8XtwQdmSD4LSgosrC1oLOHrM",
+            "Plan tox lifting ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/plan30.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9wbGFuMzAuanBnIiwiaWF0IjoxNzY5MzU0OTY5LCJleHAiOjE5MjcwMzQ5Njl9.oRmRXZlQJbfQFbpAfX7oWyBYtXTZmVey4zexy4qVQhk",
+            "Phyto protein volumizing ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Vol30.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9Wb2wzMC53ZWJwIiwiaWF0IjoxNzY5MzU0NzMzLCJleHAiOjE5MjcwMzQ3MzN9.hTuqZjGSJhn5mmX3yEo3abfi3HxwOmUusuV8rLlJVVM",
+            "Melano cut brightening ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/br30.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9icjMwLmpwZyIsImlhdCI6MTc2OTk1ODExMywiZXhwIjoxOTI3NjM4MTEzfQ.NUmP-rd8lVUMEobfYGkFGk83Cr12RISejvuIAzFnBvA",
+            "Blue crystal hydrating ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Blue%20crystal%20hydrating%20ampoule.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9CbHVlIGNyeXN0YWwgaHlkcmF0aW5nIGFtcG91bGUuanBlZyIsImlhdCI6MTc4MDU2OTYxNCwiZXhwIjoxNzgxNDMzNjE0fQ.QtUr8cBjRaCgdrKfW6DnEZq9LNsi7EzqzQG47GxX45I",
+            "EV shot skin boosting mask": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/mask.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9tYXNrLnBuZyIsImlhdCI6MTc2OTk0MjcwMiwiZXhwIjoxOTI3NjIyNzAyfQ.YdfuzylFO-lrh8x6j2vjolAQRR2CIxrWTWttNQX2zDA",
+            "Active barrier hydrating cream": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/250707000867784.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS8yNTA3MDcwMDA4Njc3ODQuanBnIiwiaWF0IjoxNzY5MzUxNjY4LCJleHAiOjE5MjcwMzE2Njh9.5scqWSehvPB0CM27ARsTIXsb96uIH6A_Cq7ic4PZv8E",
+            "Lift-toning sun protector cream": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Lift-toning%20sun%20protector%20cream.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9MaWZ0LXRvbmluZyBzdW4gcHJvdGVjdG9yIGNyZWFtLmpwZyIsImlhdCI6MTc4MDU2OTY4NCwiZXhwIjoyMDk1OTI5Njg0fQ.dwCpXCEGw-SqLQsa0sVltHYlGtQtB12dD7gZOdwRYrY"
+        };
+        
+        // Medical Image Mapping
+        const medProductImageMap = {
+            "Crystal Plus": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/f8ead94e5360b.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mOGVhZDk0ZTUzNjBiLnBuZyIsImlhdCI6MTc2OTMxOTIyMiwiZXhwIjoxOTI2OTk5MjIyfQ.oHhH2kK_UUgbuKUufp9igjYZS6XdGd5DMJQXB9gSsdw",
+            "Crystal": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/cc492d238d1dc-removebg-preview.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9jYzQ5MmQyMzhkMWRjLXJlbW92ZWJnLXByZXZpZXcucG5nIiwiaWF0IjoxNzY5MzE5OTgxLCJleHAiOjE5MjY5OTk5ODF9.p-96RHgIhc21DB_WAthHvodJ_w3yxT3dryd4kJno3yo",
+            "Scalp MD": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/scalpMD.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zY2FscE1ELnBuZyIsImlhdCI6MTc2OTY4NjYzMywiZXhwIjoxOTI3MzY2NjMzfQ.bEzj1ErkNj3zZ0lo_r3ryYbkZEFn6eq1UMzMbRlv0dU"
+        };
 
         function setCurrency(currency) {
             currentCurrency = currency;
@@ -311,8 +339,21 @@
                 const uniqueProductsMap = new Map();
                 if (dbProducts) {
                     dbProducts.forEach(product => {
-                        if (product.name_en && !uniqueProductsMap.has(product.name_en)) {
-                            uniqueProductsMap.set(product.name_en, product);
+                        if (product.name_en) {
+                            // 1. Core impact PK 행 숨기기 (필터링)
+                            if (product.name_en.includes('Core impact PK')) {
+                                return; // 이 제품은 건너뛰고 표에 추가하지 않음
+                            }
+                            
+                            // 2. Core impact (BK/WH/DW/BG) 이름 변경
+                            if (product.name_en.includes('Core impact (BK/WH/DW/BG)')) {
+                                product.name_en = product.name_en.replace('Core impact (BK/WH/DW/BG)', 'Core impact (WH/PK/DW/BK)');
+                            }
+
+                            // 중복 방지 및 맵에 추가
+                            if (!uniqueProductsMap.has(product.name_en)) {
+                                uniqueProductsMap.set(product.name_en, product);
+                            }
                         }
                     });
                 }
@@ -343,7 +384,7 @@
             tbody.innerHTML = '';
 
             if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-10 text-red-500 font-light">No product data found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-red-500 font-light">No product data found.</td></tr>`;
                 return;
             }
 
@@ -365,10 +406,10 @@
                 const tr = document.createElement('tr');
                 if (level === 1) { 
                     tr.className = 'category-header bg-white';
-                    tr.innerHTML = `<td colspan="9" class="py-5 px-4 font-montserrat font-bold text-lg text-gray-900 border-b-2 border-gray-900 uppercase tracking-widest">${title}</td>`;
+                    tr.innerHTML = `<td colspan="10" class="py-5 px-4 font-montserrat font-bold text-lg text-gray-900 border-b-2 border-gray-900 uppercase tracking-widest">${title}</td>`;
                 } else if (level === 2) { 
                     tr.className = 'sub-category-header bg-gray-50 border-y border-gray-200';
-                    tr.innerHTML = `<td colspan="9" class="py-3 px-5">
+                    tr.innerHTML = `<td colspan="10" class="py-3 px-5">
                         <div class="flex items-center gap-2">
                             <div class="w-1.5 h-4 bg-gray-900"></div>
                             <span class="text-gray-900 font-bold text-sm tracking-widest uppercase">${title}</span>
@@ -376,7 +417,7 @@
                     </td>`;
                 } else if (level === 3) { 
                     tr.className = 'bg-white border-b border-gray-100';
-                    tr.innerHTML = `<td colspan="9" class="py-2.5 px-8">
+                    tr.innerHTML = `<td colspan="10" class="py-2.5 px-8">
                         <div class="flex items-center gap-2">
                             <span class="text-gray-400 text-[10px]">◆</span>
                             <span class="font-semibold text-gray-600 text-xs tracking-widest uppercase">${title}</span>
@@ -403,12 +444,26 @@
                     const b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
 
                     const { name, volume, qty } = extractNameVolumeQty(p.name_en);
+                    
+                    // Determine image URL
+                    let imageUrl = "https://placehold.co/100x100/f3f4f6/9ca3af?text=No+Image"; // Default placeholder
+                    
+                    // 이름이 긴 키워드부터 매칭하도록 정렬하여 "3ea" 등 구체적 항목이 우선 매칭되도록 보장
+                    const sortedKeys = Object.keys(productImageMap).sort((a, b) => b.length - a.length);
+                    // 원본 DB 이름(p.name_en) 기준으로 검색하여 옵션 변형(3ea) 감지
+                    const matchedKey = sortedKeys.find(key => p.name_en.toLowerCase().includes(key.toLowerCase()));
+                    if (matchedKey) {
+                        imageUrl = productImageMap[matchedKey];
+                    }
 
-                    // Product Name(name) 만 bold 유지, 나머지는 모두 font-light 적용
                     tr.innerHTML = `
-                        <td class="py-3 pl-12 pr-6">
+                        <td class="py-2 px-4 text-center">
+                            <div class="w-12 h-12 mx-auto bg-white border border-gray-100 rounded overflow-hidden flex items-center justify-center p-0.5">
+                                <img src="${imageUrl}" alt="${name}" class="max-w-full max-h-full object-contain" onerror="this.onerror=null;this.src='https://placehold.co/100x100/f3f4f6/9ca3af?text=Image+Error';">
+                            </div>
+                        </td>
+                        <td class="py-3 pl-4 pr-6">
                             <div class="flex items-center gap-3">
-                                <span class="text-gray-300 text-sm font-light">|</span>
                                 <span class="font-semibold text-gray-800">${name}</span>
                             </div>
                         </td>
@@ -458,7 +513,7 @@
             const filteredData = globalMedicalProducts.filter(d => d.currency === currentCurrency);
 
             if (!filteredData || filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="15" class="text-center py-10 text-gray-400 font-light text-sm italic">No medical data available for ${currentCurrency}.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="16" class="text-center py-10 text-gray-400 font-light text-sm italic">No medical data available for ${currentCurrency}.</td></tr>`;
                 return;
             }
 
@@ -500,7 +555,25 @@
                 // Brand, Item(Product Name)만 굵게 표시하고 나머지는 모두 font-light 적용
                 if (catSpans[idx] > 0) html += `<td rowspan="${catSpans[idx]}" class="py-3 px-4 text-center text-gray-700 tracking-wider font-light uppercase align-middle">${p.category || ''}</td>`;
                 if (brandSpans[idx] > 0) html += `<td rowspan="${brandSpans[idx]}" class="py-3 px-4 text-center font-semibold text-gray-600 uppercase tracking-widest align-middle">${p.brand || ''}</td>`;
-                if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center font-semibold text-gray-900 align-middle">${p.item || ''}</td>`;
+                
+                // --- Add Image Column ---
+                if (itemSpans[idx] > 0) {
+                    let imageUrl = "https://placehold.co/100x100/f3f4f6/9ca3af?text=No+Image";
+                    const sortedKeys = Object.keys(medProductImageMap).sort((a, b) => b.length - a.length);
+                    const matchedKey = sortedKeys.find(key => p.item && p.item.toLowerCase().includes(key.toLowerCase()));
+                    if (matchedKey) {
+                        imageUrl = medProductImageMap[matchedKey];
+                    }
+                    
+                    html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-4 text-center align-middle">
+                                <div class="w-12 h-12 mx-auto bg-white border border-gray-100 rounded overflow-hidden flex items-center justify-center p-0.5">
+                                    <img src="${imageUrl}" alt="${p.item}" class="max-w-full max-h-full object-contain" onerror="this.onerror=null;this.src='https://placehold.co/100x100/f3f4f6/9ca3af?text=Image+Error';">
+                                </div>
+                             </td>`;
+                             
+                    html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center font-semibold text-gray-900 align-middle">${p.item || ''}</td>`;
+                }
+                
                 if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center font-light text-gray-600 align-middle">${p.ingredients || ''}</td>`;
                 if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center font-light text-gray-600 align-middle">${p.type || ''}</td>`;
                 
@@ -523,7 +596,7 @@
             });
             
             const noteTr = document.createElement('tr');
-            noteTr.innerHTML = `<td colspan="15" class="py-3 px-4 text-[11px] text-gray-400 font-light text-left border-t border-gray-100 uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
+            noteTr.innerHTML = `<td colspan="16" class="py-3 px-4 text-[11px] text-gray-400 font-light text-left border-t border-gray-100 uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
             tbody.appendChild(noteTr);
         }
 
