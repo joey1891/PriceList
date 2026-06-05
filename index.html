@@ -159,7 +159,6 @@
             <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Beauty Device / Cosmetic Product Line</h2>
         </div>
         <div class="overflow-x-auto table-container bg-white mb-4">
-            <!-- unified-table 클래스 추가로 CSS 선 스타일 자동 적용 -->
             <table class="w-full text-left border-collapse cosmetic-table unified-table">
                 <colgroup>
                     <col style="width: 5%;">
@@ -198,7 +197,6 @@
             <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Medical Aesthetic Product Line</h2>
         </div>
         <div class="overflow-x-auto table-container bg-white mb-12">
-            <!-- unified-table 클래스 추가 -->
             <table class="w-full text-left border-collapse unified-table">
                 <colgroup>
                     <col style="width: 4%;">
@@ -581,7 +579,6 @@
                         ? `<img src="${mappedImg}" class="product-img cursor-pointer hover:opacity-80 transition-opacity" alt="${name}" onclick="openImageModal('${mappedImg}')">`
                         : `<div class="placeholder-img">N/A</div>`;
 
-                    // Tailwind 선 클래스를 제거하고 전역 CSS에 역할을 위임함
                     tr.innerHTML = `
                         <td class="py-2 px-4 text-center">
                             <div class="flex justify-center">${imgHtml}</div>
@@ -694,7 +691,6 @@
                 
                 html += `<td class="py-3 px-4 text-center font-light text-black">${p.specs || ''}</td>`;
 
-                // Tailwind 개별 선 클래스를 모두 제거 (CSS가 일괄 적용함)
                 html += `
                     <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.clinic_msrp)}</td>
                     <td class="py-3 px-3 text-center text-black">${formatMedCurrency(p.clinic_promotion)}</td>
@@ -717,7 +713,7 @@
         }
 
         // ==========================================
-        // 3. MEDIFAB AI ASSISTANT (GEMINI API)
+        // 3. MEDIFAB AI ASSISTANT (SUPABASE EDGE FUNCTION)
         // ==========================================
         function toggleChat() {
             const chatContainer = document.getElementById('ai-chat-container');
@@ -767,47 +763,35 @@
                     }))
                 };
 
-                const systemPrompt = `You are the "Medifab AI", an internal assistant for MEDIFAB GLOBAL's live price list. 
-                Answer the user's questions strictly based on the following JSON data representing our current catalog.
-                The user is currently viewing prices in ${currentCurrency}.
-                The current exchange rate is 1 USD = ${globalKrwRate} KRW.
-                Do not invent or hallucinate products or prices. If a price is null or missing, state that it is not available.
-                Keep your answers concise, professional, and well-formatted.
-                
-                Catalog Data: ${JSON.stringify(catalogContext)}`;
-
-                const payload = {
-                    contents: [{ parts: [{ text: message }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] }
-                };
-
-                const apiKey = ""; // Canvas automatically injects the API key at runtime
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                // 프론트엔드에서 직접 Google API를 호출하는 대신, 
+                // 미리 배포해둔 Supabase Edge Function ('chat') 을 호출합니다.
+                const { data, error } = await supabaseClient.functions.invoke('chat', {
+                    body: { message, catalogContext }
                 });
 
-                const result = await response.json();
-                
                 // Remove typing indicator
                 const typingEl = document.getElementById(typingId);
                 if (typingEl) typingEl.remove();
 
-                const candidate = result.candidates?.[0];
-                if (candidate && candidate.content?.parts?.[0]?.text) {
-                    appendMessage('ai', candidate.content.parts[0].text);
+                if (error) {
+                    console.error("Supabase Edge Function Error:", error);
+                    appendMessage('ai', '서버와 통신하는 중 문제가 발생했습니다. 관리자에게 문의해주세요.');
+                    return;
+                }
+
+                if (data && data.reply) {
+                    appendMessage('ai', data.reply);
+                } else if (data && data.error) {
+                    appendMessage('ai', `Error: ${data.error}`);
                 } else {
-                    appendMessage('ai', 'Error: Received an unexpected response format from the server.');
+                    appendMessage('ai', 'Error: 서버로부터 예상치 못한 응답을 받았습니다.');
                 }
 
             } catch (error) {
-                console.error("Gemini API Error:", error);
+                console.error("Fetch/Logic Error:", error);
                 const typingEl = document.getElementById(typingId);
                 if (typingEl) typingEl.remove();
-                appendMessage('ai', 'Connection error. Please try asking again later.');
+                appendMessage('ai', '연결 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
             }
         }
 
