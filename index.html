@@ -27,10 +27,49 @@
             border-radius: 0; 
         }
         
-        /* 볼드 효과 제거를 위해 font-weight: 500 제거 및 일반 두께로 변경 */
-        th.main-th { background-color: #111827; color: white; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem; border: none; font-weight: normal; }
+        /* 표 선 통일성을 위한 전역 CSS 추가 */
+        .unified-table th {
+            border: 1px solid #374151; /* 어두운 헤더 배경에 어울리는 구획선 (gray-700) */
+        }
+        .unified-table td {
+            border: 1px solid #e5e7eb; /* 데이터 셀의 통일된 연한 회색 선 (gray-200) */
+        }
         
-        .cosmetic-table tr:hover:not(.category-header):not(.sub-category-header) { background-color: #f9fafb; transition: background-color 0.2s ease; }
+        /* 코스메틱 테이블의 그룹 헤더 예외 처리 (세로선 제거) */
+        .cosmetic-table tr.category-header td {
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            border-bottom: 2px solid #111827 !important; 
+        }
+        .cosmetic-table tr.sub-category-header td {
+            border-left: none;
+            border-right: none;
+            border-top: 1px solid #e5e7eb !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+        .cosmetic-table tr.type-header td {
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            border-bottom: 1px solid #f3f4f6 !important;
+        }
+        
+        /* 로딩 및 안내 문구 셀 예외 처리 */
+        .unified-table tr.loading-row td {
+            border: none;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .unified-table tr.note-row td {
+            border-left: none;
+            border-right: none;
+            border-bottom: none;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        th.main-th { background-color: #111827; color: white; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem; font-weight: normal; }
+        
+        .cosmetic-table tr:hover:not(.category-header):not(.sub-category-header):not(.type-header) { background-color: #f9fafb; transition: background-color 0.2s ease; }
         
         .currency-cell { display: flex; justify-content: space-between; width: 100%; min-width: 65px; }
 
@@ -39,7 +78,6 @@
         .placeholder-img { width: 36px; height: 36px; border-radius: 4px; background-color: #f3f4f6; border: 1px dashed #d1d5db; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px; }
     </style>
 </head>
-<!-- 모든 텍스트 관련 요소에서 font-bold, font-semibold, font-medium, font-extrabold 제거 -->
 <body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white">
 
     <!-- Lock Screen -->
@@ -111,7 +149,8 @@
             <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Beauty Device / Cosmetic Product Line</h2>
         </div>
         <div class="overflow-x-auto table-container bg-white mb-4">
-            <table class="w-full text-left border-collapse whitespace-nowrap cosmetic-table">
+            <!-- unified-table 클래스 추가로 CSS 선 스타일 자동 적용 -->
+            <table class="w-full text-left border-collapse whitespace-nowrap cosmetic-table unified-table">
                 <thead>
                     <tr>
                         <th class="main-th py-3 px-4 text-center w-12 text-white">Img</th>
@@ -120,7 +159,6 @@
                         <th class="main-th py-3 px-4 text-center text-white">Quantity</th>
                         <th class="main-th py-3 px-4 text-center text-white">CT Qty</th>
                         <th class="main-th py-3 px-4 text-center text-white">MSRP</th>
-                        <!-- 글자색 하얀색(text-white) 적용 -->
                         <th class="main-th py-3 px-4 text-center text-white font-light">Promo (B2C)</th>
                         <th class="main-th py-3 px-4 text-center text-white">B2B (1-10CT)</th>
                         <th class="main-th py-3 px-4 text-center text-white">B2B (10-30CT)</th>
@@ -128,7 +166,7 @@
                     </tr>
                 </thead>
                 <tbody id="price-table-body" class="bg-transparent">
-                    <tr><td colspan="10" class="text-center py-10 text-black font-light text-sm italic">Fetching cosmetic data from server...</td></tr>
+                    <tr class="loading-row"><td colspan="10" class="text-center py-10 text-black font-light text-sm italic">Fetching cosmetic data from server...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -138,9 +176,9 @@
             <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Medical Aesthetic Product Line</h2>
         </div>
         <div class="overflow-x-auto table-container bg-white mb-12">
-            <table class="w-full text-left border-collapse whitespace-nowrap">
+            <!-- unified-table 클래스 추가 -->
+            <table class="w-full text-left border-collapse whitespace-nowrap unified-table">
                 <thead>
-                    <!-- Main grouped headers: 글자색 모두 하얀색으로 통일 및 font-medium 삭제 -->
                     <tr>
                         <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Img</th>
                         <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Cat.</th>
@@ -153,7 +191,6 @@
                         <th colspan="4" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase">Distributor</th>
                         <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase">OEM</th>
                     </tr>
-                    <!-- Sub headers: text-gray-* 클래스들을 모두 text-white로 변경 -->
                     <tr>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">MSRP</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">Promo</th>
@@ -167,7 +204,6 @@
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">30,000</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">50,000</th>
                     </tr>
-                    <!-- Percentage headers: text-gray-* 클래스들을 모두 text-white로 변경 -->
                     <tr>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light">100%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white">80%</th>
@@ -183,7 +219,7 @@
                     </tr>
                 </thead>
                 <tbody id="medical-table-body" class="text-sm bg-transparent">
-                    <tr><td colspan="16" class="text-center py-10 text-black font-light text-sm italic">Fetching medical data from server...</td></tr>
+                    <tr class="loading-row"><td colspan="16" class="text-center py-10 text-black font-light text-sm italic">Fetching medical data from server...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -262,7 +298,7 @@
             "Hyper shot": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/hypershot.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9oeXBlcnNob3Qud2VicCIsImlhdCI6MTc2OTM0NTc4OSwiZXhwIjoxOTI3MDI1Nzg5fQ.4pu-qOCjRdknUBqlMYqCT3Sm1XZ2U-hupV2YymXeUcI",
             "Expert shot scalp ampoule 15ml 3ea": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/scalp3ea.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zY2FscDNlYS5qcGciLCJpYXQiOjE3Njk4NzY3ODUsImV4cCI6MTkyNzU1Njc4NX0.0TH3Qhjgx3wmBAhJ7SUoNwwuDXnvNDMTWDC0SmEto5Y",
             "Expert shot scalp ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/fe99474f1d21bb4e898bb349b2e5c76a.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mZTk5NDc0ZjFkMjFiYjRlODk4YmIzNDliMmU1Yzc2YS5qcGciLCJpYXQiOjE3NjkzNDk4MDUsImV4cCI6MTkyNzAyOTgwNX0.XUaHM29eBlSzZe1HvBsDXv5e1nhuUg7fKyAHlbVsOjk",
-            "Root vitality volume shampoo 300ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampoo300ml.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcG9vMzAwbWwuanBnIiwiaWF0IjoxNzY5ODc0MDY0LCJleHAiOjE5Mjc1NTQwNjR9.Q_kA-8HIr6_asLAxPIMVs_i_06Aix0ItovUPyJDZzHM",
+            "Root vitality volume shampoo 300ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampoo300ml.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcG9vMzAwbWwuanBnIiwiaWF0IjoxNzY5ODczMTU2LCJleHAiOjE5Mjc1NTMxNTZ9.rpyILNhH4uQFS67Q9sKgiUDzhX7a_sWLknZvDHbzMog",
             "Root vitality volume shampoo 100ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampu.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcHUuanBnIiwiaWF0IjoxNzY5ODczMTU2LCJleHAiOjE5Mjc1NTMxNTZ9.rpyILNhH4uQFS67Q9sKgiUDzhX7a_sWLknZvDHbzMog"
         };
 
@@ -279,7 +315,6 @@
             const btnUsd = document.getElementById('btn-usd');
             const btnKrw = document.getElementById('btn-krw');
             
-            // 버튼들에서도 볼드 효과 제거
             if (currency === 'USD') {
                 btnUsd.className = "px-4 py-1.5 text-xs bg-white shadow-sm text-gray-900 transition-all uppercase tracking-wider border border-gray-300";
                 btnKrw.className = "px-4 py-1.5 text-xs text-gray-400 hover:text-gray-900 transition-all uppercase tracking-wider";
@@ -357,14 +392,12 @@
                     dbProducts.forEach(product => {
                         let displayName = product.name_en;
                         
-                        // TEXT REPLACEMENT & FILTERING LOGIC
                         if (displayName && displayName.includes("Core impact (BK/WH/DW/BG)")) {
                             displayName = displayName.replace("Core impact (BK/WH/DW/BG)", "Core impact (WH/PK/DW/BK)");
                         }
                         if (displayName && displayName.includes("Core impact PK")) {
-                            return; // Skip this product
+                            return; 
                         }
-                        
                         if (displayName && displayName.includes("Cellular water ampoule booster 50ml")) {
                             displayName = displayName.replace("Cellular water ampoule booster 50ml", "Cellular water ampoule booster 60ml");
                         }
@@ -390,8 +423,8 @@
 
             } catch (err) {
                 console.error("Data Load Error:", err);
-                document.getElementById('price-table-body').innerHTML = `<tr><td colspan="10" class="text-center py-10 text-red-500">Failed to load Cosmetic data.</td></tr>`;
-                document.getElementById('medical-table-body').innerHTML = `<tr><td colspan="16" class="text-center py-10 text-red-500">Failed to load Medical data.</td></tr>`;
+                document.getElementById('price-table-body').innerHTML = `<tr class="loading-row"><td colspan="10" class="text-center py-10 text-red-500">Failed to load Cosmetic data.</td></tr>`;
+                document.getElementById('medical-table-body').innerHTML = `<tr class="loading-row"><td colspan="16" class="text-center py-10 text-red-500">Failed to load Medical data.</td></tr>`;
             }
         }
 
@@ -403,7 +436,7 @@
             tbody.innerHTML = '';
 
             if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-red-500">No product data found.</td></tr>`;
+                tbody.innerHTML = `<tr class="loading-row"><td colspan="10" class="text-center py-10 text-red-500">No product data found.</td></tr>`;
                 return;
             }
 
@@ -425,11 +458,9 @@
                 const tr = document.createElement('tr');
                 if (level === 1) { 
                     tr.className = 'category-header bg-transparent';
-                    // font-bold 삭제
-                    tr.innerHTML = `<td colspan="10" class="py-6 px-4 font-montserrat text-lg text-black border-b-2 border-black uppercase tracking-widest">${title}</td>`;
+                    tr.innerHTML = `<td colspan="10" class="py-6 px-4 font-montserrat text-lg text-black uppercase tracking-widest">${title}</td>`;
                 } else if (level === 2) { 
-                    tr.className = 'sub-category-header bg-transparent border-y border-gray-200';
-                    // font-bold 삭제
+                    tr.className = 'sub-category-header bg-transparent';
                     tr.innerHTML = `<td colspan="10" class="py-4 px-5">
                         <div class="flex items-center gap-2">
                             <div class="w-1.5 h-4 bg-black"></div>
@@ -437,8 +468,7 @@
                         </div>
                     </td>`;
                 } else if (level === 3) { 
-                    tr.className = 'bg-transparent border-b border-gray-100';
-                    // font-semibold 삭제
+                    tr.className = 'type-header bg-transparent';
                     tr.innerHTML = `<td colspan="10" class="py-3 px-8">
                         <div class="flex items-center gap-2">
                             <span class="text-black text-[10px]">◆</span>
@@ -454,7 +484,7 @@
                 products.forEach(p => {
                     const usdPrice = p.product_prices.find(pr => pr.currency === 'USD') || {};
                     const tr = document.createElement('tr');
-                    tr.className = "border-b border-gray-100 text-sm hover:bg-gray-50 transition-colors";
+                    tr.className = "text-sm hover:bg-gray-50 transition-colors";
                     
                     const rate = currentCurrency === 'KRW' ? globalKrwRate : 1;
                     const isKrw = currentCurrency === 'KRW';
@@ -467,7 +497,6 @@
 
                     const { name, volume, qty } = extractNameVolumeQty(p.display_name);
 
-                    // Improved mapping logic based on length to prioritize longer matched keys
                     let mappedImg = "";
                     let longestMatch = "";
                     
@@ -480,12 +509,11 @@
                         }
                     }
 
-                    // 이미지에 클릭 이벤트 및 포인터 효과 추가
                     const imgHtml = mappedImg 
                         ? `<img src="${mappedImg}" class="product-img cursor-pointer hover:opacity-80 transition-opacity" alt="${name}" onclick="openImageModal('${mappedImg}')">`
                         : `<div class="placeholder-img">N/A</div>`;
 
-                    // 표 내의 모든 font-bold, font-semibold 제거, 글자색 검은색으로 통일
+                    // Tailwind 선 클래스를 제거하고 전역 CSS에 역할을 위임함
                     tr.innerHTML = `
                         <td class="py-2 px-4 text-center">
                             <div class="flex justify-center">${imgHtml}</div>
@@ -499,9 +527,9 @@
                         <td class="py-3 px-4 text-center text-black text-xs font-light">${volume}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light">${qty}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light">${p.ct_quantity || '-'}</td>
-                        <td class="py-3 px-4 text-black border-l border-gray-100 font-light">${formatCurrency(b2c_msrp, isKrw)}</td>
+                        <td class="py-3 px-4 text-black font-light">${formatCurrency(b2c_msrp, isKrw)}</td>
                         <td class="py-3 px-4 text-black">${formatCurrency(b2c_promotion, isKrw)}</td>
-                        <td class="py-3 px-4 font-light text-black border-l border-gray-100">${formatCurrency(b2b1, isKrw)}</td>
+                        <td class="py-3 px-4 font-light text-black">${formatCurrency(b2b1, isKrw)}</td>
                         <td class="py-3 px-4 font-light text-black">${formatCurrency(b2b2, isKrw)}</td>
                         <td class="py-3 px-4 font-light text-black">${formatCurrency(b2b3, isKrw)}</td>
                     `;
@@ -542,7 +570,7 @@
             const filteredData = globalMedicalProducts.filter(d => d.currency === currentCurrency);
 
             if (!filteredData || filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="16" class="text-center py-10 text-gray-400 font-light text-sm italic">No medical data available for ${currentCurrency}.</td></tr>`;
+                tbody.innerHTML = `<tr class="loading-row"><td colspan="16" class="text-center py-10 text-gray-400 font-light text-sm italic">No medical data available for ${currentCurrency}.</td></tr>`;
                 return;
             }
 
@@ -577,11 +605,10 @@
 
             filteredData.forEach((p, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-100 hover:bg-gray-50 transition-colors text-xs";
+                tr.className = "hover:bg-gray-50 transition-colors text-xs";
                 
                 let html = '';
                 
-                // Add Product Image Logic for Medical Aesthetics (클릭 이벤트 추가)
                 if (itemSpans[idx] > 0) {
                     let mappedImg = medImageMap[p.item];
                     const imgHtml = mappedImg 
@@ -591,7 +618,6 @@
                     html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle">${imgHtml}</td>`;
                 }
 
-                // 표 내의 모든 font-bold, font-semibold 제거 및 글자색 검은색 통일
                 if (catSpans[idx] > 0) html += `<td rowspan="${catSpans[idx]}" class="py-3 px-4 text-center text-black tracking-wider uppercase align-middle">${p.category || ''}</td>`;
                 if (brandSpans[idx] > 0) html += `<td rowspan="${brandSpans[idx]}" class="py-3 px-4 text-center text-black uppercase tracking-widest align-middle">${p.brand || ''}</td>`;
                 if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center text-black align-middle">${p.item || ''}</td>`;
@@ -600,14 +626,15 @@
                 
                 html += `<td class="py-3 px-4 text-center font-light text-black">${p.specs || ''}</td>`;
 
+                // Tailwind 개별 선 클래스를 모두 제거 (CSS가 일괄 적용함)
                 html += `
-                    <td class="py-3 px-3 text-center border-l border-gray-100 font-light text-black">${formatMedCurrency(p.clinic_msrp)}</td>
+                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.clinic_msrp)}</td>
                     <td class="py-3 px-3 text-center text-black">${formatMedCurrency(p.clinic_promotion)}</td>
-                    <td class="py-3 px-3 text-center border-l border-gray-100 font-light text-black">${formatMedCurrency(p.dist_1000)}</td>
+                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_1000)}</td>
                     <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_3000)}</td>
                     <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_5000)}</td>
                     <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_10000)}</td>
-                    <td class="py-3 px-3 text-center border-l border-gray-100 font-light text-black">${formatMedCurrency(p.oem_10000)}</td>
+                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_10000)}</td>
                     <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_30000)}</td>
                     <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_50000)}</td>
                 `;
@@ -617,7 +644,8 @@
             });
             
             const noteTr = document.createElement('tr');
-            noteTr.innerHTML = `<td colspan="16" class="py-3 px-4 text-[11px] text-black text-left bg-transparent border-t border-gray-100 uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
+            noteTr.className = 'note-row bg-transparent';
+            noteTr.innerHTML = `<td colspan="16" class="py-3 px-4 text-[11px] text-black text-left uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
             tbody.appendChild(noteTr);
         }
 
