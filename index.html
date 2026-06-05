@@ -548,7 +548,10 @@
             function renderProducts(products) {
                 if (products.length === 0) return;
                 products.forEach(p => {
-                    const usdPrice = p.product_prices.find(pr => pr.currency === 'USD') || {};
+                    // Safety check for product_prices
+                    const pricesArray = Array.isArray(p.product_prices) ? p.product_prices : [];
+                    const usdPrice = pricesArray.find(pr => pr.currency === 'USD') || {};
+                    
                     const tr = document.createElement('tr');
                     tr.className = "text-sm hover:bg-gray-50 transition-colors";
                     
@@ -744,16 +747,17 @@
 
             try {
                 // Build a minimized context of the catalog to keep token usage efficient
+                // FIXED: Array.isArray() check added to prevent Javascript map crashes if a product has no prices returned.
                 const catalogContext = {
                     exchangeRate: globalKrwRate,
                     currencyToggled: currentCurrency,
                     cosmetics: globalUniqueProducts.map(p => ({
                         name: p.display_name, 
-                        prices: p.product_prices.map(pr => ({
+                        prices: Array.isArray(p.product_prices) ? p.product_prices.map(pr => ({
                             currency: pr.currency, 
                             msrp: pr.b2c_msrp, 
                             b2b_tier1: pr.b2b_tier1_1_to_10_ct
-                        }))
+                        })) : []
                     })),
                     medical: globalMedicalProducts.map(p => ({
                         name: p.item, 
@@ -763,8 +767,6 @@
                     }))
                 };
 
-                // 프론트엔드에서 직접 Google API를 호출하는 대신, 
-                // 미리 배포해둔 Supabase Edge Function ('gemini-chat') 을 호출합니다.
                 const { data, error } = await supabaseClient.functions.invoke('gemini-chat', {
                     body: { message, catalogContext }
                 });
@@ -775,14 +777,14 @@
 
                 if (error) {
                     console.error("Supabase Edge Function Error:", error);
-                    appendMessage('ai', '서버와 통신하는 중 문제가 발생했습니다. 관리자에게 문의해주세요.');
+                    appendMessage('ai', '서버 통신 오류: API 설정이 제대로 되었는지 확인해주세요. (관리자 문의)');
                     return;
                 }
 
                 if (data && data.reply) {
                     appendMessage('ai', data.reply);
                 } else if (data && data.error) {
-                    appendMessage('ai', `Error: ${data.error}`);
+                    appendMessage('ai', `서버 에러 응답: ${data.error}`);
                 } else {
                     appendMessage('ai', 'Error: 서버로부터 예상치 못한 응답을 받았습니다.');
                 }
