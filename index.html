@@ -202,10 +202,11 @@
                     <col style="width: 4%;">
                     <col style="width: 6%;">
                     <col style="width: 8%;">
-                    <col style="width: 13%;">
+                    <col style="width: 12%;">
                     <col style="width: 10%;">
                     <col style="width: 7%;">
-                    <col style="width: 7%;">
+                    <col style="width: 4%;">
+                    <col style="width: 4%;">
                     <col style="width: 5%;">
                     <col style="width: 5%;">
                     <col style="width: 5%;">
@@ -224,7 +225,8 @@
                         <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Item</th>
                         <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Ingredients</th>
                         <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Type</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">specs</th>
+                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Package</th>
+                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Volume</th>
                         <th colspan="2" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase">Clinic</th>
                         <th colspan="4" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase">Distributor</th>
                         <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase">OEM</th>
@@ -257,7 +259,7 @@
                     </tr>
                 </thead>
                 <tbody id="medical-table-body" class="text-sm bg-transparent">
-                    <tr class="loading-row"><td colspan="16" class="text-center py-10 text-black font-light text-sm italic">Fetching medical data from server...</td></tr>
+                    <tr class="loading-row"><td colspan="17" class="text-center py-10 text-black font-light text-sm italic">Fetching medical data from server...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -364,7 +366,7 @@
             "Hyper shot": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/hypershot.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9oeXBlcnNob3Qud2VicCIsImlhdCI6MTc2OTM0NTc4OSwiZXhwIjoxOTI3MDI1Nzg5fQ.4pu-qOCjRdknUBqlMYqCT3Sm1XZ2U-hupV2YymXeUcI",
             "Expert shot scalp ampoule 15ml 3ea": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/scalp3ea.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zY2FscDNlYS5qcGciLCJpYXQiOjE3Njk4NzY3ODUsImV4cCI6MTkyNzU1Njc4NX0.0TH3Qhjgx3wmBAhJ7SUoNwwuDXnvNDMTWDC0SmEto5Y",
             "Expert shot scalp ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/fe99474f1d21bb4e898bb349b2e5c76a.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mZTk5NDc0ZjFkMjFiYjRlODk4YmIzNDliMmU1Yzc2YS5qcGciLCJpYXQiOjE3NjkzNDk4MDUsImV4cCI6MTkyNzAyOTgwNX0.XUaHM29eBlSzZe1HvBsDXv5e1nhuUg7fKyAHlbVsOjk",
-            "Root vitality volume shampoo 300ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampoo300ml.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcG9vMzAwbWwuanBnIiwiaWF0IjoxNzY5ODczMTU2LCJleHAiOjE5Mjc1NTMxNTZ9.rpyILNhH4uQFS67Q9sKgiUDzhX7a_sWLknZvDHbzMog",
+            "Root vitality volume shampoo 300ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampoo300ml.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcG9vMzAwbWwuanBnIiwiaWF0IjoxNzY5ODc0MDY0LCJleHAiOjE5Mjc1NTQwNjR9.Q_kA-8HIr6_asLAxPIMVs_i_06Aix0ItovUPyJDZzHM",
             "Root vitality volume shampoo 100ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampu.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcHUuanBnIiwiaWF0IjoxNzY5ODczMTU2LCJleHAiOjE5Mjc1NTMxNTZ9.rpyILNhH4uQFS67Q9sKgiUDzhX7a_sWLknZvDHbzMog"
         };
 
@@ -490,7 +492,7 @@
             } catch (err) {
                 console.error("Data Load Error:", err);
                 document.getElementById('price-table-body').innerHTML = `<tr class="loading-row"><td colspan="10" class="text-center py-10 text-red-500">Failed to load Cosmetic data.</td></tr>`;
-                document.getElementById('medical-table-body').innerHTML = `<tr class="loading-row"><td colspan="16" class="text-center py-10 text-red-500">Failed to load Medical data.</td></tr>`;
+                document.getElementById('medical-table-body').innerHTML = `<tr class="loading-row"><td colspan="17" class="text-center py-10 text-red-500">Failed to load Medical data.</td></tr>`;
             }
         }
 
@@ -564,7 +566,10 @@
                     const b2b2 = usdPrice.b2b_tier2_10_to_30_ct ? usdPrice.b2b_tier2_10_to_30_ct * rate : null;
                     const b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
 
-                    const { name, volume, qty } = extractNameVolumeQty(p.display_name);
+                    let { name, volume, qty } = extractNameVolumeQty(p.display_name);
+                    
+                    // 수량이 없거나 '-' 일 경우 기본값 1ea 설정
+                    if (qty === '-' || qty === '' || !qty) qty = '1ea';
 
                     let mappedImg = "";
                     let longestMatch = "";
@@ -638,7 +643,7 @@
             const filteredData = globalMedicalProducts.filter(d => d.currency === currentCurrency);
 
             if (!filteredData || filteredData.length === 0) {
-                tbody.innerHTML = `<tr class="loading-row"><td colspan="16" class="text-center py-10 text-gray-400 font-light text-sm italic">No medical data available for ${currentCurrency}.</td></tr>`;
+                tbody.innerHTML = `<tr class="loading-row"><td colspan="17" class="text-center py-10 text-gray-400 font-light text-sm italic">No medical data available for ${currentCurrency}.</td></tr>`;
                 return;
             }
 
@@ -686,13 +691,30 @@
                     html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle">${imgHtml}</td>`;
                 }
 
-                if (catSpans[idx] > 0) html += `<td rowspan="${catSpans[idx]}" class="py-3 px-4 text-center text-black tracking-wider uppercase align-middle">${p.category || ''}</td>`;
+                // Chitosan-based 텍스트 치환 적용
+                if (catSpans[idx] > 0) html += `<td rowspan="${catSpans[idx]}" class="py-3 px-4 text-center text-black tracking-wider uppercase align-middle">${(p.category || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 if (brandSpans[idx] > 0) html += `<td rowspan="${brandSpans[idx]}" class="py-3 px-4 text-center text-black uppercase tracking-widest align-middle">${p.brand || ''}</td>`;
                 if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center text-black align-middle">${p.item || ''}</td>`;
-                if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${p.ingredients || ''}</td>`;
-                if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${p.type || ''}</td>`;
+                if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.ingredients || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
+                if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.type || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 
-                html += `<td class="py-3 px-4 text-center font-light text-black">${p.specs || ''}</td>`;
+                let rawSpecs = p.specs || '';
+                let specPkg = rawSpecs;
+                let specVol = '-';
+                
+                // Parsing out the volume dimension (e.g. "3cc * 3cc", "3.5ml") from the quantity
+                const volRegex = /(\d+(?:\.\d+)?\s*(?:cc|ml|g)(?:\s*(?:\*|x|X)\s*\d+(?:\.\d+)?\s*(?:cc|ml|g))?)/i;
+                const volMatch = rawSpecs.match(volRegex);
+                if (volMatch) {
+                    specVol = volMatch[0];
+                    specPkg = rawSpecs.replace(volMatch[0], '').trim();
+                    specPkg = specPkg.replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); // Remove leading/trailing symbols left over
+                }
+                if (!specPkg) specPkg = '-';
+
+                // specs 2열 분리 렌더링
+                html += `<td class="py-3 px-2 text-center font-light text-black">${specPkg}</td>`;
+                html += `<td class="py-3 px-2 text-center font-light text-black">${specVol}</td>`;
 
                 html += `
                     <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.clinic_msrp)}</td>
@@ -711,7 +733,7 @@
             });
             
             const noteTr = document.createElement('tr');
-            noteTr.innerHTML = `<td colspan="16" class="py-3 px-4 text-[11px] text-black text-left bg-transparent border-t border-gray-100 uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
+            noteTr.innerHTML = `<td colspan="17" class="py-3 px-4 text-[11px] text-black text-left bg-transparent border-t border-gray-100 uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
             tbody.appendChild(noteTr);
         }
 
