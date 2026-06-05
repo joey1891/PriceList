@@ -27,7 +27,17 @@
             border-radius: 0; 
         }
         
-        /* 표 선 통일성을 위한 전역 CSS 추가 */
+        /* 표 선 통일성 및 열 너비 고정을 위한 전역 CSS 추가 */
+        .unified-table {
+            table-layout: fixed;
+            width: 100%;
+            min-width: 1200px;
+        }
+        .unified-table th, .unified-table td {
+            white-space: normal;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
         .unified-table th {
             border: 1px solid #374151; /* 어두운 헤더 배경에 어울리는 구획선 (gray-700) */
         }
@@ -150,10 +160,22 @@
         </div>
         <div class="overflow-x-auto table-container bg-white mb-4">
             <!-- unified-table 클래스 추가로 CSS 선 스타일 자동 적용 -->
-            <table class="w-full text-left border-collapse whitespace-nowrap cosmetic-table unified-table">
+            <table class="w-full text-left border-collapse cosmetic-table unified-table">
+                <colgroup>
+                    <col style="width: 5%;">
+                    <col style="width: 25%;">
+                    <col style="width: 8%;">
+                    <col style="width: 8%;">
+                    <col style="width: 8%;">
+                    <col style="width: 9.2%;">
+                    <col style="width: 9.2%;">
+                    <col style="width: 9.2%;">
+                    <col style="width: 9.2%;">
+                    <col style="width: 9.2%;">
+                </colgroup>
                 <thead>
                     <tr>
-                        <th class="main-th py-3 px-4 text-center w-12 text-white">Img</th>
+                        <th class="main-th py-3 px-4 text-center text-white">Img</th>
                         <th class="main-th py-3 px-4 text-white">Product Name</th>
                         <th class="main-th py-3 px-4 text-center text-white">Volume</th>
                         <th class="main-th py-3 px-4 text-center text-white">Quantity</th>
@@ -177,7 +199,25 @@
         </div>
         <div class="overflow-x-auto table-container bg-white mb-12">
             <!-- unified-table 클래스 추가 -->
-            <table class="w-full text-left border-collapse whitespace-nowrap unified-table">
+            <table class="w-full text-left border-collapse unified-table">
+                <colgroup>
+                    <col style="width: 4%;">
+                    <col style="width: 6%;">
+                    <col style="width: 8%;">
+                    <col style="width: 13%;">
+                    <col style="width: 10%;">
+                    <col style="width: 7%;">
+                    <col style="width: 7%;">
+                    <col style="width: 5%;">
+                    <col style="width: 5%;">
+                    <col style="width: 5%;">
+                    <col style="width: 5%;">
+                    <col style="width: 5%;">
+                    <col style="width: 5%;">
+                    <col style="width: 5%;">
+                    <col style="width: 5%;">
+                    <col style="width: 5%;">
+                </colgroup>
                 <thead>
                     <tr>
                         <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Img</th>
@@ -225,6 +265,34 @@
         </div>
         
     </div>
+
+    <!-- AI Chat UI -->
+    <div id="ai-chat-container" class="fixed bottom-6 right-6 z-[60] hidden flex-col w-80 sm:w-96 h-[30rem] bg-white border border-gray-300 shadow-2xl">
+        <!-- Header -->
+        <div class="bg-gray-900 text-white px-5 py-4 flex justify-between items-center cursor-pointer" onclick="toggleChat()">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                <span class="font-montserrat text-sm tracking-widest uppercase">MEDIFAB AI</span>
+            </div>
+            <button class="text-white hover:text-gray-400 text-xl leading-none">&times;</button>
+        </div>
+        <!-- Chat History -->
+        <div id="chat-history" class="flex-1 p-5 overflow-y-auto flex flex-col gap-4 text-sm bg-gray-50/50">
+            <div class="bg-white border border-gray-200 p-3.5 shadow-sm text-gray-800 self-start max-w-[85%] leading-relaxed">
+                Hello! I am the Medifab internal AI assistant. You can ask me about product pricing, availability, and specific details from the current catalog.
+            </div>
+        </div>
+        <!-- Input Area -->
+        <div class="p-4 border-t border-gray-200 bg-white flex gap-2">
+            <input type="text" id="chat-input" class="flex-1 px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-900 bg-gray-50 focus:bg-white transition-colors" placeholder="Ask about products..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+            <button onclick="sendChatMessage()" class="bg-gray-900 text-white px-4 py-2 text-xs uppercase tracking-widest hover:bg-black transition-colors">Send</button>
+        </div>
+    </div>
+
+    <!-- AI FAB (Floating Action Button) -->
+    <button id="ai-fab" onclick="toggleChat()" class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white w-14 h-14 rounded-none shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center hover:bg-black transition-transform hover:-translate-y-1">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+    </button>
 
     <script>
         // Set Current Date in English
@@ -644,9 +712,132 @@
             });
             
             const noteTr = document.createElement('tr');
-            noteTr.className = 'note-row bg-transparent';
-            noteTr.innerHTML = `<td colspan="16" class="py-3 px-4 text-[11px] text-black text-left uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
+            noteTr.innerHTML = `<td colspan="16" class="py-3 px-4 text-[11px] text-black text-left bg-transparent border-t border-gray-100 uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
             tbody.appendChild(noteTr);
+        }
+
+        // ==========================================
+        // 3. MEDIFAB AI ASSISTANT (GEMINI API)
+        // ==========================================
+        function toggleChat() {
+            const chatContainer = document.getElementById('ai-chat-container');
+            const fab = document.getElementById('ai-fab');
+            if (chatContainer.classList.contains('hidden')) {
+                chatContainer.classList.remove('hidden');
+                chatContainer.classList.add('flex');
+                fab.classList.add('hidden');
+                document.getElementById('chat-input').focus();
+            } else {
+                chatContainer.classList.add('hidden');
+                chatContainer.classList.remove('flex');
+                fab.classList.remove('hidden');
+            }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Append user message
+            appendMessage('user', message);
+            input.value = '';
+
+            // Append "Thinking..." placeholder
+            const typingId = appendMessage('ai', '<span class="flex items-center gap-2">Thinking <span class="flex gap-1"><span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span><span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span><span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></span></span></span>', true);
+
+            try {
+                // Build a minimized context of the catalog to keep token usage efficient
+                const catalogContext = {
+                    exchangeRate: globalKrwRate,
+                    currencyToggled: currentCurrency,
+                    cosmetics: globalUniqueProducts.map(p => ({
+                        name: p.display_name, 
+                        prices: p.product_prices.map(pr => ({
+                            currency: pr.currency, 
+                            msrp: pr.b2c_msrp, 
+                            b2b_tier1: pr.b2b_tier1_1_to_10_ct
+                        }))
+                    })),
+                    medical: globalMedicalProducts.map(p => ({
+                        name: p.item, 
+                        brand: p.brand, 
+                        msrp_clinic: p.clinic_msrp, 
+                        distributor_1000: p.dist_1000
+                    }))
+                };
+
+                const systemPrompt = `You are the "Medifab AI", an internal assistant for MEDIFAB GLOBAL's live price list. 
+                Answer the user's questions strictly based on the following JSON data representing our current catalog.
+                The user is currently viewing prices in ${currentCurrency}.
+                The current exchange rate is 1 USD = ${globalKrwRate} KRW.
+                Do not invent or hallucinate products or prices. If a price is null or missing, state that it is not available.
+                Keep your answers concise, professional, and well-formatted.
+                
+                Catalog Data: ${JSON.stringify(catalogContext)}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: message }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+
+                const apiKey = ""; // Canvas automatically injects the API key at runtime
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                // Remove typing indicator
+                const typingEl = document.getElementById(typingId);
+                if (typingEl) typingEl.remove();
+
+                const candidate = result.candidates?.[0];
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    appendMessage('ai', candidate.content.parts[0].text);
+                } else {
+                    appendMessage('ai', 'Error: Received an unexpected response format from the server.');
+                }
+
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                const typingEl = document.getElementById(typingId);
+                if (typingEl) typingEl.remove();
+                appendMessage('ai', 'Connection error. Please try asking again later.');
+            }
+        }
+
+        function appendMessage(sender, text, isHtml = false) {
+            const history = document.getElementById('chat-history');
+            const msgDiv = document.createElement('div');
+            const id = 'msg-' + Date.now();
+            msgDiv.id = id;
+            
+            if (sender === 'user') {
+                msgDiv.className = 'bg-gray-900 text-white p-3.5 shadow-md self-end max-w-[85%] break-words leading-relaxed';
+                msgDiv.textContent = text; // Prevent XSS from user input
+            } else {
+                msgDiv.className = `bg-white border border-gray-200 p-3.5 shadow-sm text-gray-800 self-start max-w-[85%] break-words leading-relaxed`;
+                
+                if (isHtml) {
+                    msgDiv.innerHTML = text;
+                } else {
+                    // Convert basic markdown-like bold text to HTML, and newlines to <br>
+                    let formattedText = text
+                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-montserrat">$1</strong>')
+                        .replace(/\*/g, '•')
+                        .replace(/\n/g, '<br>');
+                    msgDiv.innerHTML = formattedText;
+                }
+            }
+            
+            history.appendChild(msgDiv);
+            history.scrollTop = history.scrollHeight;
+            return id;
         }
 
     </script>
