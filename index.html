@@ -41,7 +41,6 @@
             word-break: keep-all;
             overflow-wrap: break-word;
         }
-        
         .unified-table th {
             border: 1px solid #374151; /* 어두운 헤더 배경에 어울리는 구획선 (gray-700) */
         }
@@ -223,7 +222,7 @@
                     </tr>
                     <tr>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">70%</th> <!-- 70%로 고정 반영 -->
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">70%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">40%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">35%</th>
@@ -415,7 +414,7 @@
 
         const medImageMap = {
             "Crystal": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/cc492d238d1dc-removebg-preview.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9jYzQ5MmQyMzhkMWRjLXJlbW92ZWJnLXByZXZpZXcucG5nIiwiaWF0IjoxNzY5MzE5OTgxLCJleHAiOjE5MjY5OTk5ODF9.p-96RHgIhc21DB_WAthHvodJ_w3yxT3dryd4kJno3yo",
-            "Crystal Plus": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/f8ead94e5360b.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mOGVhZDk0ZTUzNjBiLnBuZyIsImlhdCI6MTc2OTMxOTkyMjwiZXhwIjoxOTI2OTk5MjIyfQ.oHhH2kK_UUgbuKUufp9igjYZS6XdGd5DMJQXB9gSsdw",
+            "Crystal Plus": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/f8ead94e5360b.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mOGVhZDk0ZTUzNjBiLnBuZyIsImlhdCI6MTc2OTMxOTIyMiwiZXhwIjoxOTI2OTk5MjIyfQ.oHhH2kK_UUgbuKUufp9igjYZS6XdGd5DMJQXB9gSsdw",
             "Scalp MD": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ScalpMD%20(1).png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9TY2FscE1EICgxKS5wbmciLCJpYXQiOjE3ODA2MjYxMjAsImV4cCI6MjA5NTk4NjEyMH0.9U_nU_gxKrs0mhXBgNlmKwi81fywoK57EF9670E-Va8"
         };
 
@@ -604,19 +603,16 @@
                     tr.className = "text-sm hover:bg-gray-50 transition-colors";
                     
                     const rate = currentCurrency === 'KRW' ? globalKrwRate : 1;
-                    const isKrw = currentCurrency === 'KRW';
+                const isKrw = currentCurrency === 'KRW';
 
-                    const b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
-                    
-                    // Promo 가격을 MSRP의 70%로 고정 계산
-                    const b2c_promotion = b2c_msrp ? b2c_msrp * 0.70 : null;
-                    
-                    // Apply fixed supply rates (45%, 40%, 35%) directly to MSRP regardless of product DB prices
-                    const b2b1 = b2c_msrp ? b2c_msrp * 0.45 : null;
-                    const b2b2 = b2c_msrp ? b2c_msrp * 0.40 : null;
-                    const b2b3 = b2c_msrp ? b2c_msrp * 0.35 : null;
+                // DB에서 불러온 가격에 환율만 적용하여 출력 (비율 하드코딩 완전 제거됨)
+                const b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
+                const b2c_promotion = usdPrice.b2c_promotion ? usdPrice.b2c_promotion * rate : null;
+                const b2b1 = usdPrice.b2b_tier1_1_to_10_ct ? usdPrice.b2b_tier1_1_to_10_ct * rate : null;
+                const b2b2 = usdPrice.b2b_tier2_10_to_30_ct ? usdPrice.b2b_tier2_10_to_30_ct * rate : null;
+                const b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
 
-                    let { name, volume, qty } = extractNameVolumeQty(p.display_name);
+                let { name, volume, qty } = extractNameVolumeQty(p.display_name);
                     
                     if (qty === '-' || qty === '' || !qty) qty = '1ea';
 
