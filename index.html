@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confidential - MEDIFAB Product Live Price List</title>
+    <title>Confidential - MEDIFAB Product Live Price List & Quotation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -26,11 +26,10 @@
         .table-container { 
             border: 1px solid #e5e7eb;
             border-radius: 0; 
-            max-height: 70vh; /* 세로 스크롤을 위한 최대 높이 설정 */
-            overflow-y: auto; /* 세로 스크롤 활성화 */
+            max-height: 70vh; 
+            overflow-y: auto; 
         }
         
-        /* 표 선 통일성 및 열 너비 고정을 위한 전역 CSS 추가 */
         .unified-table {
             table-layout: fixed;
             width: 100%;
@@ -42,13 +41,12 @@
             overflow-wrap: break-word;
         }
         .unified-table th {
-            border: 1px solid #374151; /* 어두운 헤더 배경에 어울리는 구획선 (gray-700) */
+            border: 1px solid #374151; 
         }
         .unified-table td {
-            border: 1px solid #e5e7eb; /* 데이터 셀의 통일된 연한 회색 선 (gray-200) */
+            border: 1px solid #e5e7eb; 
         }
         
-        /* 테이블 헤더 고정 (Sticky Header) */
         .unified-table thead {
             position: -webkit-sticky;
             position: sticky;
@@ -56,60 +54,22 @@
             z-index: 20;
         }
         
-        /* 스크롤 시 헤더 뒤쪽 내용이 비치지 않도록 명시적 배경색 적용 */
         .unified-table thead th {
             background-color: #111827; 
             background-clip: padding-box;
         }
 
-        /* 테이블 안쪽 스크롤바 커스텀 */
-        .table-container::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        .table-container::-webkit-scrollbar-track {
-            background: #f8fafc; 
-        }
-        .table-container::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        .table-container::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
-        }
+        .table-container::-webkit-scrollbar { width: 8px; height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #f8fafc; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* 코스메틱 테이블의 그룹 헤더 예외 처리 (세로선 제거) */
-        .cosmetic-table tr.category-header td {
-            border-left: none;
-            border-right: none;
-            border-top: none;
-            border-bottom: 2px solid #111827 !important; 
-        }
-        .cosmetic-table tr.sub-category-header td {
-            border-left: none;
-            border-right: none;
-            border-top: 1px solid #e5e7eb !important;
-            border-bottom: 1px solid #e5e7eb !important;
-        }
-        .cosmetic-table tr.type-header td {
-            border-left: none;
-            border-right: none;
-            border-top: none;
-            border-bottom: 1px solid #f3f4f6 !important;
-        }
+        .cosmetic-table tr.category-header td { border-left: none; border-right: none; border-top: none; border-bottom: 2px solid #111827 !important; }
+        .cosmetic-table tr.sub-category-header td { border-left: none; border-right: none; border-top: 1px solid #e5e7eb !important; border-bottom: 1px solid #e5e7eb !important; }
+        .cosmetic-table tr.type-header td { border-left: none; border-right: none; border-top: none; border-bottom: 1px solid #f3f4f6 !important; }
         
-        /* 로딩 및 안내 문구 셀 예외 처리 */
-        .unified-table tr.loading-row td {
-            border: none;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .unified-table tr.note-row td {
-            border-left: none;
-            border-right: none;
-            border-bottom: none;
-            border-top: 1px solid #e5e7eb;
-        }
-        
+        .unified-table tr.loading-row td { border: none; border-bottom: 1px solid #e5e7eb; }
+        .unified-table tr.note-row td { border-left: none; border-right: none; border-bottom: none; border-top: 1px solid #e5e7eb; }
         .cosmetic-table tr:hover:not(.category-header):not(.sub-category-header):not(.type-header) { background-color: #f9fafb; transition: background-color 0.2s ease; }
         
         .currency-cell { display: flex; justify-content: space-between; width: 100%; min-width: 65px; }
@@ -117,6 +77,30 @@
         .product-img { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid #e5e7eb; }
         .med-product-img { width: 44px; height: 44px; object-fit: contain; }
         .placeholder-img { width: 36px; height: 36px; border-radius: 4px; background-color: #f3f4f6; border: 1px dashed #d1d5db; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px; }
+
+        /* Print and Quotation Styles */
+        .print-only, .print-only-cell, .print-only-inline { display: none; }
+        
+        @media print {
+            body { background-color: #ffffff; margin: 0; padding: 0; }
+            #lock-screen, #ai-chat-container, #ai-fab, .no-print { display: none !important; }
+            /* Hide top content sections */
+            #main-content > div:not(#quotation-section) { display: none !important; }
+            
+            #main-content { padding: 0 !important; margin: 0 !important; display: block !important; }
+            #quotation-section { margin-top: 0 !important; padding-top: 0 !important; border: none !important; }
+            #print-area {
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 auto !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .print-only { display: block !important; }
+            .print-only-cell { display: table-cell !important; }
+            .print-only-inline { display: inline !important; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white">
@@ -138,7 +122,7 @@
         </div>
     </div>
 
-    <!-- Image Modal for Enlarged View -->
+    <!-- Image Modal -->
     <div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeImageModal(event)">
         <div class="relative max-w-4xl max-h-[90vh] p-4 flex flex-col items-center">
             <button class="absolute -top-10 right-0 text-white hover:text-gray-300 text-3xl" onclick="closeImageModal(event)">&times;</button>
@@ -203,17 +187,10 @@
         </div>
         <div class="overflow-x-auto table-container bg-white mb-4">
             <table class="w-full text-left border-collapse cosmetic-table unified-table">
+                <!-- 생략 없이 기존 컬럼그룹 유지 -->
                 <colgroup>
-                    <col style="width: 5%;">
-                    <col style="width: 25%;">
-                    <col style="width: 8%;">
-                    <col style="width: 8%;">
-                    <col style="width: 8%;">
-                    <col style="width: 9.2%;">
-                    <col style="width: 9.2%;">
-                    <col style="width: 9.2%;">
-                    <col style="width: 9.2%;">
-                    <col style="width: 9.2%;">
+                    <col style="width: 5%;"><col style="width: 25%;"><col style="width: 8%;"><col style="width: 8%;"><col style="width: 8%;">
+                    <col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;">
                 </colgroup>
                 <thead>
                     <tr>
@@ -253,23 +230,10 @@
         <div class="overflow-x-auto table-container bg-white mb-12">
             <table class="w-full text-left border-collapse unified-table">
                 <colgroup>
-                    <col style="width: 4%;">
-                    <col style="width: 6%;">
-                    <col style="width: 8%;">
-                    <col style="width: 12%;">
-                    <col style="width: 10%;">
-                    <col style="width: 7%;">
-                    <col style="width: 4%;">
-                    <col style="width: 4%;">
-                    <col style="width: 5%;">
-                    <col style="width: 5%;">
-                    <col style="width: 5%;">
-                    <col style="width: 5%;">
-                    <col style="width: 5%;">
-                    <col style="width: 5%;">
-                    <col style="width: 5%;">
-                    <col style="width: 5%;">
-                    <col style="width: 5%;">
+                    <col style="width: 4%;"><col style="width: 6%;"><col style="width: 8%;"><col style="width: 12%;"><col style="width: 10%;">
+                    <col style="width: 7%;"><col style="width: 4%;"><col style="width: 4%;"><col style="width: 5%;"><col style="width: 5%;">
+                    <col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;">
+                    <col style="width: 5%;"><col style="width: 5%;">
                 </colgroup>
                 <thead>
                     <tr>
@@ -288,12 +252,10 @@
                     <tr>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">Promo</th>
-                        
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1,000</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">3,000</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">5,000</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
-                        
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">30,000</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">50,000</th>
@@ -301,12 +263,10 @@
                     <tr>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">80%</th>
-                        
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">42%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">37%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">34%</th>
-                        
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">33%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">30%</th>
                         <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">27%</th>
@@ -317,12 +277,133 @@
                 </tbody>
             </table>
         </div>
-        
+
+        <!-- 3. QUOTATION GENERATOR -->
+        <div id="quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
+            <!-- Controls (Not printed) -->
+            <div class="no-print mb-8">
+                <div class="flex justify-between items-end mb-4">
+                    <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Quotation Generator</h2>
+                    <div class="space-x-2 flex">
+                        <button onclick="addQuoteItem()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium transition-colors">+ Add Item</button>
+                        <button onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors">Print / Save PDF</button>
+                        <button onclick="shareViaEmail()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Share (Email)
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-4 border border-gray-200 flex flex-wrap gap-6 items-center">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-bold text-gray-700">Incoterms:</label>
+                        <select id="quote-incoterms" class="border border-gray-300 p-1.5 text-sm bg-white" onchange="renderQuoteTable()">
+                            <option value="FOB">FOB</option>
+                            <option value="EXW">EXW</option>
+                        </select>
+                        <span class="text-xs text-gray-500">* EXW applies a 3% discount to the unit price</span>
+                    </div>
+                    <!-- 스페셜 할인율 추가 -->
+                    <div class="flex items-center gap-2 border-l border-gray-300 pl-6 ml-2">
+                        <label class="text-sm font-bold text-gray-700">Special Discount (%):</label>
+                        <input type="number" id="quote-discount" min="0" max="100" class="border border-gray-300 p-1.5 text-sm bg-white w-16 text-right" value="0" onchange="renderQuoteTable()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Print Area (Proforma Invoice) -->
+            <div id="print-area" class="bg-white p-12 mx-auto shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100" style="max-w: 210mm; min-height: 297mm;">
+                
+                <!-- Header: Logo & Title -->
+                <div class="flex justify-between items-start mb-10 border-b-2 border-gray-900 pb-6">
+                    <div>
+                        <img src="https://metadqppbypzgiowkgzg.supabase.co/storage/v1/object/sign/SIN%20WONJONG/Medifab%20logo.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zYjU3MDQxZS04NjZlLTQxOTYtODJiMy0yZjMzODZhNjBkYTAiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJTSU4gV09OSk9ORy9NZWRpZmFiIGxvZ28ucG5nIiwiaWF0IjoxNzgwOTE5MDY1LCJleHAiOjIwOTYyNzkwNjV9.AOFB6QneYt7PLdENq_KWBkkAncl-xk5wkK3i1-cAH1E" alt="Medifab Logo" class="h-12 mb-4 object-contain">
+                        <h2 class="font-bold text-gray-900">MEDIFAB GLOBAL</h2>
+                        <p class="text-xs text-gray-600 mt-1">
+                            Room 417, Daeryung Techno Town 20th,<br>
+                            5, Gasan digital 1-ro, Geumcheon-gu,<br>
+                            Seoul, Republic of Korea
+                        </p>
+                        <p class="text-xs text-gray-600 mt-1">Email: contact@imedifab.com</p>
+                    </div>
+                    <div class="text-right">
+                        <h1 class="text-3xl font-montserrat tracking-widest text-gray-900 uppercase">Proforma Invoice</h1>
+                        <div class="mt-4 text-sm">
+                            <p class="mb-1"><span class="font-bold text-gray-700">DATE:</span> <span id="quote-date" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">YYYY-MM-DD</span><span id="quote-date-print" class="print-only-inline"></span></p>
+                            <p><span class="font-bold text-gray-700">QUOTE NO:</span> <span id="quote-no" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">QT-2026-001</span><span id="quote-no-print" class="print-only-inline"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Info -->
+                <div class="mb-8">
+                    <p class="font-bold text-gray-900 mb-2 border-l-4 border-gray-900 pl-2">TO (CUSTOMER)</p>
+                    <textarea id="quote-to" class="w-full border border-dashed border-gray-300 p-3 text-sm h-24 bg-gray-50 focus:bg-white outline-none resize-none no-print" placeholder="Enter Customer Name, Company, Address, and Contact Info here..."></textarea>
+                    <div id="quote-to-print" class="print-only whitespace-pre-wrap text-sm border border-transparent p-3 min-h-[6rem]"></div>
+                </div>
+
+                <!-- Quote Table -->
+                <table class="w-full text-left border-collapse mb-6">
+                    <thead>
+                        <tr class="bg-gray-100 border-t-2 border-b-2 border-gray-900 text-xs uppercase tracking-wider text-gray-700">
+                            <th class="py-3 px-2 text-center w-[5%] print-only-cell hidden">No</th>
+                            <th class="py-3 px-2 text-center w-[5%] no-print">Del</th>
+                            <th class="py-3 px-2 w-[40%]">Item Description</th>
+                            <th class="py-3 px-2 text-center w-[15%]">Color/Opt</th>
+                            <th class="py-3 px-2 text-center w-[15%]">Qty</th>
+                            <th class="py-3 px-2 text-right w-[15%]">U.Price</th>
+                            <th class="py-3 px-2 text-right w-[15%]">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quote-tbody" class="text-sm">
+                        <!-- Items will be injected here -->
+                    </tbody>
+                </table>
+
+                <!-- Totals -->
+                <div class="flex justify-between items-start mt-6 pt-4 border-t border-gray-300">
+                    <div class="w-1/2 pr-4">
+                        <p class="font-bold text-gray-900 mb-2 border-l-4 border-gray-900 pl-2">BANK INFORMATION</p>
+                        <div contenteditable="true" class="border border-dashed border-gray-300 p-3 text-xs bg-gray-50 focus:bg-white outline-none min-h-[80px] no-print" id="bank-info-edit">Bank name : NongHyup Bank / Yeoksam branch
+Bank address: 351 Gangnamdaero, Seocho-dong, Seocho-gu, Seoul, Korea
+SWIFT CODE: NACFKRSE
+Account number: 452-0022-0212-11
+Beneficiary : MediFab Co., LTD
+Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, Republic of Korea</div>
+                        <div class="print-only whitespace-pre-wrap text-xs p-3" id="bank-info-print"></div>
+
+                        <div class="mt-4 text-xs text-gray-600">
+                            <p><span class="font-bold text-gray-800">Incoterms:</span> <span id="quote-incoterms-print" class="uppercase">FOB</span></p>
+                            <p class="mt-1 hidden text-red-600 font-medium" id="exw-notice">* EXW condition applied (Unit Price reflects 3% discount)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="w-1/2 max-w-[280px]">
+                        <div class="flex justify-between items-center py-2 text-sm">
+                            <span class="text-gray-600">Subtotal:</span>
+                            <span><span id="quote-currency-label1" class="text-xs mr-1 text-gray-400"></span><span id="quote-subtotal" class="font-medium">0.00</span></span>
+                        </div>
+                        <!-- 할인율 행 추가 -->
+                        <div id="quote-discount-row" class="flex justify-between items-center py-2 text-sm text-red-600 hidden">
+                            <span>Discount (<span id="quote-discount-display">0</span>%):</span>
+                            <span>-<span id="quote-currency-label2" class="text-xs mr-1"></span><span id="quote-discount-amount" class="font-medium">0.00</span></span>
+                        </div>
+                        <div class="flex justify-between items-center py-3 border-t-2 border-gray-900 mt-1">
+                            <span class="font-bold text-gray-900">GRAND TOTAL:</span>
+                            <span class="font-bold text-lg text-gray-900"><span id="quote-currency-label" class="text-sm mr-1"></span><span id="quote-grandtotal">0.00</span></span>
+                        </div>
+                        <div class="text-right mt-12">
+                            <div class="border-b border-gray-400 w-48 ml-auto mb-2"></div>
+                            <p class="text-xs text-gray-500">Authorized Signature</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- AI Chat UI -->
     <div id="ai-chat-container" class="fixed bottom-6 right-6 z-[60] hidden flex-col w-80 sm:w-96 h-[30rem] bg-white border border-gray-300 shadow-2xl">
-        <!-- Header -->
         <div class="bg-gray-900 text-white px-5 py-4 flex justify-between items-center cursor-pointer" onclick="toggleChat()">
             <div class="flex items-center gap-2">
                 <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
@@ -330,30 +411,29 @@
             </div>
             <button class="text-white hover:text-gray-400 text-xl leading-none">&times;</button>
         </div>
-        <!-- Chat History -->
         <div id="chat-history" class="flex-1 p-5 overflow-y-auto flex flex-col gap-4 text-sm bg-gray-50/50">
             <div class="bg-white border border-gray-200 p-3.5 shadow-sm text-gray-800 self-start max-w-[85%] leading-relaxed">
                 Hello! I am the Medifab internal AI assistant. You can ask me about product pricing, availability, and specific details from the current catalog.
             </div>
         </div>
-        <!-- Input Area -->
         <div class="p-4 border-t border-gray-200 bg-white flex gap-2">
             <input type="text" id="chat-input" class="flex-1 px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:border-gray-900 bg-gray-50 focus:bg-white transition-colors" placeholder="Ask about products..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
             <button onclick="sendChatMessage()" class="bg-gray-900 text-white px-4 py-2 text-xs uppercase tracking-widest hover:bg-black transition-colors">Send</button>
         </div>
     </div>
 
-    <!-- AI FAB (Floating Action Button) -->
+    <!-- AI FAB -->
     <button id="ai-fab" onclick="toggleChat()" class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white w-14 h-14 rounded-none shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center hover:bg-black transition-transform hover:-translate-y-1">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
     </button>
 
     <script>
-        // Set Current Date in English
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', options);
+        const todayStr = new Date().toLocaleDateString('en-US', options);
+        document.getElementById('current-date').textContent = `Today: ${todayStr}`;
+        document.getElementById('quote-date').textContent = new Date().toISOString().split('T')[0];
 
-        // --- PASSWORD PROTECTION LOGIC ---
+        // --- PASSWORD LOGIC ---
         function checkPassword() {
             const pwd = document.getElementById('pwd-input').value;
             const errorMsg = document.getElementById('error-msg');
@@ -374,27 +454,20 @@
             }
         }
 
-        // --- IMAGE MODAL LOGIC ---
+        // --- IMAGE MODAL ---
         function openImageModal(imgSrc) {
             const modal = document.getElementById('image-modal');
-            const modalImg = document.getElementById('modal-img');
-            modalImg.src = imgSrc;
+            document.getElementById('modal-img').src = imgSrc;
             modal.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                modal.classList.remove('opacity-0');
-            });
+            requestAnimationFrame(() => modal.classList.remove('opacity-0'));
         }
-
         function closeImageModal(e) {
             const modal = document.getElementById('image-modal');
             modal.classList.add('opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.getElementById('modal-img').src = '';
-            }, 300);
+            setTimeout(() => { modal.classList.add('hidden'); document.getElementById('modal-img').src = ''; }, 300);
         }
 
-        // --- SUPABASE CONFIGURATION ---
+        // --- SUPABASE CONFIG ---
         const SUPABASE_URL = 'https://rayhgqcpupwmwpymtkwg.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -406,7 +479,6 @@
         let globalUniqueProducts = [];
         let globalMedicalProducts = [];
 
-        // Image Mapping
         const productImageMap = {
             "Cellular water ampoule booster 120ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoulbooster120.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxib29zdGVyMTIwLmpwZyIsImlhdCI6MTc4MDYyNzM4NCwiZXhwIjoyMDk1OTg3Mzg0fQ.YgYQumgSOVgFPo5h4rPdJgWEvU-DW-GBbrWWlGIGI2o",
             "Cellular water ampoule booster": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoule%20booster%2060ml.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxlIGJvb3N0ZXIgNjBtbC5wbmciLCJpYXQiOjE3ODA2MjcyODIsImV4cCI6MjA5NTk4NzI4Mn0.LKa9sEPCp05ASOzS2tnq2ybIrdOorq8GyKwfwxKYSgM",
@@ -424,7 +496,6 @@
             "Root vitality volume shampoo 300ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampoo300ml.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcG9vMzAwbWwuanBnIiwiaWF0IjoxNzY5ODc0MDY0LCJleHAiOjE5Mjc1NTQwNjR9.Q_kA-8HIr6_asLAxPIMVs_i_06Aix0ItovUPyJDZzHM",
             "Root vitality volume shampoo 100ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampu.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcHUuanBnIiwiaWF0IjoxNzY5ODczMTU2LCJleHAiOjE5Mjc1NTMxNTZ9.rpyILNhH4uQFS67Q9sKgiUDzhX7a_sWLknZvDHbzMog"
         };
-
         const medImageMap = {
             "Crystal": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/cc492d238d1dc-removebg-preview.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9jYzQ5MmQyMzhkMWRjLXJlbW92ZWJnLXByZXZpZXcucG5nIiwiaWF0IjoxNzY5MzE5OTgxLCJleHAiOjE5MjY5OTk5ODF9.p-96RHgIhc21DB_WAthHvodJ_w3yxT3dryd4kJno3yo",
             "Crystal Plus": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/f8ead94e5360b.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mOGVhZDk0ZTUzNjBiLnBuZyIsImlhdCI6MTc2OTMxOTIyMiwiZXhwIjoxOTI2OTk5MjIyfQ.oHhH2kK_UUgbuKUufp9igjYZS6XdGd5DMJQXB9gSsdw",
@@ -432,13 +503,10 @@
         };
 
         function changeExchangeRate(val) {
-            if (val === 'live') {
-                appliedKrwRate = liveKrwRate;
-            } else {
-                appliedKrwRate = parseFloat(val);
-            }
+            appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
             renderTableData();
             renderMedicalTableData();
+            renderQuoteTable(); // 견적서 갱신
         }
 
         function setCurrency(currency) {
@@ -460,30 +528,30 @@
                 rateContainer.classList.remove('hidden');
                 rateContainer.classList.add('flex');
             }
-            
             renderTableData();
             renderMedicalTableData();
+            renderQuoteTable(); // 견적서 갱신
         }
 
-        // B2C / Medical 테이블용 일반 화폐 포맷팅
         function formatCurrency(amount, roundKrwToThousands = false) {
             if (amount === null || amount === undefined || amount === 0) return '<div class="text-center w-full text-black">-</div>';
             let displayAmount = amount;
-            
-            if (currentCurrency === 'KRW' && roundKrwToThousands) {
-                displayAmount = Math.round(displayAmount / 1000) * 1000;
-            } else {
-                displayAmount = Math.round(displayAmount); // 달러 포함 소수점 첫째 자리에서 반올림
-            }
-            
-            const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(displayAmount);
-            return `<div class="text-center w-full">${formattedAmount}</div>`;
+            if (currentCurrency === 'KRW' && roundKrwToThousands) displayAmount = Math.round(displayAmount / 1000) * 1000;
+            else displayAmount = Math.round(displayAmount);
+            return `<div class="text-center w-full">${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(displayAmount)}</div>`;
         }
-
         function formatMedCurrency(amount) {
             if (amount === null || amount === undefined) return '<span class="text-black">sample</span>';
-            const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(amount));
-            return formattedAmount;
+            return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(amount));
+        }
+        // 견적서용 숫자 포맷
+        function formatNumber(num) {
+            if (num === null || num === undefined) return '0.00';
+            if (currentCurrency === 'KRW') {
+                return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(num));
+            } else {
+                return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+            }
         }
 
         function extractNameVolumeQty(fullName) {
@@ -492,19 +560,14 @@
             let volume = '-';
             let qty = '-';
             const formatQty = (q) => q.trim().toLowerCase();
-
             const volQtyMatch = fullName.match(/(.*?)\s+(\d+\.?\d*\s*(?:ml|g|oz|kg|l|fl\.oz))\s*(?:x|\*|X)?\s*(\d+\s*(?:ea|pcs|p|sheets|pads|매|개))$/i);
             if (volQtyMatch) return { name: volQtyMatch[1].trim(), volume: volQtyMatch[2].trim(), qty: formatQty(volQtyMatch[3]) };
-
             const volMatch = fullName.match(/(.*?)\s+(\d+\.?\d*\s*(?:ml|g|oz|kg|l|fl\.oz))$/i);
             if (volMatch) return { name: volMatch[1].trim(), volume: volMatch[2].trim(), qty: '-' };
-
             const qtyMatch = fullName.match(/(.*?)\s+(\d+\s*(?:ea|pcs|p|sheets|pads|매|개))$/i);
             if (qtyMatch) return { name: qtyMatch[1].trim(), volume: '-', qty: formatQty(qtyMatch[2]) };
-
             const genericMatch = fullName.match(/(.*?)\s+(\d+\s*[a-zA-Z]+(?:\s*(?:x|\*|X)?\s*\d+\s*[a-zA-Z]+)?)$/);
             if (genericMatch) return { name: genericMatch[1].trim(), volume: genericMatch[2].trim(), qty: '-' };
-
             return { name, volume, qty };
         }
 
@@ -516,11 +579,8 @@
                     liveKrwRate = exData.rates.KRW;
                     appliedKrwRate = liveKrwRate;
                     document.getElementById('live-rate').textContent = `1 USD = ₩ ` + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate);
-                    
                     const liveOption = document.querySelector('#krw-rate-select option[value="live"]');
-                    if (liveOption) {
-                        liveOption.textContent = `Live (₩${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate)})`;
-                    }
+                    if (liveOption) liveOption.textContent = `Live (₩${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate)})`;
                 } catch (e) {
                     document.getElementById('live-rate').textContent = `Rate Load Failed (Default: ₩1,400)`;
                     console.error("Exchange API Error:", e);
@@ -528,10 +588,7 @@
 
                 const { data: dbProducts, error: prodErr } = await supabaseClient
                     .from('products')
-                    .select(`
-                        sub_category, name_en, ct_quantity,
-                        product_prices (currency, b2c_msrp, b2c_promotion, b2b_tier1_1_to_10_ct, b2b_tier2_10_to_30_ct, b2b_tier3_30_to_70_ct)
-                    `)
+                    .select(`sub_category, name_en, ct_quantity, product_prices (currency, b2c_msrp, b2c_promotion, b2b_tier1_1_to_10_ct, b2b_tier2_10_to_30_ct, b2b_tier3_30_to_70_ct)`)
                     .order('created_at', { ascending: true });
                 if (prodErr) throw prodErr;
 
@@ -539,22 +596,11 @@
                 if (dbProducts) {
                     dbProducts.forEach(product => {
                         let displayName = product.name_en;
-                        
-                        if (displayName && displayName.includes("Core impact (BK/WH/DW/BG)")) {
-                            displayName = displayName.replace("Core impact (BK/WH/DW/BG)", "Core impact (WH/PK/DW/BK)");
-                        }
-                        if (displayName && displayName.includes("Core impact PK")) {
-                            return; 
-                        }
-                        if (displayName && displayName.includes("Cellular water ampoule booster 50ml")) {
-                            displayName = displayName.replace("Cellular water ampoule booster 50ml", "Cellular water ampoule booster 60ml");
-                        }
-                        
+                        if (displayName && displayName.includes("Core impact (BK/WH/DW/BG)")) displayName = displayName.replace("Core impact (BK/WH/DW/BG)", "Core impact (WH/PK/DW/BK)");
+                        if (displayName && displayName.includes("Core impact PK")) return; 
+                        if (displayName && displayName.includes("Cellular water ampoule booster 50ml")) displayName = displayName.replace("Cellular water ampoule booster 50ml", "Cellular water ampoule booster 60ml");
                         product.display_name = displayName;
-
-                        if (displayName && !uniqueProductsMap.has(displayName)) {
-                            uniqueProductsMap.set(displayName, product);
-                        }
+                        if (displayName && !uniqueProductsMap.has(displayName)) uniqueProductsMap.set(displayName, product);
                     });
                 }
                 globalUniqueProducts = Array.from(uniqueProductsMap.values());
@@ -568,6 +614,7 @@
 
                 renderTableData();
                 renderMedicalTableData();
+                initQuotationSystem();
 
             } catch (err) {
                 console.error("Data Load Error:", err);
@@ -582,12 +629,10 @@
         function renderTableData() {
             const tbody = document.getElementById('price-table-body');
             tbody.innerHTML = '';
-
             if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
                 tbody.innerHTML = `<tr class="loading-row"><td colspan="10" class="text-center py-10 text-red-500">No product data found.</td></tr>`;
                 return;
             }
-
             const faceDevices = globalUniqueProducts.filter(p => p.sub_category === 'Device-face');
             const faceCosmetics = globalUniqueProducts.filter(p => p.sub_category === 'Product-face');
             const hairDevices = globalUniqueProducts.filter(p => p.sub_category === 'Device-hair');
@@ -601,81 +646,44 @@
                 if (lowerName.includes('cream')) return 'CREAM';
                 return 'SHAMPOO';
             }
-
             function renderHeader(title, level) {
                 const tr = document.createElement('tr');
-                if (level === 1) { 
-                    tr.className = 'category-header bg-transparent';
-                    tr.innerHTML = `<td colspan="10" class="py-6 px-4 font-montserrat text-lg text-black uppercase tracking-widest">${title}</td>`;
-                } else if (level === 2) { 
-                    tr.className = 'sub-category-header bg-transparent';
-                    tr.innerHTML = `<td colspan="10" class="py-4 px-5">
-                        <div class="flex items-center gap-2">
-                            <div class="w-1.5 h-4 bg-black"></div>
-                            <span class="text-black text-sm tracking-widest uppercase">${title}</span>
-                        </div>
-                    </td>`;
-                } else if (level === 3) { 
-                    tr.className = 'type-header bg-transparent';
-                    tr.innerHTML = `<td colspan="10" class="py-3 px-8">
-                        <div class="flex items-center gap-2">
-                            <span class="text-black text-[10px]">◆</span>
-                            <span class="text-black text-xs tracking-widest uppercase">${title}</span>
-                        </div>
-                    </td>`;
-                }
+                if (level === 1) { tr.className = 'category-header bg-transparent'; tr.innerHTML = `<td colspan="10" class="py-6 px-4 font-montserrat text-lg text-black uppercase tracking-widest">${title}</td>`; } 
+                else if (level === 2) { tr.className = 'sub-category-header bg-transparent'; tr.innerHTML = `<td colspan="10" class="py-4 px-5"><div class="flex items-center gap-2"><div class="w-1.5 h-4 bg-black"></div><span class="text-black text-sm tracking-widest uppercase">${title}</span></div></td>`; } 
+                else if (level === 3) { tr.className = 'type-header bg-transparent'; tr.innerHTML = `<td colspan="10" class="py-3 px-8"><div class="flex items-center gap-2"><span class="text-black text-[10px]">◆</span><span class="text-black text-xs tracking-widest uppercase">${title}</span></div></td>`; }
                 tbody.appendChild(tr);
             }
-
             function renderProducts(products) {
                 if (products.length === 0) return;
                 products.forEach(p => {
                     const pricesArray = Array.isArray(p.product_prices) ? p.product_prices : [];
                     const usdPrice = pricesArray.find(pr => pr.currency === 'USD') || {};
-                    
                     const tr = document.createElement('tr');
                     tr.className = "text-sm hover:bg-gray-50 transition-colors";
-                    
                     const rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
                     const isKrw = currentCurrency === 'KRW';
 
-                // DB에서 불러온 가격에 환율만 적용하여 출력 (비율 하드코딩 완전 제거됨)
-                const b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
-                const b2c_promotion = usdPrice.b2c_promotion ? usdPrice.b2c_promotion * rate : null;
-                const b2b1 = usdPrice.b2b_tier1_1_to_10_ct ? usdPrice.b2b_tier1_1_to_10_ct * rate : null;
-                const b2b2 = usdPrice.b2b_tier2_10_to_30_ct ? usdPrice.b2b_tier2_10_to_30_ct * rate : null;
-                const b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
+                    const b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
+                    const b2c_promotion = usdPrice.b2c_promotion ? usdPrice.b2c_promotion * rate : null;
+                    const b2b1 = usdPrice.b2b_tier1_1_to_10_ct ? usdPrice.b2b_tier1_1_to_10_ct * rate : null;
+                    const b2b2 = usdPrice.b2b_tier2_10_to_30_ct ? usdPrice.b2b_tier2_10_to_30_ct * rate : null;
+                    const b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
 
-                let { name, volume, qty } = extractNameVolumeQty(p.display_name);
-                    
+                    let { name, volume, qty } = extractNameVolumeQty(p.display_name);
                     if (qty === '-' || qty === '' || !qty) qty = '1ea';
 
                     let mappedImg = "";
                     let longestMatch = "";
-                    
                     for (const [key, url] of Object.entries(productImageMap)) {
                         if (name.toLowerCase().includes(key.toLowerCase()) || p.display_name.toLowerCase().includes(key.toLowerCase())) {
-                            if (key.length > longestMatch.length) {
-                                longestMatch = key;
-                                mappedImg = url;
-                            }
+                            if (key.length > longestMatch.length) { longestMatch = key; mappedImg = url; }
                         }
                     }
 
-                    const imgHtml = mappedImg 
-                        ? `<img src="${mappedImg}" class="product-img cursor-pointer hover:opacity-80 transition-opacity" alt="${name}" onclick="openImageModal('${mappedImg}')">`
-                        : `<div class="placeholder-img">N/A</div>`;
-
+                    const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img cursor-pointer hover:opacity-80 transition-opacity" alt="${name}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img">N/A</div>`;
                     tr.innerHTML = `
-                        <td class="py-2 px-4 text-center align-middle">
-                            <div class="flex justify-center">${imgHtml}</div>
-                        </td>
-                        <td class="py-3 pr-6 align-middle">
-                            <div class="flex items-center gap-3">
-                                <span class="text-gray-300 text-sm font-light">|</span>
-                                <span class="text-black">${name}</span>
-                            </div>
-                        </td>
+                        <td class="py-2 px-4 text-center align-middle"><div class="flex justify-center">${imgHtml}</div></td>
+                        <td class="py-3 pr-6 align-middle"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${name}</span></div></td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${volume}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${qty}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${p.ct_quantity || '-'}</td>
@@ -688,25 +696,17 @@
                     tbody.appendChild(tr);
                 });
             }
-            
             function renderCategorizedCosmetics(cosmetics) {
                 const groups = { 'AMPOULE BOOSTER': [], 'AMPOULE': [], 'MASK': [], 'CREAM': [], 'SHAMPOO': [] };
-                cosmetics.forEach(p => {
-                    const type = getCosmeticType(p.display_name);
-                    if(groups[type]) groups[type].push(p);
-                });
+                cosmetics.forEach(p => { const type = getCosmeticType(p.display_name); if(groups[type]) groups[type].push(p); });
                 ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM', 'SHAMPOO'].forEach(type => {
-                    if (groups[type] && groups[type].length > 0) {
-                        renderHeader(type, 3);
-                        renderProducts(groups[type]);
-                    }
+                    if (groups[type] && groups[type].length > 0) { renderHeader(type, 3); renderProducts(groups[type]); }
                 });
             }
 
             renderHeader('FACE CATEGORY', 1);
             if (faceDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(faceDevices); }
             if (faceCosmetics.length > 0) { renderHeader('COSMETIC', 2); renderCategorizedCosmetics(faceCosmetics); }
-
             renderHeader('HAIR CATEGORY', 1);
             if (hairDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(hairDevices); }
             if (hairCosmetics.length > 0) { renderHeader('COSMETIC', 2); renderCategorizedCosmetics(hairCosmetics); }
@@ -718,30 +718,21 @@
         function renderMedicalTableData() {
             const tbody = document.getElementById('medical-table-body');
             tbody.innerHTML = '';
-
             let filteredData = [];
             if (currentCurrency === 'KRW') {
                 const usdData = globalMedicalProducts.filter(d => d.currency === 'USD');
                 if (usdData.length > 0) {
                     filteredData = usdData.map(p => ({
-                        ...p,
-                        currency: 'KRW',
+                        ...p, currency: 'KRW',
                         clinic_msrp: p.clinic_msrp ? p.clinic_msrp * appliedKrwRate : null,
                         clinic_promotion: p.clinic_promotion ? p.clinic_promotion * appliedKrwRate : null,
-                        dist_1000: p.dist_1000 ? p.dist_1000 * appliedKrwRate : null,
-                        dist_3000: p.dist_3000 ? p.dist_3000 * appliedKrwRate : null,
-                        dist_5000: p.dist_5000 ? p.dist_5000 * appliedKrwRate : null,
-                        dist_10000: p.dist_10000 ? p.dist_10000 * appliedKrwRate : null,
-                        oem_10000: p.oem_10000 ? p.oem_10000 * appliedKrwRate : null,
-                        oem_30000: p.oem_30000 ? p.oem_30000 * appliedKrwRate : null,
+                        dist_1000: p.dist_1000 ? p.dist_1000 * appliedKrwRate : null, dist_3000: p.dist_3000 ? p.dist_3000 * appliedKrwRate : null,
+                        dist_5000: p.dist_5000 ? p.dist_5000 * appliedKrwRate : null, dist_10000: p.dist_10000 ? p.dist_10000 * appliedKrwRate : null,
+                        oem_10000: p.oem_10000 ? p.oem_10000 * appliedKrwRate : null, oem_30000: p.oem_30000 ? p.oem_30000 * appliedKrwRate : null,
                         oem_50000: p.oem_50000 ? p.oem_50000 * appliedKrwRate : null
                     }));
-                } else {
-                    filteredData = globalMedicalProducts.filter(d => d.currency === 'KRW');
-                }
-            } else {
-                filteredData = globalMedicalProducts.filter(d => d.currency === 'USD');
-            }
+                } else filteredData = globalMedicalProducts.filter(d => d.currency === 'KRW');
+            } else filteredData = globalMedicalProducts.filter(d => d.currency === 'USD');
 
             if (!filteredData || filteredData.length === 0) {
                 tbody.innerHTML = `<tr class="loading-row"><td colspan="17" class="text-center py-10 text-gray-400 font-light text-sm italic">No medical data available for ${currentCurrency}.</td></tr>`;
@@ -749,108 +740,327 @@
             }
 
             function calcSpans(key) {
-                let spanArr = [];
-                let currentVal = null;
-                let count = 0;
+                let spanArr = [], currentVal = null, count = 0;
                 for (let i = 0; i < filteredData.length; i++) {
-                    if (filteredData[i][key] !== currentVal) {
-                        if (count > 0) spanArr.push(count);
-                        currentVal = filteredData[i][key];
-                        count = 1;
-                    } else {
-                        count++;
-                    }
+                    if (filteredData[i][key] !== currentVal) { if (count > 0) spanArr.push(count); currentVal = filteredData[i][key]; count = 1; } 
+                    else count++;
                 }
                 if (count > 0) spanArr.push(count);
-                
                 let result = [];
-                spanArr.forEach(c => {
-                    result.push(c);
-                    for(let i = 0; i < c - 1; i++) result.push(0);
-                });
+                spanArr.forEach(c => { result.push(c); for(let i = 0; i < c - 1; i++) result.push(0); });
                 return result;
             }
-
-            const catSpans = calcSpans('category');
-            const brandSpans = calcSpans('brand');
-            const itemSpans = calcSpans('item');
-            const ingSpans = calcSpans('ingredients');
-            const typeSpans = calcSpans('type');
+            const catSpans = calcSpans('category'), brandSpans = calcSpans('brand'), itemSpans = calcSpans('item'), ingSpans = calcSpans('ingredients'), typeSpans = calcSpans('type');
 
             filteredData.forEach((p, idx) => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50 transition-colors text-xs";
-                
                 let html = '';
-                
                 if (itemSpans[idx] > 0) {
                     let mappedImg = medImageMap[p.item];
-                    const imgHtml = mappedImg 
-                        ? `<img src="${mappedImg}" class="med-product-img mx-auto cursor-pointer hover:opacity-80 transition-opacity" alt="${p.item}" onclick="openImageModal('${mappedImg}')">`
-                        : `<div class="placeholder-img mx-auto w-8 h-8"></div>`;
-                    
+                    const imgHtml = mappedImg ? `<img src="${mappedImg}" class="med-product-img mx-auto cursor-pointer hover:opacity-80 transition-opacity" alt="${p.item}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8"></div>`;
                     html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle">${imgHtml}</td>`;
                 }
-
-                // Chitosan-based 텍스트 치환 적용
                 if (catSpans[idx] > 0) html += `<td rowspan="${catSpans[idx]}" class="py-3 px-4 text-center text-black tracking-wider uppercase align-middle">${(p.category || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 if (brandSpans[idx] > 0) html += `<td rowspan="${brandSpans[idx]}" class="py-3 px-4 text-center text-black uppercase tracking-widest align-middle">${p.brand || ''}</td>`;
                 if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center text-black align-middle">${p.item || ''}</td>`;
                 if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.ingredients || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.type || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 
-                let rawSpecs = p.specs || '';
-                let specPkg = rawSpecs;
-                let specVol = '-';
-                
+                let rawSpecs = p.specs || '', specPkg = rawSpecs, specVol = '-';
                 const volRegex = /(\d+(?:\.\d+)?\s*(?:cc|ml|g)(?:\s*(?:\*|x|X)\s*\d+(?:\.\d+)?\s*(?:cc|ml|g))?)/i;
                 const volMatch = rawSpecs.match(volRegex);
-                if (volMatch) {
-                    specVol = volMatch[0];
-                    specPkg = rawSpecs.replace(volMatch[0], '').trim();
-                    specPkg = specPkg.replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); 
-                }
+                if (volMatch) { specVol = volMatch[0]; specPkg = rawSpecs.replace(volMatch[0], '').trim().replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); }
                 if (!specPkg) specPkg = '-';
 
-                html += `<td class="py-3 px-2 text-center font-light text-black">${specPkg}</td>`;
-                html += `<td class="py-3 px-2 text-center font-light text-black">${specVol}</td>`;
-
-                html += `
-                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.clinic_msrp)}</td>
-                    <td class="py-3 px-3 text-center text-black">${formatMedCurrency(p.clinic_promotion)}</td>
-                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_1000)}</td>
-                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_3000)}</td>
-                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_5000)}</td>
-                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_10000)}</td>
-                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_10000)}</td>
-                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_30000)}</td>
-                    <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_50000)}</td>
-                `;
-                
+                html += `<td class="py-3 px-2 text-center font-light text-black">${specPkg}</td><td class="py-3 px-2 text-center font-light text-black">${specVol}</td>`;
+                html += `<td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.clinic_msrp)}</td>
+                         <td class="py-3 px-3 text-center text-black">${formatMedCurrency(p.clinic_promotion)}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_1000)}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_3000)}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_5000)}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_10000)}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_10000)}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_30000)}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_50000)}</td>`;
                 tr.innerHTML = html;
                 tbody.appendChild(tr);
             });
-            
             const noteTr = document.createElement('tr');
             noteTr.innerHTML = `<td colspan="17" class="py-3 px-4 text-[11px] text-black text-left bg-transparent border-t border-gray-100 uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
             tbody.appendChild(noteTr);
         }
 
         // ==========================================
-        // 3. MEDIFAB AI ASSISTANT (SUPABASE EDGE FUNCTION)
+        // 3. QUOTATION GENERATOR LOGIC
+        // ==========================================
+        let allProductsList = [];
+        let quoteItems = [];
+
+        function initQuotationSystem() {
+            allProductsList = [];
+            const addedNames = new Set();
+            
+            // Cosmetic Data - 이름 중복 필터링 적용
+            globalUniqueProducts.forEach(p => {
+                if (!addedNames.has(p.display_name)) {
+                    allProductsList.push({ id: 'cos_' + p.display_name, name: p.display_name, type: 'cosmetic', raw: p });
+                    addedNames.add(p.display_name);
+                }
+            });
+            // Medical Data - 이름 중복 필터링 적용
+            globalMedicalProducts.forEach(p => {
+                const fullName = `[${p.brand}] ${p.item}`;
+                if (!addedNames.has(fullName)) {
+                    allProductsList.push({ id: 'med_' + p.item, name: fullName, type: 'medical', raw: p });
+                    addedNames.add(fullName);
+                }
+            });
+            renderQuoteTable();
+        }
+
+        function getCtSize(product) {
+            if (product.type === 'medical') return 1; 
+            if (!product.ct_quantity) return 1;
+            const num = parseInt(product.ct_quantity.replace(/[^0-9]/g, ''));
+            return isNaN(num) || num === 0 ? 1 : num;
+        }
+
+        function calculateUnitPrice(item) {
+            if (item.manualPrice) return item.unitPrice;
+            if (!item.productId) return 0;
+
+            const prodObj = allProductsList.find(p => p.id === item.productId);
+            if (!prodObj) return 0;
+
+            const ctSize = getCtSize(prodObj.raw);
+            const totalEa = (parseInt(item.ctQty) || 0) * ctSize + (parseInt(item.eaQty) || 0);
+
+            let priceUsd = 0;
+            
+            if (prodObj.type === 'cosmetic') {
+                const pricesArray = Array.isArray(prodObj.raw.product_prices) ? prodObj.raw.product_prices : [];
+                const usdPrice = pricesArray.find(pr => pr.currency === 'USD') || {};
+                const totalCt = totalEa / ctSize;
+                
+                if (totalCt >= 30 && usdPrice.b2b_tier3_30_to_70_ct) priceUsd = usdPrice.b2b_tier3_30_to_70_ct;
+                else if (totalCt >= 10 && usdPrice.b2b_tier2_10_to_30_ct) priceUsd = usdPrice.b2b_tier2_10_to_30_ct;
+                else if (totalCt > 0 && usdPrice.b2b_tier1_1_to_10_ct) priceUsd = usdPrice.b2b_tier1_1_to_10_ct;
+                else priceUsd = usdPrice.b2b_tier1_1_to_10_ct || usdPrice.b2c_msrp || 0;
+            } else {
+                const p = prodObj.raw;
+                if (totalEa >= 50000 && p.oem_50000) priceUsd = p.oem_50000;
+                else if (totalEa >= 30000 && p.oem_30000) priceUsd = p.oem_30000;
+                else if (totalEa >= 10000) priceUsd = p.oem_10000 || p.dist_10000 || 0;
+                else if (totalEa >= 5000 && p.dist_5000) priceUsd = p.dist_5000;
+                else if (totalEa >= 3000 && p.dist_3000) priceUsd = p.dist_3000;
+                else if (totalEa > 0 && p.dist_1000) priceUsd = p.dist_1000;
+                else priceUsd = p.dist_1000 || p.clinic_msrp || 0;
+            }
+
+            const rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
+            return priceUsd * rate;
+        }
+
+        function addQuoteItem() {
+            quoteItems.push({
+                id: Date.now(),
+                productId: '',
+                color: '',
+                ctQty: 0,
+                eaQty: 0,
+                unitPrice: 0,
+                manualPrice: false,
+                isFoc: false // FOC 상태 추가
+            });
+            renderQuoteTable();
+        }
+
+        function removeQuoteItem(id) {
+            quoteItems = quoteItems.filter(item => item.id !== id);
+            renderQuoteTable();
+        }
+
+        function updateQuoteItem(id, field, value, isManual = false) {
+            const item = quoteItems.find(i => i.id === id);
+            if (!item) return;
+            
+            item[field] = value;
+            if (isManual && field === 'unitPrice') {
+                item.manualPrice = true;
+                item.unitPrice = parseFloat(value) || 0;
+            } else if (field === 'productId' || field === 'ctQty' || field === 'eaQty') {
+                if(field === 'productId') item.manualPrice = false;
+            }
+            renderQuoteTable();
+        }
+
+        function renderQuoteTable() {
+            const tbody = document.getElementById('quote-tbody');
+            tbody.innerHTML = '';
+            
+            let subTotal = 0;
+            const incoterms = document.getElementById('quote-incoterms').value;
+            const discountRate = parseFloat(document.getElementById('quote-discount').value) || 0;
+
+            if(quoteItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 italic text-sm no-print">Click "+ Add Item" to generate quotation.</td></tr>`;
+            }
+
+            quoteItems.forEach((item, index) => {
+                const prodObj = allProductsList.find(p => p.id === item.productId);
+                const ctSize = prodObj ? getCtSize(prodObj.raw) : 1;
+                const totalEa = (parseInt(item.ctQty) || 0) * ctSize + (parseInt(item.eaQty) || 0);
+                
+                if (!item.manualPrice) item.unitPrice = calculateUnitPrice(item);
+                
+                let appliedUnitPrice = item.unitPrice;
+                if (incoterms === 'EXW') appliedUnitPrice = item.unitPrice * 0.97;
+                
+                // FOC 기능 적용
+                if (item.isFoc) appliedUnitPrice = 0;
+                
+                const amount = appliedUnitPrice * totalEa;
+                subTotal += amount;
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-200 text-sm";
+                
+                let prodOptions = `<option value="">Select Product...</option>`;
+                allProductsList.forEach(p => { prodOptions += `<option value="${p.id}" ${p.id === item.productId ? 'selected' : ''}>${p.name}</option>`; });
+
+                tr.innerHTML = `
+                    <td class="py-2 px-2 text-center print-only-cell hidden text-gray-700">${index + 1}</td>
+                    <td class="py-2 px-2 text-center no-print"><button onclick="removeQuoteItem(${item.id})" class="text-red-500 hover:text-red-700 font-bold px-2">&times;</button></td>
+                    <td class="py-2 px-2">
+                        <select class="w-full border p-1 text-xs outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" onchange="updateQuoteItem(${item.id}, 'productId', this.value)">
+                            ${prodOptions}
+                        </select>
+                        <div class="print-only hidden font-medium text-gray-900">${prodObj ? prodObj.name : ''}</div>
+                    </td>
+                    <td class="py-2 px-2 text-center">
+                        <input type="text" class="w-full border p-1 text-xs text-center outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" value="${item.color}" placeholder="None" onchange="updateQuoteItem(${item.id}, 'color', this.value)">
+                        <span class="print-only hidden">${item.color || '-'}</span>
+                    </td>
+                    <td class="py-2 px-2 text-center">
+                        <div class="flex items-center justify-center gap-1 no-print">
+                            <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none bg-gray-50" value="${item.ctQty}" title="Cartons" onchange="updateQuoteItem(${item.id}, 'ctQty', this.value)"> <span class="text-xs text-gray-500">CT</span>
+                            <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none bg-gray-50 ml-1" value="${item.eaQty}" title="Ea" onchange="updateQuoteItem(${item.id}, 'eaQty', this.value)"> <span class="text-xs text-gray-500">EA</span>
+                        </div>
+                        <div class="print-only hidden text-center">
+                            <span class="font-bold">${totalEa}</span> <span class="text-[10px] text-gray-500">EA</span>
+                            ${item.ctQty > 0 ? `<br><span class="text-[10px] text-gray-400">(${item.ctQty}CT + ${item.eaQty}EA)</span>` : ''}
+                        </div>
+                    </td>
+                    <td class="py-2 px-2 text-right">
+                        <div class="no-print float-right flex flex-col items-end gap-1">
+                            <label class="text-[10px] text-gray-500 cursor-pointer flex items-center gap-1">
+                                <input type="checkbox" ${item.isFoc ? 'checked' : ''} onchange="updateQuoteItem(${item.id}, 'isFoc', this.checked)"> FOC
+                            </label>
+                            <input type="number" class="w-20 border p-1 text-xs text-right outline-none ${item.isFoc ? 'bg-gray-200 text-gray-400' : 'bg-gray-50 focus:bg-white'}" value="${appliedUnitPrice.toFixed(2)}" onchange="updateQuoteItem(${item.id}, 'unitPrice', this.value, true)" ${item.isFoc ? 'readonly' : ''}>
+                        </div>
+                        <span class="print-only hidden">${item.isFoc ? 'FOC' : formatNumber(appliedUnitPrice)}</span>
+                    </td>
+                    <td class="py-2 px-2 text-right font-medium text-gray-900">${item.isFoc ? '0.00' : formatNumber(amount)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 스페셜 할인율 적용 계산
+            const discountAmount = subTotal * (discountRate / 100);
+            const grandTotal = subTotal - discountAmount;
+
+            document.getElementById('quote-subtotal').textContent = formatNumber(subTotal);
+            document.getElementById('quote-discount-display').textContent = discountRate;
+            document.getElementById('quote-discount-amount').textContent = formatNumber(discountAmount);
+            document.getElementById('quote-grandtotal').textContent = formatNumber(grandTotal);
+            
+            const discountRow = document.getElementById('quote-discount-row');
+            if (discountRate > 0) discountRow.classList.remove('hidden');
+            else discountRow.classList.add('hidden');
+
+            const curLabel = currentCurrency === 'USD' ? '$' : '₩';
+            document.getElementById('quote-currency-label').textContent = curLabel;
+            document.getElementById('quote-currency-label1').textContent = curLabel;
+            document.getElementById('quote-currency-label2').textContent = curLabel;
+            
+            document.getElementById('quote-incoterms-print').textContent = incoterms;
+            const exwNotice = document.getElementById('exw-notice');
+            if (incoterms === 'EXW') exwNotice.classList.remove('hidden');
+            else exwNotice.classList.add('hidden');
+        }
+
+        function printQuotation() {
+            // Sync contenteditables to print containers
+            document.getElementById('quote-to-print').textContent = document.getElementById('quote-to').value;
+            document.getElementById('bank-info-print').innerHTML = document.getElementById('bank-info-edit').innerHTML;
+            document.getElementById('quote-date-print').textContent = document.getElementById('quote-date').textContent;
+            document.getElementById('quote-no-print').textContent = document.getElementById('quote-no').textContent;
+            
+            window.print();
+        }
+
+        function shareViaEmail() {
+            if (quoteItems.length === 0) {
+                alert("Please add items to the quotation before sharing.");
+                return;
+            }
+
+            const quoteNo = document.getElementById('quote-no').textContent;
+            const curLabel = document.getElementById('quote-currency-label').textContent;
+            const subTotal = parseFloat(document.getElementById('quote-subtotal').textContent.replace(/,/g, ''));
+            const discountRate = parseFloat(document.getElementById('quote-discount-display').textContent);
+            const discountAmount = parseFloat(document.getElementById('quote-discount-amount').textContent.replace(/,/g, ''));
+            const grandTotal = document.getElementById('quote-grandtotal').textContent;
+            const incoterms = document.getElementById('quote-incoterms').value;
+
+            const subject = `Quotation from MEDIFAB GLOBAL - ${quoteNo}`;
+            let body = `Hello,\n\nPlease find the details of your requested quotation below:\n\n`;
+            body += `[Quotation No: ${quoteNo}]\n`;
+            body += `[Incoterms: ${incoterms}]\n\n`;
+
+            quoteItems.forEach((item, index) => {
+                const prodObj = allProductsList.find(p => p.id === item.productId);
+                const name = prodObj ? prodObj.name : 'Unknown Product';
+                const ctSize = prodObj ? getCtSize(prodObj.raw) : 1;
+                const totalEa = (parseInt(item.ctQty) || 0) * ctSize + (parseInt(item.eaQty) || 0);
+                
+                body += `${index + 1}. ${name} ${item.isFoc ? '(FOC)' : ''}\n`;
+                if (item.color) body += `   - Option/Color: ${item.color}\n`;
+                body += `   - Quantity: ${totalEa} EA ( ${item.ctQty} CT + ${item.eaQty} EA )\n`;
+                
+                if (item.isFoc) {
+                    body += `   - Unit Price: FOC\n\n`;
+                } else {
+                    body += `   - Unit Price: ${curLabel}${item.unitPrice.toFixed(2)}\n\n`;
+                }
+            });
+
+            body += `----------------------------------------\n`;
+            if (discountRate > 0) {
+                body += `Subtotal: ${curLabel}${subTotal.toFixed(2)}\n`;
+                body += `Special Discount (${discountRate}%): -${curLabel}${discountAmount.toFixed(2)}\n`;
+                body += `----------------------------------------\n`;
+            }
+            body += `GRAND TOTAL: ${curLabel}${grandTotal}\n`;
+            body += `----------------------------------------\n\n`;
+            body += `If you have any questions, please let us know.\n\n`;
+            body += `Best regards,\nMEDIFAB GLOBAL`;
+
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+        }
+
+        // ==========================================
+        // 4. MEDIFAB AI ASSISTANT
         // ==========================================
         function toggleChat() {
-            const chatContainer = document.getElementById('ai-chat-container');
-            const fab = document.getElementById('ai-fab');
+            const chatContainer = document.getElementById('ai-chat-container'), fab = document.getElementById('ai-fab');
             if (chatContainer.classList.contains('hidden')) {
-                chatContainer.classList.remove('hidden');
-                chatContainer.classList.add('flex');
-                fab.classList.add('hidden');
+                chatContainer.classList.remove('hidden'); chatContainer.classList.add('flex'); fab.classList.add('hidden');
                 document.getElementById('chat-input').focus();
             } else {
-                chatContainer.classList.add('hidden');
-                chatContainer.classList.remove('flex');
-                fab.classList.remove('hidden');
+                chatContainer.classList.add('hidden'); chatContainer.classList.remove('flex'); fab.classList.remove('hidden');
             }
         }
 
@@ -858,58 +1068,24 @@
             const input = document.getElementById('chat-input');
             const message = input.value.trim();
             if (!message) return;
-
-            // Append user message
             appendMessage('user', message);
             input.value = '';
-
-            // Append "Thinking..." placeholder
             const typingId = appendMessage('ai', '<span class="flex items-center gap-2">Thinking <span class="flex gap-1"><span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span><span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span><span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></span></span></span>', true);
 
             try {
                 const catalogContext = {
-                    exchangeRate: appliedKrwRate,
-                    currencyToggled: currentCurrency,
-                    cosmetics: globalUniqueProducts.map(p => ({
-                        name: p.display_name, 
-                        prices: Array.isArray(p.product_prices) ? p.product_prices.map(pr => ({
-                            currency: pr.currency, 
-                            msrp: pr.b2c_msrp, 
-                            b2b_tier1: pr.b2b_tier1_1_to_10_ct
-                        })) : []
-                    })),
-                    medical: globalMedicalProducts.map(p => ({
-                        name: p.item, 
-                        brand: p.brand, 
-                        msrp_clinic: p.clinic_msrp, 
-                        distributor_1000: p.dist_1000
-                    }))
+                    exchangeRate: appliedKrwRate, currencyToggled: currentCurrency,
+                    cosmetics: globalUniqueProducts.map(p => ({ name: p.display_name, prices: Array.isArray(p.product_prices) ? p.product_prices.map(pr => ({ currency: pr.currency, msrp: pr.b2c_msrp, b2b_tier1: pr.b2b_tier1_1_to_10_ct })) : [] })),
+                    medical: globalMedicalProducts.map(p => ({ name: p.item, brand: p.brand, msrp_clinic: p.clinic_msrp, distributor_1000: p.dist_1000 }))
                 };
-
-                const { data, error } = await supabaseClient.functions.invoke('gemini-chat', {
-                    body: { message, catalogContext }
-                });
-
-                // Remove typing indicator
+                const { data, error } = await supabaseClient.functions.invoke('gemini-chat', { body: { message, catalogContext } });
                 const typingEl = document.getElementById(typingId);
                 if (typingEl) typingEl.remove();
 
-                if (error) {
-                    console.error("Supabase Edge Function Error:", error);
-                    let detailMsg = error.message || '알 수 없는 통신 오류';
-                    
-                    appendMessage('ai', `⚠️ <b>서버 동작 오류 발생</b><br><span class="text-red-500 font-medium">${detailMsg}</span><br><br>💡 <b>해결 방법:</b> Supabase 대시보드 메뉴의 <b>[Edge Functions]</b> -> <b>[gemini-chat]</b> -> 상단의 <b>[Logs]</b> 탭을 클릭하여 어떤 에러 로그가 찍혀있는지 확인해주세요.`, true);
-                    return;
-                }
-
-                if (data && data.reply) {
-                    appendMessage('ai', data.reply);
-                } else if (data && data.error) {
-                    appendMessage('ai', `서버 에러 응답: ${data.error}`);
-                } else {
-                    appendMessage('ai', 'Error: 서버로부터 예상치 못한 응답을 받았습니다.');
-                }
-
+                if (error) { appendMessage('ai', `⚠️ <b>서버 동작 오류 발생</b><br><span class="text-red-500 font-medium">${error.message}</span>`, true); return; }
+                if (data && data.reply) appendMessage('ai', data.reply);
+                else if (data && data.error) appendMessage('ai', `서버 에러 응답: ${data.error}`);
+                else appendMessage('ai', 'Error: 서버로부터 예상치 못한 응답을 받았습니다.');
             } catch (error) {
                 console.error("Fetch/Logic Error:", error);
                 const typingEl = document.getElementById(typingId);
@@ -920,27 +1096,15 @@
 
         function appendMessage(sender, text, isHtml = false) {
             const history = document.getElementById('chat-history');
-            const msgDiv = document.createElement('div');
-            const id = 'msg-' + Date.now();
+            const msgDiv = document.createElement('div'), id = 'msg-' + Date.now();
             msgDiv.id = id;
-            
             if (sender === 'user') {
-                msgDiv.className = 'bg-gray-900 text-white p-3.5 shadow-md self-end max-w-[85%] break-words leading-relaxed';
-                msgDiv.textContent = text; 
+                msgDiv.className = 'bg-gray-900 text-white p-3.5 shadow-md self-end max-w-[85%] break-words leading-relaxed'; msgDiv.textContent = text; 
             } else {
                 msgDiv.className = `bg-white border border-gray-200 p-3.5 shadow-sm text-gray-800 self-start max-w-[85%] break-words leading-relaxed`;
-                
-                if (isHtml) {
-                    msgDiv.innerHTML = text;
-                } else {
-                    let formattedText = text
-                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-montserrat">$1</strong>')
-                        .replace(/\*/g, '•')
-                        .replace(/\n/g, '<br>');
-                    msgDiv.innerHTML = formattedText;
-                }
+                if (isHtml) msgDiv.innerHTML = text;
+                else msgDiv.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-montserrat">$1</strong>').replace(/\*/g, '•').replace(/\n/g, '<br>');
             }
-            
             history.appendChild(msgDiv);
             history.scrollTop = history.scrollHeight;
             return id;
