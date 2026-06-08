@@ -295,6 +295,15 @@
                 </div>
                 
                 <div class="bg-gray-50 p-4 border border-gray-200 flex flex-wrap gap-6 items-center">
+                    <!-- 견적 구분 (해외/국내) 추가 -->
+                    <div class="flex items-center gap-2 border-r border-gray-300 pr-6">
+                        <label class="text-sm font-bold text-gray-700">Region:</label>
+                        <select id="quote-region" class="border border-gray-300 p-1.5 text-sm bg-white" onchange="changeRegion()">
+                            <option value="overseas">Overseas (해외)</option>
+                            <option value="domestic">Domestic (국내)</option>
+                        </select>
+                    </div>
+                    
                     <div class="flex items-center gap-2">
                         <label class="text-sm font-bold text-gray-700">Incoterms:</label>
                         <select id="quote-incoterms" class="border border-gray-300 p-1.5 text-sm bg-white" onchange="renderQuoteTable()">
@@ -501,6 +510,36 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             "Crystal Plus": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/f8ead94e5360b.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mOGVhZDk0ZTUzNjBiLnBuZyIsImlhdCI6MTc2OTMxOTIyMiwiZXhwIjoxOTI2OTk5MjIyfQ.oHhH2kK_UUgbuKUufp9igjYZS6XdGd5DMJQXB9gSsdw",
             "Scalp MD": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ScalpMD%20(1).png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9TY2FscE1EICgxKS5wbmciLCJpYXQiOjE3ODA2MjYxMjAsImV4cCI6MjA5NTk4NjEyMH0.9U_nU_gxKrs0mhXBgNlmKwi81fywoK57EF9670E-Va8"
         };
+
+        // --- 해외 및 국내 계좌 정보 설정 ---
+        const bankInfoOverseas = `Bank name : NongHyup Bank / Yeoksam branch
+Bank address: 351 Gangnamdaero, Seocho-dong, Seocho-gu, Seoul, Korea
+SWIFT CODE: NACFKRSE
+Account number: 452-0022-0212-11
+Beneficiary : MediFab Co., LTD
+Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, Republic of Korea`;
+
+        const bankInfoDomestic = `은행명 : 우리은행 (독산동지점)
+계좌번호 : 1005-204-129976
+예금과목 : 우리CUBE 기업자유예금
+예금주 : 주식회사메디팹`;
+
+        // 드롭다운 변경 시 지역에 맞게 계좌 정보 업데이트 함수
+        function changeRegion() {
+            const region = document.getElementById('quote-region').value;
+            const bankInfoEdit = document.getElementById('bank-info-edit');
+            const incotermsSelect = document.getElementById('quote-incoterms');
+            
+            if (region === 'overseas') {
+                bankInfoEdit.innerText = bankInfoOverseas;
+                incotermsSelect.disabled = false;
+                incotermsSelect.value = 'FOB'; 
+            } else {
+                bankInfoEdit.innerText = bankInfoDomestic;
+                incotermsSelect.value = 'EXW'; 
+            }
+            renderQuoteTable(); 
+        }
 
         function changeExchangeRate(val) {
             appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
