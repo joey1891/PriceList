@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #111827; }
         .font-montserrat { font-family: 'Montserrat', sans-serif; }
@@ -108,8 +109,6 @@
             border-bottom: none;
             border-top: 1px solid #e5e7eb;
         }
-
-        th.main-th { background-color: #111827; color: white; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem; font-weight: normal; }
         
         .cosmetic-table tr:hover:not(.category-header):not(.sub-category-header):not(.type-header) { background-color: #f9fafb; transition: background-color 0.2s ease; }
         
@@ -206,16 +205,27 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <th class="main-th py-3 px-4 text-center text-white">Img</th>
-                        <th class="main-th py-3 px-4 text-white">Product Name</th>
-                        <th class="main-th py-3 px-4 text-center text-white">Volume</th>
-                        <th class="main-th py-3 px-4 text-center text-white">Quantity</th>
-                        <th class="main-th py-3 px-4 text-center text-white">CT Qty</th>
-                        <th class="main-th py-3 px-4 text-center text-white">MSRP</th>
-                        <th class="main-th py-3 px-4 text-center text-white font-light">Promo (B2C)</th>
-                        <th class="main-th py-3 px-4 text-center text-white">B2B (1-10CT)</th>
-                        <th class="main-th py-3 px-4 text-center text-white">B2B (10-30CT)</th>
-                        <th class="main-th py-3 px-4 text-center text-white">B2B (30-70CT)</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-left bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Product Name</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Volume</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Quantity</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">CT Qty</th>
+                        <th colspan="2" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">B2C</th>
+                        <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">B2B Wholesale</th>
+                    </tr>
+                    <tr>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest font-light border-b border-gray-700">Promo</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1-10 CT</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10-30 CT</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">30+ CT</th>
+                    </tr>
+                    <tr>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">-</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">40%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">35%</th>
                     </tr>
                 </thead>
                 <tbody id="price-table-body" class="bg-transparent">
@@ -251,43 +261,43 @@
                 </colgroup>
                 <thead>
                     <tr>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Img</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Cat.</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Brand</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Item</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Ingredients</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Type</th>
-                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Package</th>
-                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle">Volume</th>
-                        <th colspan="2" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase">Clinic</th>
-                        <th colspan="4" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase">Distributor</th>
-                        <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase">OEM</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Cat.</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Brand</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Item</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Ingredients</th>
+                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Type</th>
+                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Package</th>
+                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Volume</th>
+                        <th colspan="2" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Clinic</th>
+                        <th colspan="4" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Distributor</th>
+                        <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">OEM</th>
                     </tr>
                     <tr>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">MSRP</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">Promo</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">Promo</th>
                         
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">1,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">3,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">5,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">10,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">3,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">5,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
                         
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">10,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">30,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest">50,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">30,000</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">50,000</th>
                     </tr>
                     <tr>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light">100%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white">80%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">80%</th>
                         
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light">45%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light">42%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light">37%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light">34%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">42%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">37%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">34%</th>
                         
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white">33%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white">30%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white">27%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">33%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">30%</th>
+                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">27%</th>
                     </tr>
                 </thead>
                 <tbody id="medical-table-body" class="text-sm bg-transparent">
@@ -427,20 +437,24 @@
             renderMedicalTableData();
         }
 
+        // B2C / Medical 테이블용 일반 화폐 포맷팅
         function formatCurrency(amount, roundKrwToThousands = false) {
             if (amount === null || amount === undefined || amount === 0) return '<div class="text-center w-full text-black">-</div>';
             let displayAmount = amount;
-            const fractionDigits = currentCurrency === 'KRW' ? 0 : 2;
+            
             if (currentCurrency === 'KRW' && roundKrwToThousands) {
                 displayAmount = Math.round(displayAmount / 1000) * 1000;
+            } else {
+                displayAmount = Math.round(displayAmount); // 달러 포함 소수점 첫째 자리에서 반올림
             }
-            const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: fractionDigits }).format(displayAmount);
+            
+            const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(displayAmount);
             return `<div class="text-center w-full">${formattedAmount}</div>`;
         }
 
         function formatMedCurrency(amount) {
             if (amount === null || amount === undefined) return '<span class="text-black">sample</span>';
-            const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(amount);
+            const formattedAmount = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(amount));
             return formattedAmount;
         }
 
@@ -582,7 +596,6 @@
             function renderProducts(products) {
                 if (products.length === 0) return;
                 products.forEach(p => {
-                    // Safety check for product_prices
                     const pricesArray = Array.isArray(p.product_prices) ? p.product_prices : [];
                     const usdPrice = pricesArray.find(pr => pr.currency === 'USD') || {};
                     
@@ -594,13 +607,14 @@
 
                     const b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
                     const b2c_promotion = usdPrice.b2c_promotion ? usdPrice.b2c_promotion * rate : null;
-                    const b2b1 = usdPrice.b2b_tier1_1_to_10_ct ? usdPrice.b2b_tier1_1_to_10_ct * rate : null;
-                    const b2b2 = usdPrice.b2b_tier2_10_to_30_ct ? usdPrice.b2b_tier2_10_to_30_ct * rate : null;
-                    const b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
+                    
+                    // Apply fixed supply rates (45%, 40%, 35%) directly to MSRP regardless of product DB prices
+                    const b2b1 = b2c_msrp ? b2c_msrp * 0.45 : null;
+                    const b2b2 = b2c_msrp ? b2c_msrp * 0.40 : null;
+                    const b2b3 = b2c_msrp ? b2c_msrp * 0.35 : null;
 
                     let { name, volume, qty } = extractNameVolumeQty(p.display_name);
                     
-                    // 수량이 없거나 '-' 일 경우 기본값 1ea 설정
                     if (qty === '-' || qty === '' || !qty) qty = '1ea';
 
                     let mappedImg = "";
@@ -620,23 +634,23 @@
                         : `<div class="placeholder-img">N/A</div>`;
 
                     tr.innerHTML = `
-                        <td class="py-2 px-4 text-center">
+                        <td class="py-2 px-4 text-center align-middle">
                             <div class="flex justify-center">${imgHtml}</div>
                         </td>
-                        <td class="py-3 pr-6">
+                        <td class="py-3 pr-6 align-middle">
                             <div class="flex items-center gap-3">
-                                <span class="text-black text-sm font-light">|</span>
+                                <span class="text-gray-300 text-sm font-light">|</span>
                                 <span class="text-black">${name}</span>
                             </div>
                         </td>
-                        <td class="py-3 px-4 text-center text-black text-xs font-light">${volume}</td>
-                        <td class="py-3 px-4 text-center text-black text-xs font-light">${qty}</td>
-                        <td class="py-3 px-4 text-center text-black text-xs font-light">${p.ct_quantity || '-'}</td>
-                        <td class="py-3 px-4 text-black font-light">${formatCurrency(b2c_msrp, isKrw)}</td>
-                        <td class="py-3 px-4 text-black">${formatCurrency(b2c_promotion, isKrw)}</td>
-                        <td class="py-3 px-4 font-light text-black">${formatCurrency(b2b1, isKrw)}</td>
-                        <td class="py-3 px-4 font-light text-black">${formatCurrency(b2b2, isKrw)}</td>
-                        <td class="py-3 px-4 font-light text-black">${formatCurrency(b2b3, isKrw)}</td>
+                        <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${volume}</td>
+                        <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${qty}</td>
+                        <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${p.ct_quantity || '-'}</td>
+                        <td class="py-3 px-4 text-black font-light align-middle">${formatCurrency(b2c_msrp, isKrw)}</td>
+                        <td class="py-3 px-4 text-black align-middle">${formatCurrency(b2c_promotion, isKrw)}</td>
+                        <td class="py-3 px-4 font-light text-black align-middle">${formatCurrency(b2b1, isKrw)}</td>
+                        <td class="py-3 px-4 font-light text-black align-middle">${formatCurrency(b2b2, isKrw)}</td>
+                        <td class="py-3 px-4 font-light text-black align-middle">${formatCurrency(b2b3, isKrw)}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -734,17 +748,15 @@
                 let specPkg = rawSpecs;
                 let specVol = '-';
                 
-                // Parsing out the volume dimension (e.g. "3cc * 3cc", "3.5ml") from the quantity
                 const volRegex = /(\d+(?:\.\d+)?\s*(?:cc|ml|g)(?:\s*(?:\*|x|X)\s*\d+(?:\.\d+)?\s*(?:cc|ml|g))?)/i;
                 const volMatch = rawSpecs.match(volRegex);
                 if (volMatch) {
                     specVol = volMatch[0];
                     specPkg = rawSpecs.replace(volMatch[0], '').trim();
-                    specPkg = specPkg.replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); // Remove leading/trailing symbols left over
+                    specPkg = specPkg.replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); 
                 }
                 if (!specPkg) specPkg = '-';
 
-                // specs 2열 분리 렌더링
                 html += `<td class="py-3 px-2 text-center font-light text-black">${specPkg}</td>`;
                 html += `<td class="py-3 px-2 text-center font-light text-black">${specVol}</td>`;
 
@@ -800,8 +812,6 @@
             const typingId = appendMessage('ai', '<span class="flex items-center gap-2">Thinking <span class="flex gap-1"><span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span><span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span><span class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></span></span></span>', true);
 
             try {
-                // Build a minimized context of the catalog to keep token usage efficient
-                // FIXED: Array.isArray() check added to prevent Javascript map crashes if a product has no prices returned.
                 const catalogContext = {
                     exchangeRate: globalKrwRate,
                     currencyToggled: currentCurrency,
@@ -861,14 +871,13 @@
             
             if (sender === 'user') {
                 msgDiv.className = 'bg-gray-900 text-white p-3.5 shadow-md self-end max-w-[85%] break-words leading-relaxed';
-                msgDiv.textContent = text; // Prevent XSS from user input
+                msgDiv.textContent = text; 
             } else {
                 msgDiv.className = `bg-white border border-gray-200 p-3.5 shadow-sm text-gray-800 self-start max-w-[85%] break-words leading-relaxed`;
                 
                 if (isHtml) {
                     msgDiv.innerHTML = text;
                 } else {
-                    // Convert basic markdown-like bold text to HTML, and newlines to <br>
                     let formattedText = text
                         .replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-900 font-montserrat">$1</strong>')
                         .replace(/\*/g, '•')
