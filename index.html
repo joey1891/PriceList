@@ -1288,7 +1288,76 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             else exwNotice.classList.add('hidden');
         }
 
-        function printQuotation() {
+        async function saveQuotationToDB() {
+            try {
+                // 1. 견적서 메인 정보 저장
+                const quoteData = {
+                    quote_no: document.getElementById('quote-no').textContent,
+                    quote_date: document.getElementById('quote-date').textContent,
+                    currency: currentCurrency,
+                    region: document.getElementById('quote-region').value,
+                    incoterms: document.getElementById('quote-incoterms').value,
+                    customer_company: document.getElementById('cust-company').value,
+                    customer_name: document.getElementById('cust-name').value,
+                    customer_address: document.getElementById('cust-address').value,
+                    customer_email: document.getElementById('cust-email').value,
+                    subtotal: parseFloat(document.getElementById('quote-subtotal').textContent.replace(/,/g, '')),
+                    discount_rate: parseFloat(document.getElementById('quote-discount-display').textContent),
+                    discount_amount: parseFloat(document.getElementById('quote-discount-amount').textContent.replace(/,/g, '')),
+                    grand_total: parseFloat(document.getElementById('quote-grandtotal').textContent.replace(/,/g, '')),
+                    bank_info: document.getElementById('bank-info-edit').innerText,
+                    remarks: document.getElementById('quote-remarks-edit').innerText
+                };
+
+                const { data: quoteResult, error: quoteError } = await supabaseClient
+                    .from('quotations')
+                    .insert([quoteData])
+                    .select();
+
+                if (quoteError) throw quoteError;
+                if (!quoteResult || quoteResult.length === 0) throw new Error("견적서 저장 후 ID를 받아오지 못했습니다.");
+                const savedQuoteId = quoteResult[0].id;
+
+                // 2. 견적서 상세 아이템들 저장
+                const itemsToSave = quoteItems.map((item, index) => {
+                    const prodObj = allProductsList.find(p => p.id === item.productId);
+                    const displayItemName = item.productId === 'CUSTOM' ? (item.customName || 'Custom Item') : (prodObj ? prodObj.name : '');
+                    const ctSize = prodObj ? getCtSize(prodObj) : 1;
+                    const totalEa = (item.ctQty * ctSize) + item.eaQty;
+
+                    // EXW 할인율 및 FOC 상태 반영된 단위 가격 계산
+                    let appliedUnitPrice = Number(item.unitPrice) || 0;
+                    if (document.getElementById('quote-incoterms').value === 'EXW') appliedUnitPrice *= 0.97;
+                    appliedUnitPrice = Math.round(appliedUnitPrice);
+
+                    return {
+                        quotation_id: savedQuoteId,
+                        product_id: item.productId,
+                        product_name: displayItemName,
+                        color: item.color || '',
+                        ct_qty: item.ctQty,
+                        ea_qty: item.eaQty,
+                        total_ea: totalEa,
+                        unit_price: item.isFoc ? 0 : appliedUnitPrice,
+                        is_foc: item.isFoc,
+                        amount: item.isFoc ? 0 : (appliedUnitPrice * totalEa),
+                        item_index: index + 1
+                    };
+                });
+
+                const { error: itemsError } = await supabaseClient
+                    .from('quotation_items')
+                    .insert(itemsToSave);
+
+                if (itemsError) throw itemsError;
+                console.log("견적서가 Supabase 데이터베이스에 성공적으로 저장되었습니다.");
+
+            } catch (err) {
+                console.error("DB 저장 중 에러 발생:", err);
+            }
+        }
+
+        async function printQuotation() {
             if (window.isFocLimitExceeded) return;
 
             const comp = document.getElementById('cust-company').value.trim();
@@ -1308,10 +1377,13 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             document.getElementById('quote-date-print').textContent = document.getElementById('quote-date').textContent;
             document.getElementById('quote-no-print').textContent = document.getElementById('quote-no').textContent;
             
+            // 프린트창 띄우기 직전에 데이터베이스에 견적서 저장
+            await saveQuotationToDB();
+
             window.print();
         }
 
-        function shareViaEmail() {
+        async function shareViaEmail() {
             if (window.isFocLimitExceeded) return;
 
             if (quoteItems.length === 0) {
@@ -1379,6 +1451,9 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
 
             body += `If you have any questions, please let us know.\n\n`;
             body += `Best regards,\nMEDIFAB GLOBAL`;
+
+            // 이메일 창을 띄우기 직전에 데이터베이스에 견적서 저장
+            await saveQuotationToDB();
 
             const mailtoLink = `mailto:${document.getElementById('cust-email').value || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.location.href = mailtoLink;
