@@ -355,7 +355,7 @@
                 </div>
             </div>
 
-            <!-- Customer Details Input Container (Not printed directly, syncs to print view) -->
+            <!-- Customer Details Input Container -->
             <div class="mb-8 bg-gray-50 p-6 border border-gray-200 no-print">
                 <p class="font-bold text-gray-900 mb-4 border-l-4 border-gray-900 pl-2">CUSTOMER INFORMATION</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -599,7 +599,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         const medImageMap = {
             "Crystal": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/cc492d238d1dc-removebg-preview.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9jYzQ5MmQyMzhkMWRjLXJlbW92ZWJnLXByZXZpZXcucG5nIiwiaWF0IjoxNzY5MzE5OTgxLCJleHAiOjE5MjY5OTk5ODF9.p-96RHgIhc21DB_WAthHvodJ_w3yxT3dryd4kJno3yo",
             "Crystal Plus": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/f8ead94e5360b.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mOGVhZDk0ZTUzNjBiLnBuZyIsImlhdCI6MTc2OTMxOTIyMiwiZXhwIjoxOTI2OTk5MjIyfQ.oHhH2kK_UUgbuKUufp9igjYZS6XdGd5DMJQXB9gSsdw",
-            "Scalp MD": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ScalpMD%20(1).png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9TY2FscE1EICgxKS5wbmciLCJpYXQiOjE3ODA2MjYxMjAsImV4cCI6MjA5NTk4NjEyMH0.9U_nU_gxKrs0mhXBgNlmKwi81fywoK57EF9670E-Va8"
+            "Scalp MD": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ScalpMD%20(1).png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9TY2FscE1EICgxKS5wbmciLCJpYXQiOjE3ODA2MjYxMjAsImV4cCI6MjA5NTk4NjEyMH0.9U_nU_gxKrs0mhXBgNlmKwi81fywoK57EF9670E-Va8",
+            "Echrever": ""
         };
 
         // --- Bank Info Setups ---
@@ -701,8 +702,29 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 globalMedicalProducts = [
                     { item: 'Crystal', ingredients: 'Chitosan-based', type: 'Filler', specs: '1.0ml', clinic_msrp: 120, clinic_promotion: 100, dist_1000: 60, dist_3000: 55, dist_5000: 50, dist_10000: 45, oem_10000: 40, oem_30000: 35, oem_50000: 30, currency: 'USD' },
                     { item: 'Crystal Plus', ingredients: 'Chitosan-based', type: 'Filler', specs: '1.0ml', clinic_msrp: 130, clinic_promotion: 110, dist_1000: 65, dist_3000: 60, dist_5000: 55, dist_10000: 50, oem_10000: 45, oem_30000: 40, oem_50000: 35, currency: 'USD' },
-                    { item: 'Scalp MD', ingredients: 'dECM', type: 'Skin Booster', specs: '5.0ml * 5ea', clinic_msrp: 200, clinic_promotion: 180, dist_1000: 100, dist_3000: 90, dist_5000: 80, dist_10000: 75, oem_10000: 70, oem_30000: 60, oem_50000: 55, currency: 'USD' }
+                    { item: 'Scalp MD', ingredients: 'dECM', type: 'Skin Booster', specs: '5.0ml * 5ea', clinic_msrp: 200, clinic_promotion: 180, dist_1000: 100, dist_3000: 90, dist_5000: 80, dist_10000: 75, oem_10000: 70, oem_30000: 60, oem_50000: 55, currency: 'USD' },
+                    { item: 'Echrever', ingredients: 'PLLA', type: 'Collagen Stimulator', specs: '200mg * 1ea', clinic_msrp: 150, clinic_promotion: 130, dist_1000: 75, dist_3000: 70, dist_5000: 65, dist_10000: 60, oem_10000: 55, oem_30000: 50, oem_50000: 45, currency: 'USD' }
                 ];
+            }
+
+            // --- Inject Echrever into Medical Products if missing ---
+            if (!globalMedicalProducts.some(p => p.item && p.item.toLowerCase().includes('echrever'))) {
+                globalMedicalProducts.push({
+                    item: 'Echrever', 
+                    ingredients: 'PLLA', 
+                    type: 'Collagen Stimulator', 
+                    specs: '200mg * 1ea', 
+                    clinic_msrp: 150, 
+                    clinic_promotion: 130, 
+                    dist_1000: 75, 
+                    dist_3000: 70, 
+                    dist_5000: 65, 
+                    dist_10000: 60, 
+                    oem_10000: 55, 
+                    oem_30000: 50, 
+                    oem_50000: 45, 
+                    currency: 'USD'
+                });
             }
 
             // 4. Raw Materials Data Load
@@ -899,39 +921,33 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         function renderMedicalTableData() {
             const tbody = document.getElementById('medical-table-body');
             tbody.innerHTML = '';
-            let filteredData = [];
             
-            if (currentCurrency === 'KRW') {
-                const usdData = globalMedicalProducts.filter(d => d.currency === 'USD');
-                if (usdData.length > 0) {
-                    filteredData = usdData.map(p => ({
-                        ...p, currency: 'KRW',
-                        clinic_msrp: p.clinic_msrp ? p.clinic_msrp * appliedKrwRate : null,
-                        clinic_promotion: p.clinic_promotion ? p.clinic_promotion * appliedKrwRate : null,
-                        dist_1000: p.dist_1000 ? p.dist_1000 * appliedKrwRate : null, dist_3000: p.dist_3000 ? p.dist_3000 * appliedKrwRate : null,
-                        dist_5000: p.dist_5000 ? p.dist_5000 * appliedKrwRate : null, dist_10000: p.dist_10000 ? p.dist_10000 * appliedKrwRate : null,
-                        oem_10000: p.oem_10000 ? p.oem_10000 * appliedKrwRate : null, oem_30000: p.oem_30000 ? p.oem_30000 * appliedKrwRate : null,
-                        oem_50000: p.oem_50000 ? p.oem_50000 * appliedKrwRate : null
-                    }));
-                } else filteredData = globalMedicalProducts.filter(d => d.currency === 'KRW');
-            } else {
-                const krwData = globalMedicalProducts.filter(d => d.currency === 'KRW');
-                if (krwData.length > 0) {
-                    filteredData = krwData.map(p => ({
-                        ...p, currency: 'USD',
-                        clinic_msrp: p.clinic_msrp ? p.clinic_msrp / appliedKrwRate : null,
-                        clinic_promotion: p.clinic_promotion ? p.clinic_promotion / appliedKrwRate : null,
-                        dist_1000: p.dist_1000 ? p.dist_1000 / appliedKrwRate : null, dist_3000: p.dist_3000 ? p.dist_3000 / appliedKrwRate : null,
-                        dist_5000: p.dist_5000 ? p.dist_5000 / appliedKrwRate : null, dist_10000: p.dist_10000 ? p.dist_10000 / appliedKrwRate : null,
-                        oem_10000: p.oem_10000 ? p.oem_10000 / appliedKrwRate : null, oem_30000: p.oem_30000 ? p.oem_30000 / appliedKrwRate : null,
-                        oem_50000: p.oem_50000 ? p.oem_50000 / appliedKrwRate : null
-                    }));
-                } else {
-                    filteredData = globalMedicalProducts.filter(d => d.currency === 'USD');
-                }
-            }
+            if (!globalMedicalProducts || globalMedicalProducts.length === 0) return;
 
-            if (!filteredData || filteredData.length === 0) return;
+            // 통화(Currency) 값이 DB에서 누락되었을 경우를 대비한 유연한 매핑 로직
+            const filteredData = globalMedicalProducts.map(p => {
+                const nativeCurrency = (p.currency || 'USD').toUpperCase();
+                let rate = 1;
+                
+                if (nativeCurrency === 'USD' && currentCurrency === 'KRW') {
+                    rate = appliedKrwRate;
+                } else if (nativeCurrency === 'KRW' && currentCurrency === 'USD') {
+                    rate = 1 / appliedKrwRate;
+                }
+
+                return {
+                    ...p,
+                    clinic_msrp: p.clinic_msrp ? p.clinic_msrp * rate : null,
+                    clinic_promotion: p.clinic_promotion ? p.clinic_promotion * rate : null,
+                    dist_1000: p.dist_1000 ? p.dist_1000 * rate : null,
+                    dist_3000: p.dist_3000 ? p.dist_3000 * rate : null,
+                    dist_5000: p.dist_5000 ? p.dist_5000 * rate : null,
+                    dist_10000: p.dist_10000 ? p.dist_10000 * rate : null,
+                    oem_10000: p.oem_10000 ? p.oem_10000 * rate : null,
+                    oem_30000: p.oem_30000 ? p.oem_30000 * rate : null,
+                    oem_50000: p.oem_50000 ? p.oem_50000 * rate : null
+                };
+            });
 
             function calcSpans(key) {
                 let spanArr = [], currentVal = null, count = 0;
@@ -960,7 +976,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.type || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 
                 let rawSpecs = p.specs || '', specPkg = rawSpecs, specVol = '-';
-                const volRegex = /(\d+(?:\.\d+)?\s*(?:cc|ml|g)(?:\s*(?:\*|x|X)\s*\d+(?:\.\d+)?\s*(?:cc|ml|g))?)/i;
+                // mg 단위를 포함하도록 정규식 개선
+                const volRegex = /(\d+(?:\.\d+)?\s*(?:cc|ml|g|mg)(?:\s*(?:\*|x|X)\s*\d+(?:\.\d+)?\s*(?:cc|ml|g|mg|ea|vial))?)/i;
                 const volMatch = rawSpecs.match(volRegex);
                 if (volMatch) { specVol = volMatch[0]; specPkg = rawSpecs.replace(volMatch[0], '').trim().replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); }
                 if (!specPkg) specPkg = '-';
