@@ -356,7 +356,6 @@
                 <div class="flex justify-between items-start mb-10 border-b-2 border-gray-900 pb-6">
                     <div>
                         <img src="https://metadqppbypzgiowkgzg.supabase.co/storage/v1/object/sign/SIN%20WONJONG/Medifab%20logo.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zYjU3MDQxZS04NjZlLTQxOTYtODJiMy0yZjMzODZhNjBkYTAiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJTSU4gV09OSk9ORy9NZWRpZmFiIGxvZ28ucG5nIiwiaWF0IjoxNzgwOTE5MDY1LCJleHAiOjIwOTYyNzkwNjV9.AOFB6QneYt7PLdENq_KWBkkAncl-xk5wkK3i1-cAH1E" alt="Medifab Logo" class="h-12 mb-4 object-contain">
-                        <h2 class="font-bold text-gray-900">MEDIFAB GLOBAL</h2>
                         <p class="text-xs text-gray-600 mt-1">
                             Room 417, Daeryung Techno Town 20th,<br>
                             5, Gasan digital 1-ro, Geumcheon-gu,<br>
@@ -368,7 +367,8 @@
                         <h1 class="text-3xl font-montserrat tracking-widest text-gray-900 uppercase">Proforma Invoice</h1>
                         <div class="mt-4 text-sm">
                             <p class="mb-1"><span class="font-bold text-gray-700">DATE:</span> <span id="quote-date" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">YYYY-MM-DD</span><span id="quote-date-print" class="print-only-inline"></span></p>
-                            <p><span class="font-bold text-gray-700">QUOTE NO:</span> <span id="quote-no" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">QT-2026-001</span><span id="quote-no-print" class="print-only-inline"></span></p>
+                            <p class="mb-1"><span class="font-bold text-gray-700">QUOTE NO:</span> <span id="quote-no" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">QT-2026-001</span><span id="quote-no-print" class="print-only-inline"></span></p>
+                            <p><span class="font-bold text-gray-700">CURRENCY:</span> <span id="quote-currency-display" class="font-medium">USD</span></p>
                         </div>
                     </div>
                 </div>
@@ -388,8 +388,8 @@
                             <th class="py-3 px-2 w-[40%]">Item Description</th>
                             <th class="py-3 px-2 text-center w-[15%]">Color/Opt</th>
                             <th class="py-3 px-2 text-center w-[15%]">Qty</th>
-                            <th class="py-3 px-2 text-right w-[15%]">U.Price</th>
-                            <th class="py-3 px-2 text-right w-[15%]">Amount</th>
+                            <th class="py-3 px-2 text-right w-[15%]">U.Price (<span id="quote-th-currency1">USD</span>)</th>
+                            <th class="py-3 px-2 text-right w-[15%]">Amount (<span id="quote-th-currency2">USD</span>)</th>
                         </tr>
                     </thead>
                     <tbody id="quote-tbody" class="text-sm">
@@ -1192,6 +1192,10 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             document.getElementById('quote-currency-label1').textContent = curLabel;
             document.getElementById('quote-currency-label2').textContent = curLabel;
             
+            document.getElementById('quote-currency-display').textContent = targetCurrency;
+            document.getElementById('quote-th-currency1').textContent = targetCurrency;
+            document.getElementById('quote-th-currency2').textContent = targetCurrency;
+            
             document.getElementById('quote-incoterms-print').textContent = incoterms;
             const exwNotice = document.getElementById('exw-notice');
             if (incoterms === 'EXW') exwNotice.classList.remove('hidden');
@@ -1238,6 +1242,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             const subject = `Quotation from MEDIFAB GLOBAL - ${quoteNo}`;
             let body = `Hello ${custName ? custName : 'there'},\n\nPlease find the details of your requested quotation below:\n\n`;
             body += `[Quotation No: ${quoteNo}]\n`;
+            body += `[Currency: ${targetCurrency}]\n`;
             body += `[Incoterms: ${incoterms}]\n\n`;
 
             quoteItems.forEach((item, index) => {
