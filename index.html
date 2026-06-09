@@ -890,16 +890,17 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             // Cosmetic Data
             (globalUniqueProducts || []).forEach(p => {
                 if (!p || !p.display_name) return;
-                if (!addedNames.has(p.display_name)) {
-                    allProductsList.push({ id: 'cos_' + p.display_name, name: p.display_name, type: 'cosmetic', raw: p });
-                    addedNames.add(p.display_name);
+                const fullName = `[Beauty] ${p.display_name}`;
+                if (!addedNames.has(fullName)) {
+                    allProductsList.push({ id: 'cos_' + p.display_name, name: fullName, type: 'cosmetic', raw: p });
+                    addedNames.add(fullName);
                 }
             });
             
             // Medical Data
             (globalMedicalProducts || []).forEach(p => {
                 if (!p || !p.item) return;
-                const fullName = `[${p.brand || 'Unbranded'}] ${p.item}`;
+                const fullName = `[Medical] ${p.item}`;
                 if (!addedNames.has(fullName)) {
                     allProductsList.push({ id: 'med_' + p.item, name: fullName, type: 'medical', raw: p });
                     addedNames.add(fullName);
