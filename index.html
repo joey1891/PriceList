@@ -413,6 +413,12 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                             <p><span class="font-bold text-gray-800">Incoterms:</span> <span id="quote-incoterms-print" class="uppercase">FOB</span></p>
                             <p class="mt-1 hidden text-red-600 font-medium" id="exw-notice">* EXW condition applied (Unit Price reflects 3% discount)</p>
                         </div>
+                        
+                        <div class="mt-6">
+                            <p class="font-bold text-gray-900 mb-2 border-l-4 border-gray-900 pl-2">REMARKS</p>
+                            <div contenteditable="true" class="border border-dashed border-gray-300 p-3 text-xs bg-gray-50 focus:bg-white outline-none min-h-[60px] no-print text-gray-700" id="quote-remarks-edit"></div>
+                            <div class="print-only whitespace-pre-wrap text-xs py-2 text-gray-700" id="quote-remarks-print"></div>
+                        </div>
                     </div>
                     
                     <div class="w-1/2 max-w-[280px]">
@@ -1216,6 +1222,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
 
             document.getElementById('quote-to-print').innerHTML = toHtml || '<span class="text-gray-400 italic">No customer info provided.</span>';
             document.getElementById('bank-info-print').innerHTML = document.getElementById('bank-info-edit').innerHTML;
+            document.getElementById('quote-remarks-print').innerHTML = document.getElementById('quote-remarks-edit').innerHTML;
             document.getElementById('quote-date-print').textContent = document.getElementById('quote-date').textContent;
             document.getElementById('quote-no-print').textContent = document.getElementById('quote-no').textContent;
             
@@ -1236,6 +1243,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             const discountAmount = document.getElementById('quote-discount-amount').textContent;
             const grandTotal = document.getElementById('quote-grandtotal').textContent;
             const incoterms = document.getElementById('quote-incoterms').value;
+            const remarks = document.getElementById('quote-remarks-edit').innerText.trim();
             
             const custName = document.getElementById('cust-name').value.trim();
 
@@ -1280,6 +1288,11 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             }
             body += `GRAND TOTAL: ${curLabel}${grandTotal}\n`;
             body += `----------------------------------------\n\n`;
+            
+            if (remarks) {
+                body += `[Remarks]\n${remarks}\n\n`;
+            }
+
             body += `If you have any questions, please let us know.\n\n`;
             body += `Best regards,\nMEDIFAB GLOBAL`;
 
