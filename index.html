@@ -76,7 +76,7 @@
 
         .product-img { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid #e5e7eb; }
         .med-product-img { width: 44px; height: 44px; object-fit: contain; }
-        .placeholder-img { width: 36px; height: 36px; border-radius: 4px; background-color: #f3f4f6; border: 1px dashed #d1d5db; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px; }
+        .placeholder-img { width: 36px; height: 36px; border-radius: 4px; background-color: #f3f4f6; border: 1px dashed #d1d5db; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px; font-weight: bold; }
 
         /* Print and Quotation Styles */
         .print-only, .print-only-cell, .print-only-inline { display: none; }
@@ -226,7 +226,7 @@
         <div class="mt-8 flex justify-between items-end">
             <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Medical Aesthetic Product Line</h2>
         </div>
-        <div class="overflow-x-auto table-container bg-white mb-12">
+        <div class="overflow-x-auto table-container bg-white mb-4">
             <table class="w-full text-left border-collapse unified-table">
                 <colgroup>
                     <col style="width: 4%;"><col style="width: 16%;"><col style="width: 12%;">
@@ -277,7 +277,39 @@
             </table>
         </div>
 
-        <!-- 3. QUOTATION GENERATOR -->
+        <!-- 3. Proprietary Raw Materials Product Line -->
+        <div class="mt-8 flex justify-between items-end">
+            <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Proprietary Raw Materials</h2>
+        </div>
+        <div class="overflow-x-auto table-container bg-white mb-12">
+            <table class="w-full text-left border-collapse unified-table">
+                <colgroup>
+                    <col style="width: 5%;">   <!-- Img -->
+                    <col style="width: 15%;">  <!-- Name -->
+                    <col style="width: 25%;">  <!-- Active Ingredient -->
+                    <col style="width: 15%;">  <!-- Grade -->
+                    <col style="width: 10%;">  <!-- Form -->
+                    <col style="width: 15%;">  <!-- Unit -->
+                    <col style="width: 15%;">  <!-- Price -->
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
+                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Product Name</th>
+                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Active Ingredient(s)</th>
+                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Grade</th>
+                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Form</th>
+                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Unit</th>
+                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Unit Price</th>
+                    </tr>
+                </thead>
+                <tbody id="raw-materials-table-body" class="text-sm bg-transparent">
+                    <tr class="loading-row"><td colspan="7" class="text-center py-10 text-black font-light text-sm italic">Fetching raw materials data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 4. QUOTATION GENERATOR -->
         <div id="quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
             <!-- Controls (Not printed) -->
             <div class="no-print mb-8">
@@ -544,6 +576,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         let appliedKrwRate = 1400;
         let globalUniqueProducts = [];
         let globalMedicalProducts = [];
+        let globalRawMaterials = [];
         window.isFocLimitExceeded = false; // FOC 상태 추적 변수
 
         const productImageMap = {
@@ -613,6 +646,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     console.error("Exchange API Error:", e);
                 }
 
+                // 1. Cosmetic Data Load
                 const { data: dbProducts, error: prodErr } = await supabaseClient
                     .from('products')
                     .select(`sub_category, name_en, ct_quantity, product_prices (currency, b2c_msrp, b2c_promotion, b2b_tier1_1_to_10_ct, b2b_tier2_10_to_30_ct, b2b_tier3_30_to_70_ct)`)
@@ -633,6 +667,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 }
                 globalUniqueProducts = Array.from(uniqueProductsMap.values());
 
+                // 2. Medical Data Load
                 const { data: dbMedicals, error: medErr } = await supabaseClient
                     .from('medical_aesthetic_products')
                     .select('*')
@@ -640,22 +675,46 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 if (medErr) throw medErr;
                 globalMedicalProducts = dbMedicals || [];
 
+                // 3. Raw Materials Data Load
+                const { data: dbRaw, error: rawErr } = await supabaseClient
+                    .from('raw_materials')
+                    .select('*')
+                    .order('product_name', { ascending: true });
+                
+                if (rawErr || !dbRaw || dbRaw.length === 0) {
+                    console.warn("Raw materials table missing or empty. Using fallback data.");
+                    globalRawMaterials = [
+                        { id: 'RM1', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 9500 },
+                        { id: 'RM2', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Medical", form: "Solution", unit: "2%/1L", unit_price_usd: 20000 },
+                        { id: 'RM3', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Medical", form: "Powder", unit: "100g", unit_price_usd: 60000 },
+                        { id: 'RM4', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 11000 },
+                        { id: 'RM5', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Medical", form: "Solution", unit: "2%/1L", unit_price_usd: 16000 },
+                        { id: 'RM6', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Medical", form: "Powder", unit: "100g", unit_price_usd: 20000 },
+                        { id: 'RM7', product_name: "Chitogenix™", active_ingredients: "dECM & Carboxymethyl Chitosan Complex", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 18000 }
+                    ];
+                } else {
+                    globalRawMaterials = dbRaw;
+                }
+
                 renderTableData();
                 renderMedicalTableData();
+                renderRawMaterialsTableData();
                 initQuotationSystem();
 
             } catch (err) {
                 console.error("Data Load Error:", err);
                 document.getElementById('price-table-body').innerHTML = `<tr class="loading-row"><td colspan="10" class="text-center py-10 text-red-500">Failed to load Cosmetic data.</td></tr>`;
                 document.getElementById('medical-table-body').innerHTML = `<tr class="loading-row"><td colspan="17" class="text-center py-10 text-red-500">Failed to load Medical data.</td></tr>`;
+                document.getElementById('raw-materials-table-body').innerHTML = `<tr class="loading-row"><td colspan="7" class="text-center py-10 text-red-500">Failed to load Raw Materials data.</td></tr>`;
             }
         }
 
         function changeExchangeRate(val) {
             appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
-            // 상단 테이블과 하단 견적서를 모두 동기화 재렌더링
+            // 상단 테이블 3개와 하단 견적서를 모두 동기화 재렌더링
             renderTableData();
             renderMedicalTableData();
+            renderRawMaterialsTableData();
             renderQuoteTable(); 
         }
 
@@ -679,9 +738,10 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 rateContainer.classList.add('flex');
             }
             
-            // 상단 테이블과 하단 견적서를 모두 동기화 재렌더링
+            // 상단 테이블 3개와 하단 견적서를 모두 동기화 재렌더링
             renderTableData();
             renderMedicalTableData();
+            renderRawMaterialsTableData();
             renderQuoteTable();
         }
 
@@ -897,7 +957,65 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         }
 
         // ==========================================
-        // 3. QUOTATION GENERATOR LOGIC (SYNCHRONIZED WITH TABLES)
+        // 3. RENDER RAW MATERIALS TABLE
+        // ==========================================
+        function renderRawMaterialsTableData() {
+            const tbody = document.getElementById('raw-materials-table-body');
+            tbody.innerHTML = '';
+            if (!globalRawMaterials || globalRawMaterials.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-10 text-gray-500 text-sm">No raw materials data available.</td></tr>';
+                return;
+            }
+
+            // Grouping logic for "Product Name" and "Active Ingredients"
+            function calcSpans(key) {
+                let spanArr = [], currentVal = null, count = 0;
+                for (let i = 0; i < globalRawMaterials.length; i++) {
+                    if (globalRawMaterials[i][key] !== currentVal) {
+                        if (count > 0) spanArr.push(count);
+                        currentVal = globalRawMaterials[i][key];
+                        count = 1;
+                    } else count++;
+                }
+                if (count > 0) spanArr.push(count);
+                let result = [];
+                spanArr.forEach(c => { result.push(c); for(let i = 0; i < c - 1; i++) result.push(0); });
+                return result;
+            }
+
+            const nameSpans = calcSpans('product_name');
+            const ingSpans = calcSpans('active_ingredients');
+
+            globalRawMaterials.forEach((p, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors text-xs";
+                
+                let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
+                let price = (Number(p.unit_price_usd) || 0) * rate;
+
+                let html = '';
+                if (nameSpans[idx] > 0) {
+                    html += `<td rowspan="${nameSpans[idx]}" class="py-2 px-2 text-center align-middle"><div class="placeholder-img mx-auto w-8 h-8 bg-gray-100">RM</div></td>`;
+                    html += `<td rowspan="${nameSpans[idx]}" class="py-3 px-4 text-center text-gray-900 font-medium align-middle">${p.product_name}</td>`;
+                }
+                if (ingSpans[idx] > 0) {
+                    html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center text-gray-700 font-light align-middle">${p.active_ingredients}</td>`;
+                }
+                
+                html += `
+                    <td class="py-3 px-4 text-center font-light text-black">${p.grade}</td>
+                    <td class="py-3 px-4 text-center font-light text-black">${p.form}</td>
+                    <td class="py-3 px-4 text-center font-light text-black">${p.unit}</td>
+                    <td class="py-3 px-6 text-center font-medium text-black">${formatMedCurrency(price)}</td>
+                `;
+                
+                tr.innerHTML = html;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // 4. QUOTATION GENERATOR LOGIC (SYNCHRONIZED WITH TABLES)
         // ==========================================
         let allProductsList = [];
         let quoteItems = [];
@@ -933,11 +1051,26 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     addedNames.add(fullName);
                 }
             });
+
+            // Raw Materials Data
+            (globalRawMaterials || []).forEach(p => {
+                if (!p || !p.product_name) return;
+                // 이름 뒤에 등급과 형태, 용량을 표기하여 옵션을 구분합니다.
+                const fullName = `[Raw] ${p.product_name} (${p.grade} / ${p.form} / ${p.unit})`;
+                if (!addedNames.has(fullName)) {
+                    // ID는 식별이 가능하도록 조합하여 생성
+                    const uniqueId = `raw_${p.product_name.replace(/[^a-zA-Z0-9]/g, '')}_${p.grade}_${p.form}_${p.unit}`.replace(/\s+/g, '');
+                    allProductsList.push({ id: uniqueId, name: fullName, type: 'raw', raw: p });
+                    addedNames.add(fullName);
+                }
+            });
+
             renderQuoteTable();
         }
 
         function getCtSize(productObj) {
-            if (!productObj || productObj.type === 'medical') return 1; 
+            // Medical이나 Raw Materials는 CT 단위를 사용하지 않음
+            if (!productObj || productObj.type === 'medical' || productObj.type === 'raw') return 1; 
             if (!productObj.raw || !productObj.raw.ct_quantity) return 1;
             const num = parseInt(String(productObj.raw.ct_quantity).replace(/[^0-9]/g, ''), 10);
             return isNaN(num) || num === 0 ? 1 : num;
@@ -983,9 +1116,9 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 item.priceTier = 'auto';
                 item.manualPrice = false;
                 
-                // Medical 제품의 경우 CT(카툰) 속성을 사용하지 않으므로 변경 시 0으로 고정
+                // Medical, Raw 제품의 경우 CT(카툰) 속성을 사용하지 않으므로 변경 시 0으로 고정
                 const prodObj = allProductsList.find(p => p.id === value);
-                if (prodObj && prodObj.type === 'medical') {
+                if (prodObj && (prodObj.type === 'medical' || prodObj.type === 'raw')) {
                     item.ctQty = 0;
                 }
             } else if (field === 'priceTier') {
@@ -1033,7 +1166,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     else if (totalCt > 0 && b2b1) finalPrice = b2b1;
                     else finalPrice = b2b1 || msrp;
                 }
-            } else {
+            } else if (prodObj.type === 'medical') {
                 const p = prodObj.raw;
                 const nativeCurrency = p.currency || 'USD';
                 
@@ -1072,6 +1205,10 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     else if (totalEa > 0 && d_1k) finalPrice = d_1k;
                     else finalPrice = d_1k || c_msrp;
                 }
+            } else if (prodObj.type === 'raw') {
+                const p = prodObj.raw;
+                let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
+                finalPrice = (Number(p.unit_price_usd) || 0) * rate;
             }
 
             return Math.round(finalPrice);
@@ -1093,7 +1230,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     <option value="b2b2" ${tier==='b2b2'?'selected':''}>B2B (10-30 CT)</option>
                     <option value="b2b3" ${tier==='b2b3'?'selected':''}>B2B (30+ CT)</option>
                 `;
-            } else {
+            } else if (prodObj.type === 'medical') {
                 options += `
                     <option value="clinic_msrp" ${tier==='clinic_msrp'?'selected':''}>Clinic MSRP</option>
                     <option value="clinic_promo" ${tier==='clinic_promo'?'selected':''}>Clinic Promo</option>
@@ -1105,6 +1242,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     <option value="oem_30000" ${tier==='oem_30000'?'selected':''}>OEM (30k)</option>
                     <option value="oem_50000" ${tier==='oem_50000'?'selected':''}>OEM (50k)</option>
                 `;
+            } else if (prodObj.type === 'raw') {
+                options += `<option value="standard" selected>Standard Price</option>`;
             }
             return options;
         }
@@ -1160,7 +1299,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
 
                 quoteItems.forEach((item, index) => {
                     const prodObj = allProductsList.find(p => p.id === item.productId);
-                    const isMedical = prodObj && prodObj.type === 'medical';
+                    const isNonCtProduct = prodObj && (prodObj.type === 'medical' || prodObj.type === 'raw');
                     const ctSize = prodObj ? getCtSize(prodObj) : 1;
                     const totalEa = (item.ctQty * ctSize) + item.eaQty;
                     
@@ -1225,14 +1364,14 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                         </td>
                         <td class="py-2 px-2 text-center align-top">
                             <div class="flex items-center justify-center gap-1 no-print">
-                                <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none ${isMedical ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-50 focus:bg-white'}" value="${item.ctQty}" title="Cartons" onchange="updateQuoteItem('${item.id}', 'ctQty', this.value)" ${isMedical ? 'disabled' : ''}> 
-                                <span class="text-xs ${isMedical ? 'text-gray-300' : 'text-gray-500'}">CT</span>
+                                <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none ${isNonCtProduct ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-50 focus:bg-white'}" value="${item.ctQty}" title="Cartons" onchange="updateQuoteItem('${item.id}', 'ctQty', this.value)" ${isNonCtProduct ? 'disabled' : ''}> 
+                                <span class="text-xs ${isNonCtProduct ? 'text-gray-300' : 'text-gray-500'}">CT</span>
                                 <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none bg-gray-50 focus:bg-white ml-1" value="${item.eaQty}" title="Ea" onchange="updateQuoteItem('${item.id}', 'eaQty', this.value)"> 
                                 <span class="text-xs text-gray-500">EA</span>
                             </div>
                             <div class="print-only hidden text-center">
                                 <span class="font-bold">${totalEa}</span> <span class="text-[10px] text-gray-500">EA</span>
-                                ${(!isMedical && item.ctQty > 0) ? `<br><span class="text-[10px] text-gray-400">(${item.ctQty}CT + ${item.eaQty}EA)</span>` : ''}
+                                ${(!isNonCtProduct && item.ctQty > 0) ? `<br><span class="text-[10px] text-gray-400">(${item.ctQty}CT + ${item.eaQty}EA)</span>` : ''}
                             </div>
                         </td>
                         <td class="py-2 px-2 text-right align-top">
@@ -1435,7 +1574,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 const prodObj = allProductsList.find(p => p.id === item.productId);
                 const displayItemName = item.productId === 'CUSTOM' ? (item.customName || 'Custom Item') : (prodObj ? prodObj.name : '');
                 
-                const isMedical = prodObj && prodObj.type === 'medical';
+                const isNonCtProduct = prodObj && (prodObj.type === 'medical' || prodObj.type === 'raw');
                 const ctSize = prodObj ? getCtSize(prodObj) : 1;
                 const ctQty = parseInt(item.ctQty, 10) || 0;
                 const eaQty = parseInt(item.eaQty, 10) || 0;
@@ -1444,8 +1583,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 body += `${index + 1}. ${displayItemName} ${item.isFoc ? '(FOC)' : ''}\n`;
                 if (item.color) body += `   - Option/Color: ${item.color}\n`;
                 
-                // 이메일 공유에서도 Medical 제품은 (CT + EA) 표기 생략
-                if (!isMedical && item.ctQty > 0) {
+                // 이메일 공유에서도 Medical/Raw 제품은 (CT + EA) 표기 생략
+                if (!isNonCtProduct && item.ctQty > 0) {
                     body += `   - Quantity: ${totalEa} EA ( ${item.ctQty} CT + ${item.eaQty} EA )\n`;
                 } else {
                     body += `   - Quantity: ${totalEa} EA\n`;
@@ -1482,7 +1621,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         }
 
         // ==========================================
-        // 4. MEDIFAB AI ASSISTANT
+        // 5. MEDIFAB AI ASSISTANT
         // ==========================================
         function toggleChat() {
             const chatContainer = document.getElementById('ai-chat-container'), fab = document.getElementById('ai-fab');
@@ -1506,7 +1645,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 const catalogContext = {
                     exchangeRate: appliedKrwRate, currencyToggled: currentCurrency,
                     cosmetics: globalUniqueProducts.map(p => ({ name: p.display_name, prices: Array.isArray(p.product_prices) ? p.product_prices.map(pr => ({ currency: pr.currency, msrp: pr.b2c_msrp, b2b_tier1: pr.b2b_tier1_1_to_10_ct })) : [] })),
-                    medical: globalMedicalProducts.map(p => ({ name: p.item, brand: p.brand, msrp_clinic: p.clinic_msrp, distributor_1000: p.dist_1000 }))
+                    medical: globalMedicalProducts.map(p => ({ name: p.item, brand: p.brand, msrp_clinic: p.clinic_msrp, distributor_1000: p.dist_1000 })),
+                    raw: globalRawMaterials.map(p => ({ name: p.product_name, grade: p.grade, unit: p.unit, unit_price_usd: p.unit_price_usd }))
                 };
                 const { data, error } = await supabaseClient.functions.invoke('gemini-chat', { body: { message, catalogContext } });
                 const typingEl = document.getElementById(typingId);
