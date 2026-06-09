@@ -83,7 +83,7 @@
         
         @media print {
             body { background-color: #ffffff; margin: 0; padding: 0; }
-            #lock-screen, #ai-chat-container, #ai-fab, .no-print { display: none !important; }
+            #lock-screen, #ai-chat-container, #ai-fab, #toast-container, .no-print { display: none !important; }
             /* Hide top content sections */
             #main-content > div:not(#quotation-section) { display: none !important; }
             
@@ -103,7 +103,7 @@
         }
     </style>
 </head>
-<body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white">
+<body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white relative">
 
     <div id="lock-screen" class="flex items-center justify-center">
         <div class="bg-white p-10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 max-w-sm w-full text-center">
@@ -120,6 +120,9 @@
             </form>
         </div>
     </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
     <div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeImageModal(event)">
         <div class="relative max-w-4xl max-h-[90vh] p-4 flex flex-col items-center">
@@ -314,8 +317,8 @@
                     <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Quotation Generator</h2>
                     <div class="space-x-2 flex">
                         <button onclick="addQuoteItem()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium transition-colors">+ Add Item</button>
-                        <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Print / Save PDF</button>
-                        <button id="btn-share" onclick="shareViaEmail()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
+                        <button id="btn-share" onclick="shareViaEmail()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                             Share (Email)
                         </button>
@@ -549,6 +552,52 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         };
 
+        // --- TOAST NOTIFICATION ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-gray-900' : 'bg-red-600';
+            toast.className = `${bgColor} text-white px-6 py-3 shadow-lg flex items-center gap-3 transition-all duration-300 transform translate-y-full opacity-0 pointer-events-auto font-montserrat text-sm tracking-wide border border-transparent`;
+            
+            const icon = type === 'success' 
+                ? `<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
+                : `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+
+            toast.innerHTML = `${icon} <span>${message}</span>`;
+            container.appendChild(toast);
+
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-full', 'opacity-0');
+            });
+
+            // Remove after 3.5 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-y-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // --- BUTTON LOADING STATE UTILITY ---
+        function setButtonLoading(buttonId, isLoading) {
+            const btn = document.getElementById(buttonId);
+            if (!btn) return;
+            
+            if (isLoading) {
+                if (!btn.dataset.originalText) {
+                    btn.dataset.originalText = btn.innerHTML;
+                }
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
+            } else {
+                btn.disabled = false;
+                if (btn.dataset.originalText) {
+                    btn.innerHTML = btn.dataset.originalText;
+                }
+            }
+        }
+
         // --- IMAGE MODAL ---
         function openImageModal(imgSrc) {
             const modal = document.getElementById('image-modal');
@@ -562,7 +611,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             setTimeout(() => { modal.classList.add('hidden'); document.getElementById('modal-img').src = ''; }, 300);
         }
 
-        // --- STREAMING_CHUNK:Database Initialization... ---
         // --- SUPABASE CONFIG ---
         const SUPABASE_URL = 'https://rayhgqcpupwmwpymtkwg.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
@@ -630,7 +678,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             renderQuoteTable(); 
         }
 
-        // --- STREAMING_CHUNK:Fetching Data & Updating Global State... ---
+        // --- Fetching Data & Updating Global State... ---
         async function initDashboard() {
             // 1. 환율 정보 로드
             try {
@@ -766,7 +814,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             initQuotationSystem();
         }
 
-        // --- STREAMING_CHUNK:Defining UI Helpers and Callbacks... ---
+        // --- Defining UI Helpers and Callbacks... ---
         function changeExchangeRate(val) {
             appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
             // 상단 테이블 3개와 하단 견적서를 모두 동기화 재렌더링
@@ -841,7 +889,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         // ==========================================
         // 1. RENDER COSMETIC TABLE
         // ==========================================
-        // --- STREAMING_CHUNK:Rendering Cosmetic Data Logics... ---
         function renderTableData() {
             const tbody = document.getElementById('price-table-body');
             tbody.innerHTML = '';
@@ -927,7 +974,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         // ==========================================
         // 2. RENDER MEDICAL AESTHETIC TABLE
         // ==========================================
-        // --- STREAMING_CHUNK:Rendering Medical Aesthetic Logic... ---
         function renderMedicalTableData() {
             const tbody = document.getElementById('medical-table-body');
             tbody.innerHTML = '';
@@ -986,7 +1032,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.type || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 
                 let rawSpecs = p.specs || '', specPkg = rawSpecs, specVol = '-';
-                // mg 단위를 포함하도록 정규식 개선
                 const volRegex = /(\d+(?:\.\d+)?\s*(?:cc|ml|g|mg)(?:\s*(?:\*|x|X)\s*\d+(?:\.\d+)?\s*(?:cc|ml|g|mg|ea|vial))?)/i;
                 const volMatch = rawSpecs.match(volRegex);
                 if (volMatch) { specVol = volMatch[0]; specPkg = rawSpecs.replace(volMatch[0], '').trim().replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); }
@@ -1014,7 +1059,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         // ==========================================
         // 3. RENDER RAW MATERIALS TABLE
         // ==========================================
-        // --- STREAMING_CHUNK:Rendering Raw Materials Logic... ---
         function renderRawMaterialsTableData() {
             const tbody = document.getElementById('raw-materials-table-body');
             tbody.innerHTML = '';
@@ -1070,9 +1114,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         }
 
         // ==========================================
-        // 4. QUOTATION GENERATOR LOGIC (SYNCHRONIZED WITH TABLES)
+        // 4. QUOTATION GENERATOR LOGIC
         // ==========================================
-        // --- STREAMING_CHUNK:Configuring Quotation Generating Core... ---
         let allProductsList = [];
         let quoteItems = [];
         let quoteItemIdCounter = 0;
@@ -1183,7 +1226,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             renderQuoteTable();
         }
 
-        // --- STREAMING_CHUNK:Calculating Advanced Quote Fields... ---
         function calculateUnitPrice(item, totalEa) {
             if (item.manualPrice) return item.unitPrice;
             if (!item.productId || item.productId === 'CUSTOM') return 0;
@@ -1332,7 +1374,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             }
         }
 
-        // --- STREAMING_CHUNK:Rendering Quotation Component View... ---
         function renderQuoteTable() {
             try {
                 const tbody = document.getElementById('quote-tbody');
@@ -1456,7 +1497,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             }
         }
 
-        // --- STREAMING_CHUNK:Defining Quotation Export Logics... ---
         function updateTotals(subTotal, discountRate, targetCurrency, incoterms) {
             const discountAmount = subTotal * (discountRate / 100);
             const grandTotal = subTotal - discountAmount;
@@ -1485,6 +1525,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             else exwNotice.classList.add('hidden');
         }
 
+        // --- ENHANCED SAVE QUOTATION LOGIC ---
         async function saveQuotationToDB() {
             try {
                 const quoteData = {
@@ -1545,15 +1586,28 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     .insert(itemsToSave);
 
                 if (itemsError) throw itemsError;
+                
                 console.log("견적서가 Supabase 데이터베이스에 성공적으로 저장되었습니다.");
+                showToast('Quotation successfully saved to database.', 'success');
+                return true;
 
             } catch (err) {
                 console.error("DB 저장 중 에러 발생:", err);
+                showToast('Database Error: ' + err.message, 'error');
+                return false;
             }
         }
 
+        // --- ENHANCED PRINT QUOTATION ---
         async function printQuotation() {
             if (window.isFocLimitExceeded) return;
+
+            if (quoteItems.length === 0) {
+                showToast('Please add items to the quotation.', 'error');
+                return;
+            }
+
+            setButtonLoading('btn-print', true);
 
             const comp = document.getElementById('cust-company').value.trim();
             const nationality = document.getElementById('cust-nationality').value.trim();
@@ -1578,11 +1632,15 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             document.getElementById('quote-date-print').textContent = quoteDate;
             document.getElementById('quote-no-print').textContent = quoteNo;
             
+            // 데이터베이스 저장 실행
             await saveQuotationToDB();
 
             const originalTitle = document.title;
             const safeCompName = comp ? comp.replace(/[\/\\?%*:|"<>]/g, '').replace(/\s+/g, '_') : 'Company';
             document.title = `${quoteDate}_${quoteNo}_${safeCompName}`;
+
+            // 다이얼로그 호출 전 로딩 상태 해제
+            setButtonLoading('btn-print', false);
 
             window.print();
             
@@ -1591,13 +1649,16 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             }, 1000);
         }
 
+        // --- ENHANCED SHARE VIA EMAIL ---
         async function shareViaEmail() {
             if (window.isFocLimitExceeded) return;
 
             if (quoteItems.length === 0) {
-                console.warn("Please add items to the quotation before sharing.");
+                showToast('Please add items to the quotation before sharing.', 'error');
                 return;
             }
+
+            setButtonLoading('btn-share', true);
 
             const quoteNo = document.getElementById('quote-no').textContent;
             const targetCurrency = currentCurrency;
@@ -1659,16 +1720,19 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             body += `If you have any questions, please let us know.\n\n`;
             body += `Best regards,\nMEDIFAB GLOBAL`;
 
+            // 데이터베이스 저장 실행
             await saveQuotationToDB();
 
             const mailtoLink = `mailto:${document.getElementById('cust-email').value || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            setButtonLoading('btn-share', false);
+            
             window.location.href = mailtoLink;
         }
 
         // ==========================================
         // 5. MEDIFAB AI ASSISTANT
         // ==========================================
-        // --- STREAMING_CHUNK:AI Chat Handler Loading... ---
         function toggleChat() {
             const chatContainer = document.getElementById('ai-chat-container'), fab = document.getElementById('ai-fab');
             if (chatContainer.classList.contains('hidden')) {
