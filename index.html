@@ -577,7 +577,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         let globalUniqueProducts = [];
         let globalMedicalProducts = [];
         let globalRawMaterials = [];
-        window.isFocLimitExceeded = false; // FOC 상태 추적 변수
+        window.isFocLimitExceeded = false;
 
         const productImageMap = {
             "Cellular water ampoule booster 120ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoulbooster120.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxib29zdGVyMTIwLmpwZyIsImlhdCI6MTc4MDYyNzM4NCwiZXhwIjoyMDk1OTg3Mzg0fQ.YgYQumgSOVgFPo5h4rPdJgWEvU-DW-GBbrWWlGIGI2o",
@@ -632,29 +632,33 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         }
 
         async function initDashboard() {
+            // 1. 환율 정보 로드
             try {
-                try {
-                    const exRes = await fetch('https://open.er-api.com/v6/latest/USD');
-                    const exData = await exRes.json();
-                    liveKrwRate = exData.rates.KRW;
-                    appliedKrwRate = liveKrwRate;
-                    document.getElementById('live-rate').textContent = `1 USD = ₩ ` + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate);
-                    const liveOption = document.querySelector('#krw-rate-select option[value="live"]');
-                    if (liveOption) liveOption.textContent = `Live (₩${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate)})`;
-                } catch (e) {
-                    document.getElementById('live-rate').textContent = `Rate Load Failed (Default: ₩1,400)`;
-                    console.error("Exchange API Error:", e);
-                }
+                const exRes = await fetch('https://open.er-api.com/v6/latest/USD');
+                const exData = await exRes.json();
+                liveKrwRate = exData.rates.KRW;
+                appliedKrwRate = liveKrwRate;
+                document.getElementById('live-rate').textContent = `1 USD = ₩ ` + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate);
+                const liveOption = document.querySelector('#krw-rate-select option[value="live"]');
+                if (liveOption) liveOption.textContent = `Live (₩${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate)})`;
+            } catch (e) {
+                document.getElementById('live-rate').textContent = `Rate Load Failed (Default: ₩1,400)`;
+                console.error("Exchange API Error:", e);
+                liveKrwRate = 1400;
+                appliedKrwRate = 1400;
+            }
 
-                // 1. Cosmetic Data Load
+            // 2. Cosmetic Data Load
+            try {
                 const { data: dbProducts, error: prodErr } = await supabaseClient
                     .from('products')
                     .select(`sub_category, name_en, ct_quantity, product_prices (currency, b2c_msrp, b2c_promotion, b2b_tier1_1_to_10_ct, b2b_tier2_10_to_30_ct, b2b_tier3_30_to_70_ct)`)
                     .order('created_at', { ascending: true });
+                    
                 if (prodErr) throw prodErr;
 
                 const uniqueProductsMap = new Map();
-                if (dbProducts) {
+                if (dbProducts && dbProducts.length > 0) {
                     dbProducts.forEach(product => {
                         let displayName = product.name_en;
                         if (displayName && displayName.includes("Core impact (BK/WH/DW/BG)")) displayName = displayName.replace("Core impact (BK/WH/DW/BG)", "Core impact (WH/PK/DW/BK/BG)");
@@ -664,49 +668,73 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                         product.display_name = displayName;
                         if (displayName && !uniqueProductsMap.has(displayName)) uniqueProductsMap.set(displayName, product);
                     });
+                    globalUniqueProducts = Array.from(uniqueProductsMap.values());
+                } else {
+                    throw new Error("No cosmetic data found in database");
                 }
-                globalUniqueProducts = Array.from(uniqueProductsMap.values());
+            } catch (err) {
+                console.warn("Cosmetic Data Load Error, using fallback data:", err);
+                globalUniqueProducts = [
+                    { sub_category: 'Device-face', display_name: 'Core impact (WH/PK/DW/BK/BG)', ct_quantity: '1CT', product_prices: [{ currency: 'USD', b2c_msrp: 650, b2c_promotion: 500, b2b_tier1_1_to_10_ct: 300, b2b_tier2_10_to_30_ct: 280, b2b_tier3_30_to_70_ct: 250 }] },
+                    { sub_category: 'Product-face', display_name: 'Cellular water ampoule booster 60ml', ct_quantity: '50CT', product_prices: [{ currency: 'USD', b2c_msrp: 60, b2c_promotion: 50, b2b_tier1_1_to_10_ct: 30, b2b_tier2_10_to_30_ct: 25, b2b_tier3_30_to_70_ct: 20 }] },
+                    { sub_category: 'Product-face', display_name: 'Plan tox lifting ampoule 30ml', ct_quantity: '50CT', product_prices: [{ currency: 'USD', b2c_msrp: 80, b2c_promotion: 65, b2b_tier1_1_to_10_ct: 40, b2b_tier2_10_to_30_ct: 35, b2b_tier3_30_to_70_ct: 30 }] },
+                    { sub_category: 'Product-face', display_name: 'Phyto protein volumizing ampoule 30ml', ct_quantity: '50CT', product_prices: [{ currency: 'USD', b2c_msrp: 85, b2c_promotion: 70, b2b_tier1_1_to_10_ct: 45, b2b_tier2_10_to_30_ct: 40, b2b_tier3_30_to_70_ct: 35 }] }
+                ];
+            }
 
-                // 2. Medical Data Load
+            // 3. Medical Data Load
+            try {
                 const { data: dbMedicals, error: medErr } = await supabaseClient
                     .from('medical_aesthetic_products')
                     .select('*')
                     .order('sort_order', { ascending: true });
+                    
                 if (medErr) throw medErr;
-                globalMedicalProducts = dbMedicals || [];
+                
+                if (dbMedicals && dbMedicals.length > 0) {
+                    globalMedicalProducts = dbMedicals;
+                } else {
+                    throw new Error("No medical data found in database");
+                }
+            } catch (err) {
+                console.warn("Medical Data Load Error, using fallback data:", err);
+                globalMedicalProducts = [
+                    { item: 'Crystal', ingredients: 'Chitosan-based', type: 'Filler', specs: '1.0ml', clinic_msrp: 120, clinic_promotion: 100, dist_1000: 60, dist_3000: 55, dist_5000: 50, dist_10000: 45, oem_10000: 40, oem_30000: 35, oem_50000: 30, currency: 'USD' },
+                    { item: 'Crystal Plus', ingredients: 'Chitosan-based', type: 'Filler', specs: '1.0ml', clinic_msrp: 130, clinic_promotion: 110, dist_1000: 65, dist_3000: 60, dist_5000: 55, dist_10000: 50, oem_10000: 45, oem_30000: 40, oem_50000: 35, currency: 'USD' },
+                    { item: 'Scalp MD', ingredients: 'dECM', type: 'Skin Booster', specs: '5.0ml * 5ea', clinic_msrp: 200, clinic_promotion: 180, dist_1000: 100, dist_3000: 90, dist_5000: 80, dist_10000: 75, oem_10000: 70, oem_30000: 60, oem_50000: 55, currency: 'USD' }
+                ];
+            }
 
-                // 3. Raw Materials Data Load
+            // 4. Raw Materials Data Load
+            try {
                 const { data: dbRaw, error: rawErr } = await supabaseClient
                     .from('raw_materials')
                     .select('*')
                     .order('product_name', { ascending: true });
                 
                 if (rawErr || !dbRaw || dbRaw.length === 0) {
-                    console.warn("Raw materials table missing or empty. Using fallback data.");
-                    globalRawMaterials = [
-                        { id: 'RM1', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 9500 },
-                        { id: 'RM2', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Medical", form: "Solution", unit: "2%/1L", unit_price_usd: 20000 },
-                        { id: 'RM3', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Medical", form: "Powder", unit: "100g", unit_price_usd: 60000 },
-                        { id: 'RM4', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 11000 },
-                        { id: 'RM5', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Medical", form: "Solution", unit: "2%/1L", unit_price_usd: 16000 },
-                        { id: 'RM6', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Medical", form: "Powder", unit: "100g", unit_price_usd: 20000 },
-                        { id: 'RM7', product_name: "Chitogenix™", active_ingredients: "dECM & Carboxymethyl Chitosan Complex", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 18000 }
-                    ];
+                    throw new Error("Raw materials table missing or empty");
                 } else {
                     globalRawMaterials = dbRaw;
                 }
-
-                renderTableData();
-                renderMedicalTableData();
-                renderRawMaterialsTableData();
-                initQuotationSystem();
-
             } catch (err) {
-                console.error("Data Load Error:", err);
-                document.getElementById('price-table-body').innerHTML = `<tr class="loading-row"><td colspan="10" class="text-center py-10 text-red-500">Failed to load Cosmetic data.</td></tr>`;
-                document.getElementById('medical-table-body').innerHTML = `<tr class="loading-row"><td colspan="17" class="text-center py-10 text-red-500">Failed to load Medical data.</td></tr>`;
-                document.getElementById('raw-materials-table-body').innerHTML = `<tr class="loading-row"><td colspan="7" class="text-center py-10 text-red-500">Failed to load Raw Materials data.</td></tr>`;
+                console.warn("Raw Materials Load Error, using fallback data:", err);
+                globalRawMaterials = [
+                    { id: 'RM1', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 9500 },
+                    { id: 'RM2', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Medical", form: "Solution", unit: "2%/1L", unit_price_usd: 20000 },
+                    { id: 'RM3', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Medical", form: "Powder", unit: "100g", unit_price_usd: 60000 },
+                    { id: 'RM4', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 11000 },
+                    { id: 'RM5', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Medical", form: "Solution", unit: "2%/1L", unit_price_usd: 16000 },
+                    { id: 'RM6', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Medical", form: "Powder", unit: "100g", unit_price_usd: 20000 },
+                    { id: 'RM7', product_name: "Chitogenix™", active_ingredients: "dECM & Carboxymethyl Chitosan Complex", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 18000 }
+                ];
             }
+
+            // 모든 데이터 로딩 후 렌더링 실행
+            renderTableData();
+            renderMedicalTableData();
+            renderRawMaterialsTableData();
+            initQuotationSystem();
         }
 
         function changeExchangeRate(val) {
@@ -967,7 +995,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 return;
             }
 
-            // Grouping logic for "Product Name" and "Active Ingredients"
             function calcSpans(key) {
                 let spanArr = [], currentVal = null, count = 0;
                 for (let i = 0; i < globalRawMaterials.length; i++) {
@@ -1055,10 +1082,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             // Raw Materials Data
             (globalRawMaterials || []).forEach(p => {
                 if (!p || !p.product_name) return;
-                // 이름 뒤에 등급과 형태, 용량을 표기하여 옵션을 구분합니다.
                 const fullName = `[Raw] ${p.product_name} (${p.grade} / ${p.form} / ${p.unit})`;
                 if (!addedNames.has(fullName)) {
-                    // ID는 식별이 가능하도록 조합하여 생성
                     const uniqueId = `raw_${p.product_name.replace(/[^a-zA-Z0-9]/g, '')}_${p.grade}_${p.form}_${p.unit}`.replace(/\s+/g, '');
                     allProductsList.push({ id: uniqueId, name: fullName, type: 'raw', raw: p });
                     addedNames.add(fullName);
@@ -1069,7 +1094,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         }
 
         function getCtSize(productObj) {
-            // Medical이나 Raw Materials는 CT 단위를 사용하지 않음
             if (!productObj || productObj.type === 'medical' || productObj.type === 'raw') return 1; 
             if (!productObj.raw || !productObj.raw.ct_quantity) return 1;
             const num = parseInt(String(productObj.raw.ct_quantity).replace(/[^0-9]/g, ''), 10);
@@ -1112,11 +1136,10 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             } else if (field === 'productId') {
                 item.productId = value;
                 item.customName = '';
-                item.color = ''; // 상품 변경 시 기존에 선택된 색상 초기화
+                item.color = ''; 
                 item.priceTier = 'auto';
                 item.manualPrice = false;
                 
-                // Medical, Raw 제품의 경우 CT(카툰) 속성을 사용하지 않으므로 변경 시 0으로 고정
                 const prodObj = allProductsList.find(p => p.id === value);
                 if (prodObj && (prodObj.type === 'medical' || prodObj.type === 'raw')) {
                     item.ctQty = 0;
@@ -1285,7 +1308,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 tbody.innerHTML = '';
                 
                 let subTotal = 0;
-                let focTotalValue = 0; // FOC 금액 계산을 위한 변수
+                let focTotalValue = 0; 
                 const targetCurrency = currentCurrency; 
                 const incoterms = document.getElementById('quote-incoterms')?.value || 'FOB';
                 const discountRate = parseFloat(document.getElementById('quote-discount')?.value) || 0;
@@ -1310,7 +1333,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     let appliedUnitPrice = Number(item.unitPrice) || 0;
                     if (incoterms === 'EXW') appliedUnitPrice *= 0.97;
                     
-                    // FOC 가치 누적 계산
                     const originalAmount = appliedUnitPrice * totalEa;
                     if (item.isFoc) {
                         focTotalValue += originalAmount;
@@ -1433,7 +1455,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
 
         async function saveQuotationToDB() {
             try {
-                // 1. 견적서 메인 정보 저장
                 const quoteData = {
                     quote_no: document.getElementById('quote-no').textContent,
                     quote_date: document.getElementById('quote-date').textContent,
@@ -1462,14 +1483,12 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 if (!quoteResult || quoteResult.length === 0) throw new Error("견적서 저장 후 ID를 받아오지 못했습니다.");
                 const savedQuoteId = quoteResult[0].id;
 
-                // 2. 견적서 상세 아이템들 저장
                 const itemsToSave = quoteItems.map((item, index) => {
                     const prodObj = allProductsList.find(p => p.id === item.productId);
                     const displayItemName = item.productId === 'CUSTOM' ? (item.customName || 'Custom Item') : (prodObj ? prodObj.name : '');
                     const ctSize = prodObj ? getCtSize(prodObj) : 1;
                     const totalEa = (item.ctQty * ctSize) + item.eaQty;
 
-                    // EXW 할인율 및 FOC 상태 반영된 단위 가격 계산
                     let appliedUnitPrice = Number(item.unitPrice) || 0;
                     if (document.getElementById('quote-incoterms').value === 'EXW') appliedUnitPrice *= 0.97;
                     appliedUnitPrice = Math.round(appliedUnitPrice);
@@ -1527,18 +1546,14 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             document.getElementById('quote-date-print').textContent = quoteDate;
             document.getElementById('quote-no-print').textContent = quoteNo;
             
-            // 프린트창 띄우기 직전에 데이터베이스에 견적서 저장
             await saveQuotationToDB();
 
-            // 인쇄/PDF 저장 시 기본 파일명 설정을 위해 일시적으로 문서 타이틀 변경
             const originalTitle = document.title;
-            // 파일명에 사용할 수 없는 특수문자 제거 및 공백 처리
             const safeCompName = comp ? comp.replace(/[\/\\?%*:|"<>]/g, '').replace(/\s+/g, '_') : 'Company';
             document.title = `${quoteDate}_${quoteNo}_${safeCompName}`;
 
             window.print();
             
-            // 인쇄 창이 닫힌 후 원래 타이틀로 복구
             setTimeout(() => {
                 document.title = originalTitle;
             }, 1000);
@@ -1583,7 +1598,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 body += `${index + 1}. ${displayItemName} ${item.isFoc ? '(FOC)' : ''}\n`;
                 if (item.color) body += `   - Option/Color: ${item.color}\n`;
                 
-                // 이메일 공유에서도 Medical/Raw 제품은 (CT + EA) 표기 생략
                 if (!isNonCtProduct && item.ctQty > 0) {
                     body += `   - Quantity: ${totalEa} EA ( ${item.ctQty} CT + ${item.eaQty} EA )\n`;
                 } else {
@@ -1613,7 +1627,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             body += `If you have any questions, please let us know.\n\n`;
             body += `Best regards,\nMEDIFAB GLOBAL`;
 
-            // 이메일 창을 띄우기 직전에 데이터베이스에 견적서 저장
             await saveQuotationToDB();
 
             const mailtoLink = `mailto:${document.getElementById('cust-email').value || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
