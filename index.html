@@ -347,7 +347,6 @@
         <!-- 4. MAIN QUOTATION GENERATOR (Cosmetic & Medical)          -->
         <!-- ========================================================= -->
         <div id="quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
-            <!-- (Contents omitted for brevity in this snippet, assumes exactly as original) -->
             <!-- Controls (Not printed) -->
             <div class="no-print mb-8">
                 <div class="flex justify-between items-end mb-4">
@@ -519,7 +518,6 @@ Beneficiary : MediFab Co., LTD</div>
         <!-- 5. RAW MATERIALS QUOTATION GENERATOR (Independent System) -->
         <!-- ========================================================= -->
         <div id="raw-quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
-            <!-- (Contents omitted for brevity in this snippet, assumes exactly as original) -->
              <div class="no-print mb-8">
                 <div class="flex justify-between items-end mb-4">
                     <h2 class="text-2xl text-blue-900 font-montserrat uppercase tracking-wider font-semibold">Proprietary Raw Materials <br> Quotation Generator</h2>
@@ -664,9 +662,9 @@ Beneficiary : MediFab Co., LTD</div>
                         </div>
                     </div>
 
-                    <!-- Negotiation Variables (Simple/Exclusive Distribution Options) -->
+                    <!-- Negotiation Variables (Applies to all Contract Types now) -->
                     <div id="negotiation-panel" class="bg-blue-50/50 p-4 border border-blue-200 shadow-sm transition-all duration-300">
-                        <label class="block text-sm font-bold text-blue-900 mb-3 border-l-4 border-blue-600 pl-2">Negotiation Variables & Options (유통 계약 협상 카드)</label>
+                        <label class="block text-sm font-bold text-blue-900 mb-3 border-l-4 border-blue-600 pl-2">Negotiation Variables & Options (유통 및 ODM 계약 협상 카드)</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <!-- Financials -->
                             <div>
@@ -851,7 +849,6 @@ Beneficiary : MediFab Co., LTD</div>
     </div>
 
     <!-- AI Chat UI -->
-    <!-- (Omitted to keep exact as original, assumed identical) -->
     <div id="ai-chat-container" class="fixed bottom-6 right-6 z-[60] hidden flex-col w-80 sm:w-96 h-[30rem] bg-white border border-gray-300 shadow-2xl">
         <div class="bg-gray-900 text-white px-5 py-4 flex justify-between items-center cursor-pointer" onclick="toggleChat()">
             <div class="flex items-center gap-2">
@@ -1732,11 +1729,10 @@ Beneficiary : MediFab Co., LTD</div>
         function handleContractTypeChange() {
             const type = document.getElementById('contract-type').value;
             const panel = document.getElementById('negotiation-panel');
-            if(type === 'simple' || type === 'exclusive') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
-            }
+            
+            // Now negotiation panel is ALWAYS displayed for ODM as well
+            panel.style.display = 'block';
+
             buildContractProductsData();
             contractProducts = []; 
             renderContractProducts();
@@ -1829,33 +1825,35 @@ Beneficiary : MediFab Co., LTD</div>
         }
 
         // --- Contract HTML Generators ---
+        
+        function getContractVariables() {
+            return {
+                years: document.getElementById('contract-years').value || 3,
+                downPayment: document.getElementById('contract-downpayment').value || 0,
+                advPct: document.getElementById('contract-advance-pct').value || 50,
+                remPct: Math.max(0, 100 - (document.getElementById('contract-advance-pct').value || 50)),
+                lateRate: document.getElementById('contract-late-rate').value || 0.15,
+                lateMax: document.getElementById('contract-late-max').value || 30,
+                licensePen1: document.getElementById('contract-license-pen1').value || 100,
+                licensePen2: document.getElementById('contract-license-pen2').value || 200,
+                planDays: document.getElementById('contract-plan-days').value || 30,
+                extDays: document.getElementById('contract-ext-days').value || 60,
+                moqInc: document.getElementById('contract-moq-inc').value || 10,
+                minOrder: document.getElementById('contract-min-order').value || 1000,
+                distName: document.getElementById('contract-dist-name').value.trim() || '[Distributor Company Name]',
+                distCountry: document.getElementById('contract-dist-country').value.trim() || '[Country/Territory]',
+                distReg: document.getElementById('contract-dist-reg').value.trim() || '[Registration No.]',
+                distRep: document.getElementById('contract-dist-rep').value.trim() || '[Representative Name]',
+                distAddress: document.getElementById('contract-dist-address').value.trim() || '[Distributor Address]'
+            };
+        }
+
         function generateStandardDistributionContract(type) {
             const isExclusive = type === 'exclusive';
-            
-            // Options Collection
-            const years = document.getElementById('contract-years').value || 3;
-            const downPayment = document.getElementById('contract-downpayment').value || 0;
-            const advPct = document.getElementById('contract-advance-pct').value || 50;
-            const remPct = 100 - advPct;
-            const lateRate = document.getElementById('contract-late-rate').value || 0.15;
-            const lateMax = document.getElementById('contract-late-max').value || 30;
-            const licensePen1 = document.getElementById('contract-license-pen1').value || 100;
-            const licensePen2 = document.getElementById('contract-license-pen2').value || 200;
-            const planDays = document.getElementById('contract-plan-days').value || 30;
-            const extDays = document.getElementById('contract-ext-days').value || 60;
-            const moqInc = document.getElementById('contract-moq-inc').value || 10;
-            const minOrder = document.getElementById('contract-min-order').value || 1000;
-
-            const distName = document.getElementById('contract-dist-name').value.trim() || '[Distributor Company Name]';
-            const distCountry = document.getElementById('contract-dist-country').value.trim() || '[Country/Territory]';
-            const distReg = document.getElementById('contract-dist-reg').value.trim() || '[Registration No.]';
-            const distRep = document.getElementById('contract-dist-rep').value.trim() || '[Representative Name]';
-            const distAddress = document.getElementById('contract-dist-address').value.trim() || '[Distributor Address]';
-
+            const vars = getContractVariables();
             const today = new Date();
             const dateStr = `${today.getDate()} day of ${today.toLocaleString('default', { month: 'long' })}, ${today.getFullYear()}`;
 
-            // Annex Items Parsing
             let productRowsHTML = '';
             let privateLabelsList = [];
             if (contractProducts.length > 0) {
@@ -1864,22 +1862,12 @@ Beneficiary : MediFab Co., LTD</div>
                     const baseName = source ? source.name : 'Unknown Base';
                     const brandName = p.privateLabelName || baseName;
                     privateLabelsList.push(brandName);
-                    
-                    productRowsHTML += `
-                        <tr>
-                            <td>${escapeHtml(brandName)}</td>
-                            <td>Fillers / Cosmetics</td>
-                            <td>${escapeHtml(baseName)}</td>
-                            <td>${escapeHtml(brandName)}</td>
-                            <td>${p.price}</td>
-                        </tr>
-                    `;
+                    productRowsHTML += `<tr><td>${escapeHtml(brandName)}</td><td>Fillers / Cosmetics</td><td>${escapeHtml(baseName)}</td><td>${escapeHtml(brandName)}</td><td>${p.price}</td></tr>`;
                 });
             } else {
                 productRowsHTML = `<tr><td colspan="5" style="text-align:center;">[No products selected]</td></tr>`;
             }
             const uniqueLabels = [...new Set(privateLabelsList)].join(', ') || '[Private Label]';
-
             const moqVals = [1,2,3,4,5].map(i => new Intl.NumberFormat().format(document.getElementById(`moq-y${i}`).value || 0));
 
             return `
@@ -1888,8 +1876,8 @@ Beneficiary : MediFab Co., LTD</div>
                     <p>This Distribution Agreement and its Annex (hereinafter referred to as “Agreement”) is entered into this <strong>${dateStr}</strong>,</p>
                     <p><strong>BETWEEN:</strong> Medifab Co., Ltd.<br>
                     (Hereinafter referred to as “MANUFACTURER”) a company organized and existing under the laws of the Republic of Korea, with its legal place of business at Room 417, Daeryung Techno Town 20th, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, Republic of Korea, duly represented by Mr. WONJONG SIN</p>
-                    <p><strong>AND:</strong> ${escapeHtml(distName)}<br>
-                    (Hereinafter referred to as “DISTRIBUTOR”), a company organized and existing under the laws of ${escapeHtml(distCountry)} with its legal place of business at ${escapeHtml(distAddress)}, and business registration number ${escapeHtml(distReg)}, duly represented by ${escapeHtml(distRep)}.</p>
+                    <p><strong>AND:</strong> ${escapeHtml(vars.distName)}<br>
+                    (Hereinafter referred to as “DISTRIBUTOR”), a company organized and existing under the laws of ${escapeHtml(vars.distCountry)} with its legal place of business at ${escapeHtml(vars.distAddress)}, and business registration number ${escapeHtml(vars.distReg)}, duly represented by ${escapeHtml(vars.distRep)}.</p>
                     
                     <p>The MANUFACTURER and the DISTRIBUTOR will be collectively referred to as PARTIES and individually as PARTY.</p>
                     <p style="text-align:center; font-weight:bold; margin: 20pt 0;">[WITNESSETH]</p>
@@ -1907,7 +1895,7 @@ Beneficiary : MediFab Co., LTD</div>
                         <p>“MOQ Year” shall mean each year counted from the date of obtaining legal registration in the Territory or upon receipt by the MANUFACTURER of the first Purchase Order for Territories that do not need legal registration of the Product.</p>
                         <p>“Private Label” shall mean the Product manufactured by the MANUFACTURER but delivered in the brand name of the DISTRIBUTOR’s choice as defined in ANNEX 1 of this agreement, to be supplied by the MANUFACTURER to the DISTRIBUTOR under this Agreement.</p>
                         <p>“Product” shall mean the product, as defined in ANNEX 1 of this Agreement, to be supplied by the MANUFACTURER to the DISTRIBUTOR under this Agreement.</p>
-                        <p>“Territory” shall mean solely <strong>${escapeHtml(distCountry)}</strong>.</p>
+                        <p>“Territory” shall mean solely <strong>${escapeHtml(vars.distCountry)}</strong>.</p>
                         <p>“Trademark” means any trademark, logo, service mark or other commercial designation, whether or not registered, used to represent or describe the Private Label of the MANUFACTURER.</p>
                     </div>
 
@@ -1928,7 +1916,7 @@ Beneficiary : MediFab Co., LTD</div>
                     <div class="clause">
                         <p>4.1 DISTRIBUTOR shall provide a Down Payment, as defined in ANNEX 1 of this Agreement within 30 days of signing of this contract in payment terms of T/T to the MANUFACTURER to be used for preparations in the production of the Private Label. The Down Payment shall be paid to MANUFACTURER by the DISTRIBUTOR at the time of signing of this Agreement. Payment for the initial purchase order after execution of this Agreement shall be deducted from the Down Payment. The Down Payment will be returned to the DISTRIBUTOR as deduction from the purchase orders. Once the balance is met, the DISTRIBUTOR will follow normal payment as defined on Article 6 and Article 7.</p>
                         <p>4.2 DISTRIBUTOR, on behalf of the MANUFACTURER, shall make legal registration of the Private Label as a medical device and as deemed proper by the laws applicable in the Territory at their own expenditure. The DISTRIBUTOR will provide a copy of the registration certificate to the MANUFACTURER once registration is complete.</p>
-                        <p>4.3 DISTRIBUTOR shall provide an Annual Purchase Plan within <strong>${planDays}</strong> days of signing of this Agreement and consequently at the beginning of each year. The Annual Purchase Plan will provide detailed order quantities by type of Private Label and by month that will meet the annual MOQ agreed upon in ANNEX 1. Any modifications or changes to the Annual Purchase Plan shall be notified immediately to the MANUFACTURER without delay.</p>
+                        <p>4.3 DISTRIBUTOR shall provide an Annual Purchase Plan within <strong>${vars.planDays}</strong> days of signing of this Agreement and consequently at the beginning of each year. The Annual Purchase Plan will provide detailed order quantities by type of Private Label and by month that will meet the annual MOQ agreed upon in ANNEX 1. Any modifications or changes to the Annual Purchase Plan shall be notified immediately to the MANUFACTURER without delay.</p>
                         <p>4.4 DISTRIBUTOR shall make appropriate changes to the Private Label packaging as deemed proper by the laws applicable in the Territory, including but not limited to sticker labels in the official language of the Territory.</p>
                         <p>4.5 DISTRIBUTOR shall explore, develop, and promote the sale of Private Label and shall make good faith efforts to increase sales of Private Label within Territory. To achieve such purpose, DISTRIBUTOR will keep MANUFACTURER informed of the status of the sales progress, make recommendations and suggestions to MANUFACTURER, and assist and cooperate with MANUFACTURER.</p>
                         <p>4.6 (a) DISTRIBUTOR shall be responsible for, at its own cost and expense, facilitating the clients to travel from Territory to Korea at the place where MANUFACTURER designated to, as well as providing board and lodging as necessary for the clients' while they remain in Korea. (b) DISTRIBUTOR shall provide round-trip flight ticket, full board and lodging when KOL of Korea visits to the Territory in order to train practitioners.</p>
@@ -1942,7 +1930,7 @@ Beneficiary : MediFab Co., LTD</div>
 
                     <h2>Article 5┃ MANUFACTURER’s Duties and Responsibilities</h2>
                     <div class="clause">
-                        <p>5.1 MANUFACTURER (a) shall use its best efforts to assist and cooperate with DISTRIBUTOR in the registration, developing and promoting the sale of the Private Label in Territory, (b) shall expeditiously provide any other materials, requested by DISTRIBUTOR necessary for DISTRIBUTOR’s performance of its duties under the Agreement, (c) shall also provide any information, which is now has or may be received by it in the future which is likely to be of interest, use, or benefit to DISTRIBUTOR to sales of Private Label in Territory, and (d) MANUFACTURER shall provide all necessary paperwork for DISTRIBUTOR’s import license to <strong>${escapeHtml(distCountry)}</strong> without delay.</p>
+                        <p>5.1 MANUFACTURER (a) shall use its best efforts to assist and cooperate with DISTRIBUTOR in the registration, developing and promoting the sale of the Private Label in Territory, (b) shall expeditiously provide any other materials, requested by DISTRIBUTOR necessary for DISTRIBUTOR’s performance of its duties under the Agreement, (c) shall also provide any information, which is now has or may be received by it in the future which is likely to be of interest, use, or benefit to DISTRIBUTOR to sales of Private Label in Territory, and (d) MANUFACTURER shall provide all necessary paperwork for DISTRIBUTOR’s import license to <strong>${escapeHtml(vars.distCountry)}</strong> without delay.</p>
                         <p>5.2 MANUFACTURER will provide documents necessary for the registration of the Private Label in the English language.</p>
                     </div>
 
@@ -1957,8 +1945,8 @@ Beneficiary : MediFab Co., LTD</div>
                     <h2>Article 7┃ Orders and Shipments</h2>
                     <div class="clause">
                         <p>7.1 In placing orders with MANUFACTURER, DISTRIBUTOR shall clearly describe the products and quantity required in the Purchase Order. DISTRIBUTOR shall comply with minimum quantity per order as specified in ANNEX 1.</p>
-                        <p>7.2 MANUFACTURER shall issue a Proforma Invoice with the details of bank account and delivery date upon receipt of the Purchase Order of DISTRIBUTOR. <strong>${advPct}%</strong> payment in advance shall be transacted to the appointed bank account within 1 (one) week upon receipt of the Proforma Invoice. The remaining balance of <strong>${remPct}%</strong> shall be transacted before delivery of the Private Label.</p>
-                        <p>7.3 If the MANUFACTURER fails to deliver any or all of the products by the dates of delivery within the period specified in the Purchase Order, the DISTRIBUTOR may deduct from the Contract Price, as liquidated damages, <strong>${lateRate}%</strong> of the delivered price of the delayed products for each day until actual delivery up to <strong>${lateMax}%</strong> of the delivered price of the delayed products.</p>
+                        <p>7.2 MANUFACTURER shall issue a Proforma Invoice with the details of bank account and delivery date upon receipt of the Purchase Order of DISTRIBUTOR. <strong>${vars.advPct}%</strong> payment in advance shall be transacted to the appointed bank account within 1 (one) week upon receipt of the Proforma Invoice. The remaining balance of <strong>${vars.remPct}%</strong> shall be transacted before delivery of the Private Label.</p>
+                        <p>7.3 If the MANUFACTURER fails to deliver any or all of the products by the dates of delivery within the period specified in the Purchase Order, the DISTRIBUTOR may deduct from the Contract Price, as liquidated damages, <strong>${vars.lateRate}%</strong> of the delivered price of the delayed products for each day until actual delivery up to <strong>${vars.lateMax}%</strong> of the delivered price of the delayed products.</p>
                         <p>7.4 MANUFACTURER shall issue a Commercial Invoice with the details of the Private Label and information required for shipping including package dimensions and weight to the DISTRIBUTOR. Private Label will only be delivered after the remaining balance for payment is verified.</p>
                         <p>7.5 All deliveries of Private Label sold by MANUFACTURER to DISTRIBUTOR pursuant to this Agreement shall be made base on Ex-Work Delivery Point, and title to and risk of loss of Private Label shall pass from MANUFACTURER to DISTRIBUTOR at Delivery Point.</p>
                     </div>
@@ -1974,8 +1962,8 @@ Beneficiary : MediFab Co., LTD</div>
 
                     <h2>Article 9┃ Term</h2>
                     <div class="clause">
-                        <p>9.1 This Agreement shall become effective upon (i) execution of this Agreement AND (ii) full payment of Down Payment by the DISTRIBUTOR to the MANUFACTURER, and shall continue in full force and effect for the period of <strong>${years}</strong> years from the date the first Purchase Order is received by the Manufacturer. The term can be terminated during the Agreement period as pursuant to Article 12.</p>
-                        <p>9.2 This Agreement may be extended through mutual agreement between the Parties in written form. The Party who wishes to extend this Agreement may inform the other Party in written form within <strong>${extDays}</strong> days before the date of termination of this Agreement and an addendum to this Agreement will be signed between both Parties.</p>
+                        <p>9.1 This Agreement shall become effective upon (i) execution of this Agreement AND (ii) full payment of Down Payment by the DISTRIBUTOR to the MANUFACTURER, and shall continue in full force and effect for the period of <strong>${vars.years}</strong> years from the date the first Purchase Order is received by the Manufacturer. The term can be terminated during the Agreement period as pursuant to Article 12.</p>
+                        <p>9.2 This Agreement may be extended through mutual agreement between the Parties in written form. The Party who wishes to extend this Agreement may inform the other Party in written form within <strong>${vars.extDays}</strong> days before the date of termination of this Agreement and an addendum to this Agreement will be signed between both Parties.</p>
                     </div>
 
                     <h2>Article 10┃ Entire Agreement</h2>
@@ -2007,7 +1995,7 @@ Beneficiary : MediFab Co., LTD</div>
                         └ 12.5-(a) transfer to MANUFACTURER or any third party MANUFACTURER may nominate any licenses, permits, registrations, authorizations, approvals and/or formalities (collectively, “Formal Approvals”), registered Proprietary Rights and (             ) which are relevant in connection with its right to import, register and distribute the Products in the Territory or using the Proprietary Rights in relation to this Agreement, and shall in this regard comply at its expense with any and all formalities and execute any and all documents which may be necessary; or<br>
                         └ 12.5-(b) cancel such Formal Approvals and deregister the Proprietary Rights, and shall in this regard comply at its expense with any and all formalities and execute any and all documents which may be necessary.</p>
                         <p>12.6 The DISTRIBUTOR hereby acknowledges that upon the termination of this Agreement, MANUFACTURER shall have the full right to appoint any third party as a distributor of the Product in the Territory and that it shall have no objections in connection with such appointment. The DISTRIBUTOR also hereby acknowledges that it has no objection to transfer the registration of the Distribution Agreement, Proprietary Rights or the registration of any Contract under this Agreement to the MANUFACTURER or any such third party appointed by MANUFACTURER without any compensation.</p>
-                        <p>12.7 If the DISTRIBUTOR has not completed the transfer, deregistration and/or cancellation of Formal Approvals and/or the Trademarks within the period of four (4) weeks from the termination date of the Agreement, then MANUFACTURER shall be entitled to a payment as liquidated damages in an amount equal to (i) <strong>$${licensePen1}</strong> per day for the first 30-day period and (ii) additional <strong>$${licensePen2}</strong> per day with respect to subsequent time periods, which shall accrue daily until such date that the DISTRIBUTOR has completed transfer, deregistration and/or cancellation of Formal Approvals and/or the Proprietary Rights in compliance with Article 12.5 and/or 12.6 of this Agreement.</p>
+                        <p>12.7 If the DISTRIBUTOR has not completed the transfer, deregistration and/or cancellation of Formal Approvals and/or the Trademarks within the period of four (4) weeks from the termination date of the Agreement, then MANUFACTURER shall be entitled to a payment as liquidated damages in an amount equal to (i) <strong>$${vars.licensePen1}</strong> per day for the first 30-day period and (ii) additional <strong>$${vars.licensePen2}</strong> per day with respect to subsequent time periods, which shall accrue daily until such date that the DISTRIBUTOR has completed transfer, deregistration and/or cancellation of Formal Approvals and/or the Proprietary Rights in compliance with Article 12.5 and/or 12.6 of this Agreement.</p>
                     </div>
 
                     <h2>Article 13┃ Force Majeure</h2>
@@ -2048,7 +2036,7 @@ Beneficiary : MediFab Co., LTD</div>
                                 <p><strong>Signed for and on behalf of the DISTRIBUTOR</strong></p>
                                 <br><br><br>
                                 <p>Authorized Signature</p>
-                                <p>Name: ${escapeHtml(distRep)}</p>
+                                <p>Name: ${escapeHtml(vars.distRep)}</p>
                                 <p>Title: Representative</p>
                             </td>
                         </tr>
@@ -2062,7 +2050,7 @@ Beneficiary : MediFab Co., LTD</div>
                     <table>
                         <tr>
                             <th style="width: 50%;">Down Payment amount</th>
-                            <td>${new Intl.NumberFormat('en-US').format(downPayment)} USD</td>
+                            <td>${new Intl.NumberFormat('en-US').format(vars.downPayment)} USD</td>
                         </tr>
                     </table>
 
@@ -2076,7 +2064,7 @@ Beneficiary : MediFab Co., LTD</div>
                     </table>
 
                     <h3>3. MOQ</h3>
-                    <p>The date the first Purchase Order received by the MANUFACTURER will be the starting date for counting the MOQ years. MOQ increases <strong>${moqInc}%</strong> each year from the first year. The annual MOQ will be as follows:</p>
+                    <p>The date the first Purchase Order received by the MANUFACTURER will be the starting date for counting the MOQ years. MOQ increases <strong>${vars.moqInc}%</strong> each year from the first year. The annual MOQ will be as follows:</p>
                     <table>
                         <tr>
                             <th>MOQ Year 1</th>
@@ -2132,7 +2120,7 @@ Beneficiary : MediFab Co., LTD</div>
                     </table>
 
                     <h3>5. Minimum quantity per order</h3>
-                    <p>The minimum quantity per order will be <strong>${new Intl.NumberFormat('en-US').format(minOrder)}</strong> units for each product type of the Private Label.</p>
+                    <p>The minimum quantity per order will be <strong>${new Intl.NumberFormat('en-US').format(vars.minOrder)}</strong> units for each product type of the Private Label.</p>
                     <br><br>
                     <p style="text-align:center">End of ANNEX 1</p>
                     <div class="page-break"></div>
@@ -2142,89 +2130,183 @@ Beneficiary : MediFab Co., LTD</div>
             `;
         }
 
-        // Generic fallback generator for ODM
-        function generateContractHTML() {
-            const type = document.getElementById('contract-type').value;
-
-            // Use the comprehensive generated standard contract when type is 'simple' or 'exclusive'
-            if(type === 'simple' || type === 'exclusive') {
-                document.getElementById('contract-print-area').innerHTML = generateStandardDistributionContract(type);
-                return;
-            }
-
-            // Fallback base for ODM
-            const advPct = document.getElementById('contract-advance-pct').value || 50;
-            const remPct = 100 - advPct;
-            const minOrder = document.getElementById('contract-min-order').value || 0;
-
-            const distName = document.getElementById('contract-dist-name').value.trim() || '[Distributor Company Name]';
-            const distCountry = document.getElementById('contract-dist-country').value.trim() || '[Country/Territory]';
-            const distReg = document.getElementById('contract-dist-reg').value.trim() || '[Registration No.]';
-            const distRep = document.getElementById('contract-dist-rep').value.trim() || '[Representative Name]';
-            const distAddress = document.getElementById('contract-dist-address').value.trim() || '[Distributor Address]';
-
+        // Dedicated Generator strictly adhering to the uploaded ODM text template
+        function generateODMContract() {
+            const vars = getContractVariables();
             const today = new Date();
             const dateStr = `${today.getDate()} day of ${today.toLocaleString('default', { month: 'long' })}, ${today.getFullYear()}`;
 
-            const isExclusive = type === 'exclusive';
-            const isOdm = type === 'odm';
-            
-            const contractTitle = isExclusive ? 'EXCLUSIVE DISTRIBUTORSHIP AGREEMENT' : 'OEM/ODM MANUFACTURING AND DISTRIBUTION AGREEMENT';
-            const roleStr = isExclusive ? 'exclusive distributor' : 'distributor';
-            
-            const annexTitle2 = isOdm ? "2. Product, Private Label and Pricing" : "2. Product and Pricing";
-            const annexParagraph = isOdm 
-                ? "<p>2.3. The Product and the Private Label is defined in the table below:</p>"
-                : "<p>2.3. The Product is defined in the table below:</p>";
-
-            let tableHeader = isOdm 
-                ? `<tr><th>Brand</th><th>Type</th><th>Model</th><th>Private Label</th><th>Price (USD)</th></tr>`
-                : `<tr><th>Category</th><th>Product Name</th><th>Price (USD)</th></tr>`;
-            
             let productRowsHTML = '';
+            let privateLabelsList = [];
             if (contractProducts.length > 0) {
                 contractProducts.forEach(p => {
                     const source = contractProductsData.find(src => src.id === p.productId);
                     const baseName = source ? source.name : 'Unknown Base';
-                    if (isOdm) {
-                        const brandName = p.privateLabelName || '[Not Specified]';
-                        productRowsHTML += `<tr><td>${escapeHtml(brandName)}</td><td>Fillers</td><td>${escapeHtml(baseName)}</td><td>${escapeHtml(brandName)}</td><td>${p.price}</td></tr>`;
-                    } else {
-                        const cat = source ? (source.type === 'medical' ? 'Medical' : 'Cosmetic') : '-';
-                        productRowsHTML += `<tr><td>${cat}</td><td>${escapeHtml(baseName)}</td><td>${p.price}</td></tr>`;
-                    }
+                    const brandName = p.privateLabelName || baseName;
+                    privateLabelsList.push(brandName);
+                    
+                    productRowsHTML += `
+                        <tr>
+                            <td style="text-align:center;">To be announced by the distributor</td>
+                            <td style="text-align:center;">Fillers / Cosmetics</td>
+                            <td style="text-align:center;">${escapeHtml(baseName)}</td>
+                            <td style="text-align:center;">${escapeHtml(brandName)}</td>
+                            <td style="text-align:right;">${p.price}</td>
+                        </tr>
+                    `;
                 });
             } else {
-                productRowsHTML = `<tr><td colspan="${isOdm ? 5 : 3}" style="text-align:center;">[No products selected in UI]</td></tr>`;
+                productRowsHTML = `<tr><td colspan="5" style="text-align:center;">[No products selected]</td></tr>`;
             }
+            const uniqueLabels = [...new Set(privateLabelsList)].join(', ') || '[Private Label]';
+            const moqVals = [1,2,3,4,5].map(i => new Intl.NumberFormat().format(document.getElementById(`moq-y${i}`).value || 0));
 
-            let contractHTML = `
+            return `
                 <div class="legal-contract">
-                    <h1>${contractTitle}</h1>
+                    <h1>DISTRIBUTORSHIP AGREEMENT</h1>
                     <p>This Distribution Agreement and its Annex (hereinafter referred to as “Agreement”) is entered into this <strong>${dateStr}</strong>,</p>
                     <p><strong>BETWEEN:</strong> Medifab Co., Ltd.<br>
                     (Hereinafter referred to as “MANUFACTURER”) a company organized and existing under the laws of the Republic of Korea, with its legal place of business at Room 417, Daeryung Techno Town 20th, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, Republic of Korea, duly represented by Mr. WONJONG SIN</p>
-                    <p><strong>AND:</strong> ${escapeHtml(distName)}<br>
-                    (Hereinafter referred to as “DISTRIBUTOR”), a company organized and existing under the laws of ${escapeHtml(distCountry)} with its legal place of business at ${escapeHtml(distAddress)}, and business registration number ${escapeHtml(distReg)}, duly represented by ${escapeHtml(distRep)}.</p>
-                    
+                    <p><strong>AND:</strong> ${escapeHtml(vars.distName)}<br>
+                    (Hereinafter referred to as “DISTRIBUTOR”), a company organized and existing under the laws of the ${escapeHtml(vars.distCountry)} with its legal place of business at ${escapeHtml(vars.distAddress)}, and business registration number ${escapeHtml(vars.distReg)}, duly represented by ${escapeHtml(vars.distRep)}.</p>
                     <p>The MANUFACTURER and the DISTRIBUTOR will be collectively referred to as PARTIES and individually as PARTY.</p>
                     <p style="text-align:center; font-weight:bold; margin: 20pt 0;">[WITNESSETH]</p>
-                    <p>WHEREAS, MANUFACTURER, as the producer of the Product, wishes to appoint DISTRIBUTOR as the ${roleStr} for [Private Label] in the Territory as defined in ANNEX 1 of this Agreement.</p>
-                    <p>WHEREAS, DISTRIBUTOR wishes to accept such appointment as the ${roleStr}.</p>
+                    <p>WHEREAS, MANUFACTURER, as the producer of the Product, wishes to appoint DISTRIBUTOR as the distributor for ${escapeHtml(uniqueLabels)} as defined in ANNEX 1 of this Agreement.</p>
+                    <p>WHEREAS, DISTRIBUTOR wishes to accept such appointment as the distributor.</p>
                     <p>NOW THEREFORE, in consideration of the principle of reciprocity and mutual benefit contained herein, the Parties hereto agree as follows:</p>
 
                     <h2>Article 1┃ Definitions</h2>
+                    <p>In this Agreement except where the context otherwise requires, the following terms and expressions shall have the meanings respectively defined as follows:</p>
                     <div class="clause">
-                        <p>“Agreement” shall mean this agreement with all the terms for the contract of ${contractTitle} and its Annex.</p>
-                        <p>“Delivery Point” means MANUFACTURER’s facilities at EXW or FOB as agreed per order.</p>
-                        <p>“Territory” shall mean solely <strong>${escapeHtml(distCountry)}</strong>.</p>
+                        <p>“Agreement” shall mean this agreement with all the terms for the contract of Distribution Agreement and its Annex.</p>
+                        <p>“Delivery Point” means MANUFACTURER’s facilities at EXW</p>
+                        <p>“FOC” means Free of Charge, products provided by the MANUFACTURER to the DISTRIBUTOR with no costs under conditions defined in ANNEX 1 of this Agreement.</p>
+                        <p>“MOQ” means minimum order quantity per year as defined in ANNEX 1 of this Agreement.</p>
+                        <p>“MOQ Year” shall mean each year counted from the date of obtaining legal registration or upon receipt by the MANUFACTURER of the first Purchase Order for Territories that do not need legal registration of the Product.</p>
+                        <p>“Private Label” shall mean the Product manufactured by the MANUFACTURER but delivered in the brand name of the DISTRIBUTOR’s choice as defined in ANNEX 1 of this agreement, to be supplied by the MANUFACTURER to the DISTRIBUTOR under this Agreement.</p>
+                        <p>“Product” shall mean the product, as defined in ANNEX 1 of this Agreement, to be supplied by the MANUFACTURER to the DISTRIBUTOR under this Agreement.</p>
                     </div>
 
                     <h2>Article 2┃ Appointment and Acceptance</h2>
+                    <p>During the term and subject to the conditions hereinafter set forth, MANUFACTURER hereby appoints DISTRIBUTOR as an distributor for Private Label, and DISTRIBUTOR accepts such appointment during the term of this Agreement.</p>
+                    
+                    <h2>Article 2.1┃ TERRITORY</h2>
                     <div class="clause">
-                        <p>2.1 During the term and subject to the conditions hereinafter set forth, MANUFACTURER hereby appoints DISTRIBUTOR as an ${roleStr} for Private Label in Territory, and DISTRIBUTOR accepts such appointment during the term of this Agreement. ${isExclusive ? 'MANUFACTURER shall not either directly or indirectly sell Private Label in Territory without the prior consent of DISTRIBUTOR.' : ''}</p>
-                        ${isExclusive ? '<p>2.2 MANUFACTURER shall not either directly or indirectly sell the product equal to Private Label in Territory without the prior consent of DISTRIBUTOR.</p>' : ''}
+                        <p>2.1.1. “Territory” shall mean solely <strong>${escapeHtml(vars.distCountry)}</strong></p>
+                        <p>2.1.2. Without the prior written consent of MANUFACTURER, DISTRIBUTOR, its subsidiary or affiliate shall not, directly and indirectly, sell Private Label to any other areas than the said Territory.</p>
                     </div>
+
+                    <h2>Article 2.2┃ EXCLUSIVITY</h2>
+                    <div class="clause">
+                        <p>2.2.1. MANUFACTURER shall not either directly or indirectly sell Private Label.</p>
+                        <p>2.2.2. MANUFACTURER shall not either directly or indirectly sell the product equal to Private Label in Territory without the prior consent of DISTRIBUTOR.</p>
+                        <p>2.2.3. The exclusive distribution right may cease at the end of the year, in which the DISTRIBUTOR fails to meet the annual MOQ requirements as specified in Article 8.1 and ANNEX 1 of this Agreement.</p>
+                        <p>2.2.4 Without the prior written consent of MANUFACTURER, DISTRIBUTOR, its subsidiary or affiliate shall not manufacture, distribute, purchase, sell, resell or otherwise handle products which, in the reasonable opinion of MANUFACTURER, compete with the Private Label.</p>
+                    </div>
+
+                    <h2>Article 3┃ Relationship of Parties</h2>
+                    <div class="clause">
+                        <p>3.1. DISTRIBUTOR is an independent contractor and is not the legal representative or agent of the MANUFACTURER for any purpose and shall have no right to authority (except as expressly provided in this Agreement) to incur, assume or create in writing or otherwise, any warranty over any of MANUFACTURER’s employees, all of whom are entirely under the control of the MANUFACTURER, who shall be responsible for their acts and omissions. Within the scope of the Agreement, the DISTRIBUTOR shall dispose freely of its activities and business hours and shall itself procure the necessary means of operations.</p>
+                        <p>3.2 The DISTRIBUTOR shall purchase and sell the Product in its own name and for its own account.</p>
+                        <p>3.3. Nothing contained in this Agreement shall be deemed to create any partnership or joint venture relationship between the parties.</p>
+                    </div>
+
+                    <h2>Article 4┃ DISTRIBUTOR’s Duties and Responsibilities</h2>
+                    <div class="clause">
+                        <p>4.1. DISTRIBUTOR shall provide an Annual Purchase Plan within <strong>${vars.planDays}</strong> days of signing of this Agreement and consequently at the beginning of each year. The Annual Purchase Plan will provide detailed order quantities by type of Private Label and by month that will meet the annual MOQ agreed upon in ANNEX 1. Any modifications or changes to the Annual Purchase Plan shall be notified immediately to the MANUFACTURER without delay.</p>
+                        <p>4.2. DISTRIBUTOR shall make appropriate changes to the Private Label packaging as deemed proper by the laws applicable, including but not limited to sticker labels in the official language.</p>
+                        <p>4.3. DISTRIBUTOR shall explore, develop, and promote the sale of Private Label and shall make good faith efforts to increase sales of Private Label. To achieve such purpose, DISTRIBUTOR will keep MANUFACTURER informed of the status of the sales progress, make recommendations and suggestions to MANUFACTURER, and assist and cooperate with MANUFACTURER.</p>
+                        <p>4.4. DISTRIBUTOR shall be responsible as the first point of contact for providing Private Label technical support to the customer and/or end-users on the correct use of Private Label based on information supplied by MANUFACTURER. DISTRIBUTOR shall establish and operate a direct line of communication to MANUFACTURER in all matters relevant to vigilance and/or post-market surveillance concerning the Private Label (including early warnings or signals) in accordance with all applicable Laws. Customer feedback relevant to safety and performance of the Private Label, the occurrence of serious incidents will be reported by the DISTRIBUTOR without delay and in any event within two (2) calendar days to MANUFACTURER. DISTRIBUTOR’s reporting to MANUFACTURER of serious incidents should follow the applicable Laws and the applicable directives.</p>
+                        <p>4.5. The DISTRIBUTOR shall immediately inform MANUFACTURER in writing of all violations of fair competition and all infringements of labelling and name rights and intellectual property rights (including Proprietary Rights) by third parties, which the DISTRIBUTOR becomes aware of and affect either MANUFACTURER or the Product/Private Label. The DISTRIBUTOR shall use its best efforts to support MANFUACTURER in defending itself against such infringements.</p>
+                        <p>4.6. MANUFACTURER may, from time to time during the term of this Agreement, upon 30 days' notice to the DISTRIBUTOR, require the DISTRIBUTOR to discontinue the sale and/or distribution of one or more Products which MANUFACTURER may determine to be inappropriate or unsuitable for distribution.</p>
+                    </div>
+
+                    <h2>Article 5┃ MANUFACTURER’s Duties and Responsibilities</h2>
+                    <div class="clause">
+                        <p>5.1. MANUFACTURER (a) shall use its best efforts to assist and cooperate with DISTRIBUTOR in the registration, developing and promoting the sale of the Private Label, (b) shall expeditiously provide any other materials, requested by DISTRIBUTOR necessary for DISTRIBUTOR’s performance of its duties under the Agreement, (c) shall also provide any information, which is now has or may be received by it in the future which is likely to be of interest, use, or benefit to DISTRIBUTOR to sales of Private Label , and (d) MANUFACTURER shall provide all necessary paperwork for DISTRIBUTOR’s import license to <strong>${escapeHtml(vars.distCountry)}</strong> without delay.</p>
+                        <p>5.2. MANUFACTURER will provide documents necessary for the registration of the Private Label in the English language.</p>
+                    </div>
+
+                    <h2>Article 6┃ Price, FOC and Payment</h2>
+                    <div class="clause">
+                        <p>6.1. Currency of the payment shall be in USD and the unit price is based on EXW. This price will not change during this Agreement.</p>
+                        <p>6.2. The FOC policy shall be as specified in ANNEX 1.</p>
+                        <p>6.3. All the payments shall be made by DISTRIBUTOR to MANUFACTURER by T/T in advance to MANUFACTURER's designated account in the Republic of Korea as specified in Article 7.2.</p>
+                        <p>6.4. DISTRIBUTOR shall be liable for and shall pay any tax, duty, charge or any other impost of a similar nature imposed upon MANUFACTURER and/or DISTRIBUTOR, in accordance with the laws applicable.</p>
+                    </div>
+
+                    <h2>Article 7┃ Orders and Shipments</h2>
+                    <div class="clause">
+                        <p>7.1. In placing orders with MANUFACTURER, DISTRIBUTOR shall clearly describe the products and quantity required in the Purchase Order. DISTRIBUTOR shall comply with minimum quantity per order as specified in ANNEX 1.</p>
+                        <p>7.2. MANUFACTURER shall issue a Proforma Invoice with the details of bank account and delivery date upon receipt of the Purchase Order of DISTRIBUTOR. <strong>${vars.advPct}%</strong> payment in advance shall be transacted to the appointed bank account within 1 (one) week upon receipt of the Proforma Invoice. The remaining balance of <strong>${vars.remPct}%</strong> shall be transacted before delivery of the Private Label.</p>
+                        <p>7.3 If the MANUFACTURER fails to deliver any or all of the products by the dates of delivery within the period specified in the Purchase Order, the DISTRIBUTOR may deduct from the Contract Price, as liquidated damages, <strong>${vars.lateRate}%</strong> of the delivered price of the delayed products for each day until actual delivery up to <strong>${vars.lateMax}%</strong> of the delivered price of the delayed products.</p>
+                        <p>7.4. MANUFACTURER shall issue a Commercial Invoice with the details of the Private Label and information required for shipping including package dimensions and weight to the DISTRIBUTOR. Private Label will only be delivered after the remaining balance for payment is verified.</p>
+                        <p>7.5. All deliveries of Private Label sold by MANUFACTURER to DISTRIBUTOR pursuant to this Agreement shall be made base on Ex-Work Delivery Point, and title to and risk of loss of Private Label shall pass from MANUFACTURER to DISTRIBUTOR at Delivery Point.</p>
+                    </div>
+
+                    <h2>Article 8┃ Minimum Purchase</h2>
+                    <div class="clause">
+                        <p>8.1. DISTRIBUTOR undertakes to purchase annual MOQ. The MOQ shall be as specified in ANNEX 1. For clarification, the purchased MOQ is the quantity which has been fully paid in each year by the DISTRIBUTOR to the MANUFACTURER.</p>
+                        <p>8.2. The minimum quantity per order during the Agreement period shall be as specified in ANNEX 1.</p>
+                        <p>8.3. If DISTRIBUTOR fails to purchase the minimum quantity as stipulated in Article 8.1, MANUFACTURER may terminate this Agreement as pursuant to Article 12.</p>
+                    </div>
+
+                    <h2>Article 9┃ Term</h2>
+                    <div class="clause">
+                        <p>9.1. This Agreement shall become effective upon execution of this Agreement, and shall continue in full force and effect for the period of <strong>${vars.years}</strong> years from the date the first Purchase Order is received by the Manufacturer. The term can be terminated during the Agreement period as pursuant to Article 12.</p>
+                        <p>9.2. This Agreement may be extended through mutual agreement between the Parties in written form. The Party who wishes to extend this Agreement may inform the other Party in written form within <strong>${vars.extDays}</strong> days before the date of termination of this Agreement and an addendum to this Agreement will be signed between both Parties.</p>
+                    </div>
+
+                    <h2>Article 10┃ Entire Agreement</h2>
+                    <p>This Agreement contains the entire understanding of the Parties and there are no commitments, agreements, or understandings between the Parties other than those expressly set forth herein. This Agreement shall not be altered, waived, modified, or amended except in writing signed by the parties hereto and notarized.</p>
+
+                    <h2>Article 11┃ Trademarks</h2>
+                    <div class="clause">
+                        <p>11.1. DISTRIBUTOR recognizes that Proprietary Rights as specified in ANNEX II shall be the solely registered and owned by the MANUFACTURER. DISTRIBUTOR shall not have or acquire any right, title or interest in Proprietary Rights: provided, however, that DISTRIBUTOR may with the consent of MANUFACTURER indicate that it is an authorized distributor of Private Label. Upon termination of this Agreement for any cause, DISTRIBUTOR shall cease holding itself out as a distributor of Private Label and cease using in any way MANUFACTURER's name or its Proprietary Rights or any material similar thereto. In case MANUFACTURER requests deregistration or transfer of any trademarks, designs, copyrights and other proprietary rights in connection with Private Label to DISTRIBUTOR, DISTRIBUTOR shall comply with such request without delay and without seeking compensation.</p>
+                        <p>11.2. DISTRIBUTOR shall not alter, deface, remove, cover or mutilate in any manner the trademark, serial or model numbers, brand or MANUFACTURER's name attached or affixed to any of Private Label, without the consent of MANUFACTURER.</p>
+                    </div>
+
+                    <h2>Article 12┃ Termination</h2>
+                    <div class="clause">
+                        <p>12.1. This Agreement may be terminated at the option of MANUFACTURER, effective upon 30 days prior written notice of termination given to DISTRIBUTOR, in the event any of the following events occurs:<br>
+                        └ 12.1-(a) Should DISTRIBUTOR become bankrupt or insolvent, or have its business placed in the hands of a receiver, assignee or trustee, whether by voluntary act or otherwise; or<br>
+                        └ 12.1-(b) Should DISTRIBUTOR fail to obtain the legal registration of the Private Label within the period specified in Article 4.2; or<br>
+                        └ 12.1-(c) Should DISTRIBUTOR fail to meet the annual MOQ requirements as specified in Article 8.1 or otherwise fail to meet promptly any of its obligations pursuant to this Agreement; or<br>
+                        └ 12.1-(d) Should DISTRIBUTOR falsify or tamper with the Private Label, including but not limited to using another brand name or similar name to sell the Private Label, using another brand of syringe, or replacing the Private Label with another product while using the same brand and box; or<br>
+                        └ 12.1-(e) Should DISTRIBUTOR be acquired by, or should itself acquire, in whole or in part, a manufacturer of the product which in the reasonable judgment of MANUFACTURER competes to a material extent with the Private Label; or<br>
+                        └ 12.1-(f) Should DISTRIBUTOR attempt to assign this Agreement or any rights hereunder without MANUFACTURER's prior written consent; or<br>
+                        └ 12.1-(g) If DISTRIBUTOR ceases to function as a going concern or to conduct its operations in the normal course of business.</p>
+                        <p>12.2. All payments owed to MANUFACTURER upon termination shall become immediately due and payable, and no cancellation or termination of this Agreement shall serve to release DISTRIBUTOR or its successors or assigns from any obligations under this Agreement.</p>
+                        <p>12.3. This Agreement may be terminated at the option of DISTRIBUTOR, effective upon 30 days prior written notice of termination given to MANUFACTURER, in the event any of the following events occurs:<br>
+                        └ 12.3-(a) Should MANUFACTURER fail to deliver the goods within the specified delivery date without advance notice to the DISTRIBUTOR.<br>
+                        └ 12.3-(b) Should MANUFACTURER attempt to assign this Agreement or any rights hereunder without DISTRIBUTOR's prior written consent; or<br>
+                        └ 12.3-(c) If MANUFACTURER ceases to function as a going concern or to conduct its operations in the normal course of business.</p>
+                        <p>12.4. If the Agreement is terminated for whatever reason, the DISTRIBUTOR shall not be entitled to any compensation arising from the termination of this Agreement, including, but not limited to, compensation for loss of good will, loss of opportunity, loss of profit, investment and/or costs assumed by the DISTRIBUTOR.</p>
+                        <p>12.5. The DISTRIBUTOR hereby acknowledges that upon the termination of this Agreement, MANUFACTURER shall have the full right to appoint any third party as a distributor of the Product and that it shall have no objections in connection with such appointment.</p>
+                    </div>
+
+                    <h2>Article 13┃ Force Majeure</h2>
+                    <div class="clause">
+                        <p>13.1. Neither party shall be liable to the other party for nonperformance or delay in performance of any of its obligations under the Agreement due to war, revolution, riot, strike or other labor dispute, fire, flood, acts of government or any other causes reasonably beyond its control.</p>
+                        <p>13.2. Upon the occurrence of such a force majeure condition the affected party shall immediately notify the other party of any further developments. Immediately after such condition is removed, the affected party shall perform such obligation with all due speed.</p>
+                        <p>13.3. The written evidence issued by the respective Chamber of Commerce will be sufficient proof of the existence and duration of the above mentioned circumstances.</p>
+                    </div>
+
+                    <h2>Article 14┃ Severability</h2>
+                    <p>The provision of this Agreement are severable, and if any provision shall be held invalid or unenforceable, in whole or in part, in any jurisdiction, then such invalidity or unenforceability shall affect only such provision, and shall not affect such provision in any other jurisdiction. To the extent legally permissible, a provision which reflects the original intent of the parties shall be substituted for such invalid or unenforceable provision.</p>
+
+                    <h2>Article 15┃ Governing Law</h2>
+                    <p>This Agreement shall be interpreted and governed by the laws of the Republic of Korea.</p>
+
+                    <h2>Article 16┃ Arbitration</h2>
+                    <div class="clause">
+                        <p>16.1. All disputes, controversies or differences which may arise between the parties out of or in relation to or in connection with this Agreement or for the breach thereof shall be in the first instance resolved through friendly negotiations.</p>
+                        <p>16.2 If no settlement can be reached within thirty (30) days from the date the dispute was risen, any Party is entitled to submit the dispute in Seoul, Korea in accordance with the Arbitration Rules of the Korean Commercial Arbitration Board. The award rendered by the arbitrator(s) shall be final and binding upon both parties concerned.</p>
+                        <p>16.3. The losing Party shall be responsible for the costs of Arbitration, the fees of the arbitrators (if any), the expenses of the arbitration proceedings and all costs and expenses for the enforcement of any arbitral award, including reasonable attorneys' fees and expenses.</p>
+                    </div>
+
+                    <h2>Article 17┃ Secrecy</h2>
+                    <p>DISTRIBUTOR shall not disclose to any third party, without the prior written consent of MANUFACTURER, or use for any purpose other than the performance of its obligations under this Agreement, any confidential information concerning the Private Label or business affairs of MANUFACTURER (including, but not limited to, prices, discounts, terms and conditions of sale, customer, business affairs, product or product specifications) which it receives directly or indirectly from MANUFACTURER, or which it acquires or develops in the course of its transactions with MANUFACTURER. Both Parties agree to sign a separate Non-Disclosure Agreement for this intent.</p>
 
                     <p style="margin-top: 40pt;">IN WITNESS WHEREOF, the Parties hereto have caused this Agreement to be executed in two (2) originals as of the date first above written.</p>
                     
@@ -2235,13 +2317,13 @@ Beneficiary : MediFab Co., LTD</div>
                                 <br><br><br>
                                 <p>Authorized Signature</p>
                                 <p>Name: WONJONG SIN</p>
-                                <p>Title: CEO</p>
+                                <p>Title: Chief Executive Officer</p>
                             </td>
                             <td style="border: none; width: 50%;">
                                 <p><strong>Signed for and on behalf of the DISTRIBUTOR</strong></p>
                                 <br><br><br>
                                 <p>Authorized Signature</p>
-                                <p>Name: ${escapeHtml(distRep)}</p>
+                                <p>Name: ${escapeHtml(vars.distRep)}</p>
                                 <p>Title: Representative</p>
                             </td>
                         </tr>
@@ -2255,32 +2337,97 @@ Beneficiary : MediFab Co., LTD</div>
                     <table>
                         <tr>
                             <th style="width: 50%;">Down Payment amount</th>
-                            <td>${new Intl.NumberFormat('en-US').format(downPayment)} USD</td>
+                            <td>${new Intl.NumberFormat('en-US').format(vars.downPayment)} USD</td>
                         </tr>
                     </table>
 
-                    <h3>${annexTitle2}</h3>
+                    <h3>2. Product, Private Label and pricing</h3>
                     <p>2.1. All pricing is based on an individual unit price.</p>
                     <p>2.2. Pricing levels will be effective from the date of signing of this Agreement.</p>
-                    ${annexParagraph}
+                    <p>2.3. The Product and the Private Label is defined in the table below:</p>
                     <table>
-                        ${tableHeader}
+                        <tr><th>Brand</th><th>Type</th><th>Model</th><th>Private Label</th><th>Price (USD)</th></tr>
                         ${productRowsHTML}
                     </table>
+
+                    <h3>3. MOQ</h3>
+                    <p>The date the first Purchase Order received by the MANUFACTURER will be the starting date for counting the MOQ years. MOQ increases <strong>${vars.moqInc}%</strong> each year from the first year. The annual MOQ will be as follows:</p>
+                    <table>
+                        <tr>
+                            <th>MOQ Year 1</th>
+                            <th>MOQ Year 2</th>
+                            <th>MOQ Year 3</th>
+                            <th>MOQ Year 4</th>
+                            <th>MOQ Year 5</th>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">${moqVals[0]}</td>
+                            <td style="text-align:center">${moqVals[1]}</td>
+                            <td style="text-align:center">${moqVals[2]}</td>
+                            <td style="text-align:center">${moqVals[3]}</td>
+                            <td style="text-align:center">${moqVals[4]}</td>
+                        </tr>
+                    </table>
+
+                    <h3>4. FOC</h3>
+                    <p>DISTRIBUTOR will be provided with the following FOC each time the below conditions are met.</p>
+                    <table>
+                        <tr>
+                            <th>Condition</th>
+                            <th>FOC (%)</th>
+                            <th>FOC (qty)</th>
+                            <th>Delivery</th>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order quantity of ${moqVals[0]} Unit within an MOQ Year 1</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-1').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-1').value || 0}</td>
+                            <td rowspan="5" style="vertical-align:middle; text-align:center;">FOC to be delivered with the corresponding Order that meets the condition</td>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order quantity of ${moqVals[1]} Unit within an MOQ Year 2</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-2').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-2').value || 0}</td>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order quantity of ${moqVals[2]} Unit within an MOQ Year 3</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-3').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-3').value || 0}</td>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order quantity of ${moqVals[3]} Unit within an MOQ Year 4</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-4').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-4').value || 0}</td>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order quantity of ${moqVals[4]} Unit within an MOQ Year 5</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-5').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-5').value || 0}</td>
+                        </tr>
+                    </table>
+
+                    <h3>5. Minimum quantity per order</h3>
+                    <p>The minimum quantity per order will be <strong>${new Intl.NumberFormat('en-US').format(vars.minOrder)}</strong> units for each product type of the Private Label.</p>
+                    <br><br>
+                    <p style="text-align:center">End of ANNEX 1</p>
+                    <div class="page-break"></div>
+                    <h1 style="text-align:center; font-weight:bold;">ANNEX II</h1>
+                    <p style="text-align:center; font-style:italic;">[Proprietary Rights and Registrations Placeholder]</p>
                 </div>
             `;
-
-            if (!isOdm) {
-                contractHTML = contractHTML.replace(/\[Private Label\]/g, 'the Product');
-                contractHTML = contractHTML.replace(/Private Label/g, 'Product');
-            }
-            document.getElementById('contract-print-area').innerHTML = contractHTML;
         }
 
         function printContract() {
             if (!document.getElementById('contract-dist-name').value.trim()) { showToast('Please enter the Distributor Company Name.', 'error'); return; }
 
-            generateContractHTML();
+            const type = document.getElementById('contract-type').value;
+            
+            // Branch to specific generator based on contract type
+            if (type === 'odm') {
+                document.getElementById('contract-print-area').innerHTML = generateODMContract();
+            } else {
+                document.getElementById('contract-print-area').innerHTML = generateStandardDistributionContract(type);
+            }
 
             document.getElementById('contract-system-section').classList.add('print-active-section');
             document.getElementById('quotation-section').classList.remove('print-active-section');
@@ -2370,3 +2517,4 @@ Beneficiary : MediFab Co., LTD</div>
     </script>
 </body>
 </html>
+```eof
