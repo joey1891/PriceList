@@ -328,20 +328,24 @@
                 <p class="font-bold text-gray-900 mb-4 border-l-4 border-gray-900 pl-2">CUSTOMER INFORMATION</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Company Name</label>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Company Name <span class="text-red-500">*</span></label>
                         <input type="text" id="cust-company" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. Medifab Partners Inc.">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Contact Name</label>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Nationality <span class="text-red-500">*</span></label>
+                        <input type="text" id="cust-nationality" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. South Korea, USA">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Contact Name <span class="text-red-500">*</span></label>
                         <input type="text" id="cust-name" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. John Doe">
                     </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Company Address</label>
-                        <input type="text" id="cust-address" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. 123 Business Rd, Seoul, Korea">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Email Address <span class="text-red-500">*</span></label>
+                        <input type="email" id="cust-email" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. contact@company.com">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Email Address</label>
-                        <input type="email" id="cust-email" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. contact@company.com">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Company Address <span class="text-red-500">*</span></label>
+                        <input type="text" id="cust-address" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. 123 Business Rd, Seoul, Korea">
                     </div>
                 </div>
             </div>
@@ -1298,6 +1302,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     region: document.getElementById('quote-region').value,
                     incoterms: document.getElementById('quote-incoterms').value,
                     customer_company: document.getElementById('cust-company').value,
+                    customer_nationality: document.getElementById('cust-nationality').value,
                     customer_name: document.getElementById('cust-name').value,
                     customer_address: document.getElementById('cust-address').value,
                     customer_email: document.getElementById('cust-email').value,
@@ -1361,12 +1366,14 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             if (window.isFocLimitExceeded) return;
 
             const comp = document.getElementById('cust-company').value.trim();
+            const nationality = document.getElementById('cust-nationality').value.trim();
             const name = document.getElementById('cust-name').value.trim();
             const addr = document.getElementById('cust-address').value.trim();
             const email = document.getElementById('cust-email').value.trim();
 
             let toHtml = '';
             if (comp) toHtml += `<span class="font-bold text-base block mb-1">${escapeHtml(comp)}</span>`;
+            if (nationality) toHtml += `<span class="block text-sm font-medium text-gray-700 mb-1">Nationality: ${escapeHtml(nationality)}</span>`;
             if (name) toHtml += `<span class="block">ATTN: ${escapeHtml(name)}</span>`;
             if (addr) toHtml += `<span class="block">${escapeHtml(addr)}</span>`;
             if (email) toHtml += `<span class="block">Email: ${escapeHtml(email)}</span>`;
