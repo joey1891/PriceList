@@ -631,7 +631,7 @@ Beneficiary : MediFab Co., LTD</div>
                                     <option value="exclusive">Exclusive Distribution (독점 유통)</option>
                                     <option value="odm">OEM/ODM Agreement (ODM 계약)</option>
                                 </select>
-                                <p class="text-[10px] text-gray-500 mt-2">Determines exclusivity clauses and terminology. Simple distribution enables granular negotiation options below.</p>
+                                <p class="text-[10px] text-gray-500 mt-2">Determines exclusivity clauses and terminology. Simple & Exclusive distribution enables granular negotiation options below.</p>
                             </div>
                             <div class="mt-4">
                                 <label class="block text-sm font-bold text-gray-800 mb-2">Contract Validity (Years)</label>
@@ -664,9 +664,9 @@ Beneficiary : MediFab Co., LTD</div>
                         </div>
                     </div>
 
-                    <!-- Negotiation Variables (Simple Distribution Options) -->
+                    <!-- Negotiation Variables (Simple/Exclusive Distribution Options) -->
                     <div id="negotiation-panel" class="bg-blue-50/50 p-4 border border-blue-200 shadow-sm transition-all duration-300">
-                        <label class="block text-sm font-bold text-blue-900 mb-3 border-l-4 border-blue-600 pl-2">Negotiation Variables & Options (단순 유통 협상 카드)</label>
+                        <label class="block text-sm font-bold text-blue-900 mb-3 border-l-4 border-blue-600 pl-2">Negotiation Variables & Options (유통 계약 협상 카드)</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <!-- Financials -->
                             <div>
@@ -1732,10 +1732,10 @@ Beneficiary : MediFab Co., LTD</div>
         function handleContractTypeChange() {
             const type = document.getElementById('contract-type').value;
             const panel = document.getElementById('negotiation-panel');
-            if(type === 'simple') {
+            if(type === 'simple' || type === 'exclusive') {
                 panel.style.display = 'block';
             } else {
-                panel.style.display = 'block'; // Or hide if strictly only for simple. Kept visible as requested.
+                panel.style.display = 'none';
             }
             buildContractProductsData();
             contractProducts = []; 
@@ -1829,7 +1829,9 @@ Beneficiary : MediFab Co., LTD</div>
         }
 
         // --- Contract HTML Generators ---
-        function generateSimpleDistributionContract() {
+        function generateStandardDistributionContract(type) {
+            const isExclusive = type === 'exclusive';
+            
             // Options Collection
             const years = document.getElementById('contract-years').value || 3;
             const downPayment = document.getElementById('contract-downpayment').value || 0;
@@ -1860,7 +1862,7 @@ Beneficiary : MediFab Co., LTD</div>
                 contractProducts.forEach(p => {
                     const source = contractProductsData.find(src => src.id === p.productId);
                     const baseName = source ? source.name : 'Unknown Base';
-                    const brandName = p.privateLabelName || baseName; // Fallback to base name if no private label entered
+                    const brandName = p.privateLabelName || baseName;
                     privateLabelsList.push(brandName);
                     
                     productRowsHTML += `
@@ -1882,7 +1884,7 @@ Beneficiary : MediFab Co., LTD</div>
 
             return `
                 <div class="legal-contract">
-                    <h1>DISTRIBUTORSHIP AGREEMENT</h1>
+                    <h1>${isExclusive ? 'EXCLUSIVE ' : ''}DISTRIBUTORSHIP AGREEMENT</h1>
                     <p>This Distribution Agreement and its Annex (hereinafter referred to as “Agreement”) is entered into this <strong>${dateStr}</strong>,</p>
                     <p><strong>BETWEEN:</strong> Medifab Co., Ltd.<br>
                     (Hereinafter referred to as “MANUFACTURER”) a company organized and existing under the laws of the Republic of Korea, with its legal place of business at Room 417, Daeryung Techno Town 20th, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, Republic of Korea, duly represented by Mr. WONJONG SIN</p>
@@ -1891,14 +1893,14 @@ Beneficiary : MediFab Co., LTD</div>
                     
                     <p>The MANUFACTURER and the DISTRIBUTOR will be collectively referred to as PARTIES and individually as PARTY.</p>
                     <p style="text-align:center; font-weight:bold; margin: 20pt 0;">[WITNESSETH]</p>
-                    <p>WHEREAS, MANUFACTURER, as the producer of the Product, wishes to appoint DISTRIBUTOR as the distributor for ${escapeHtml(uniqueLabels)} in the Territory as defined in ANNEX 1 of this Agreement.</p>
-                    <p>WHEREAS, DISTRIBUTOR wishes to accept such appointment as the distributor.</p>
+                    <p>WHEREAS, MANUFACTURER, as the producer of the Product, wishes to appoint DISTRIBUTOR as the ${isExclusive ? 'exclusive ' : ''}distributor for ${escapeHtml(uniqueLabels)} in the Territory as defined in ANNEX 1 of this Agreement.</p>
+                    <p>WHEREAS, DISTRIBUTOR wishes to accept such appointment as the ${isExclusive ? 'exclusive ' : ''}distributor.</p>
                     <p>NOW THEREFORE, in consideration of the principle of reciprocity and mutual benefit contained herein, the Parties hereto agree as follows:</p>
 
                     <h2>Article 1┃ Definitions</h2>
                     <p>In this Agreement except where the context otherwise requires, the following terms and expressions shall have the meanings respectively defined as follows:</p>
                     <div class="clause">
-                        <p>“Agreement” shall mean this agreement with all the terms for the contract of Distribution Agreement and its Annex.</p>
+                        <p>“Agreement” shall mean this agreement with all the terms for the contract of ${isExclusive ? 'Exclusive ' : ''}Distribution Agreement and its Annex.</p>
                         <p>“Delivery Point” means MANUFACTURER’s facilities at EXW</p>
                         <p>“FOC” means Free of Charge, products provided by the MANUFACTURER to the DISTRIBUTOR with no costs under conditions defined in ANNEX 1 of this Agreement.</p>
                         <p>“MOQ” means minimum order quantity per year as defined in ANNEX 1 of this Agreement.</p>
@@ -1911,8 +1913,8 @@ Beneficiary : MediFab Co., LTD</div>
 
                     <h2>Article 2┃ Appointment and Acceptance</h2>
                     <div class="clause">
-                        <p>2.1 During the term and subject to the conditions hereinafter set forth, MANUFACTURER hereby appoints DISTRIBUTOR as an distributor for Private Label in Territory, and DISTRIBUTOR accepts such appointment during the term of this Agreement.</p>
-                        <p>2.2 The distribution right may cease at the end of the year, in which the DISTRIBUTOR fails to meet the annual MOQ requirements as specified in Article 8.1 and ANNEX 1 of this Agreement.</p>
+                        <p>2.1 During the term and subject to the conditions hereinafter set forth, MANUFACTURER hereby appoints DISTRIBUTOR as an ${isExclusive ? 'exclusive ' : ''}distributor for Private Label in Territory, and DISTRIBUTOR accepts such appointment during the term of this Agreement.${isExclusive ? ' MANUFACTURER shall not either directly or indirectly sell Private Label in Territory without the prior consent of DISTRIBUTOR.' : ''}</p>
+                        <p>2.2 The ${isExclusive ? 'exclusive ' : ''}distribution right may cease at the end of the year, in which the DISTRIBUTOR fails to meet the annual MOQ requirements as specified in Article 8.1 and ANNEX 1 of this Agreement.</p>
                     </div>
 
                     <h2>Article 3┃ Relationship of Parties</h2>
@@ -2029,7 +2031,7 @@ Beneficiary : MediFab Co., LTD</div>
                     </div>
 
                     <h2>Article 17┃ Secrecy</h2>
-                    <p>DISTRIBUTOR shall not disclose to any third party, without the prior written consent of MANUFACTURER, or use for any purpose other than the performance of its obligations under this Agreement, any confidential information concerning the Private Label or business affairs of MANUFACTURER (including, but not limited to, prices, discounts, terms and conditions of sale, customer, business affairs, product or product specifications) which it receives directly or indirectly from MANUFACTURER, or which it acquires or develops in the course of its transactions with MANUFACTURER. Both Parties agree to sign a separate Non-Disclosure Agreement for this intent.</p>
+                    <p>DISTRIBUTOR shall not disclose to any third party, without the prior written consent of MANUFACTURER, or use for any purpose other than the performance of its obligations under this Agreement, any confidential information concerning the Private Label or business affairs of MANUFACTURER (including, but not limited to, prices, discounts, terms and conditions of sale, customer, business affairs, product or product specifications) which it receives directly or indirectly from MANUFACTURER, or which it acquires or develops in the course of transactions with MANUFACTURER. Both Parties agree to sign a separate Non-Disclosure Agreement for this intent.</p>
 
                     <p style="margin-top: 40pt;">IN WITNESS WHEREOF, the Parties hereto have caused this Agreement to be executed in two (2) originals as of the date first above written.</p>
                     
@@ -2140,19 +2142,17 @@ Beneficiary : MediFab Co., LTD</div>
             `;
         }
 
-        // Generic fallback generator for Exclusive / ODM
+        // Generic fallback generator for ODM
         function generateContractHTML() {
             const type = document.getElementById('contract-type').value;
 
-            // Use the comprehensive generated simple contract when type is 'simple'
-            if(type === 'simple') {
-                document.getElementById('contract-print-area').innerHTML = generateSimpleDistributionContract();
+            // Use the comprehensive generated standard contract when type is 'simple' or 'exclusive'
+            if(type === 'simple' || type === 'exclusive') {
+                document.getElementById('contract-print-area').innerHTML = generateStandardDistributionContract(type);
                 return;
             }
 
-            // Fallback base for Exclusive / ODM (Abridged version for demonstration, uses same logic but different title)
-            const years = document.getElementById('contract-years').value || 3;
-            const downPayment = document.getElementById('contract-downpayment').value || 0;
+            // Fallback base for ODM
             const advPct = document.getElementById('contract-advance-pct').value || 50;
             const remPct = 100 - advPct;
             const minOrder = document.getElementById('contract-min-order').value || 0;
