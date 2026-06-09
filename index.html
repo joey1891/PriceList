@@ -948,6 +948,12 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 item.customName = '';
                 item.priceTier = 'auto';
                 item.manualPrice = false;
+                
+                // Medical 제품의 경우 CT(카툰) 속성을 사용하지 않으므로 변경 시 0으로 고정
+                const prodObj = allProductsList.find(p => p.id === value);
+                if (prodObj && prodObj.type === 'medical') {
+                    item.ctQty = 0;
+                }
             } else if (field === 'priceTier') {
                 item.priceTier = value;
                 item.manualPrice = false;
@@ -1087,6 +1093,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
 
                 quoteItems.forEach((item, index) => {
                     const prodObj = allProductsList.find(p => p.id === item.productId);
+                    const isMedical = prodObj && prodObj.type === 'medical';
                     const ctSize = prodObj ? getCtSize(prodObj) : 1;
                     const totalEa = (item.ctQty * ctSize) + item.eaQty;
                     
@@ -1129,12 +1136,16 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                         </td>
                         <td class="py-2 px-2 text-center align-top">
                             <div class="flex items-center justify-center gap-1 no-print">
-                                <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none bg-gray-50" value="${item.ctQty}" title="Cartons" onchange="updateQuoteItem('${item.id}', 'ctQty', this.value)"> <span class="text-xs text-gray-500">CT</span>
-                                <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none bg-gray-50 ml-1" value="${item.eaQty}" title="Ea" onchange="updateQuoteItem('${item.id}', 'eaQty', this.value)"> <span class="text-xs text-gray-500">EA</span>
+                                <!-- Medical 제품일 경우 CT 입력 비활성화 및 스타일 변경 -->
+                                <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none ${isMedical ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-50 focus:bg-white'}" value="${item.ctQty}" title="Cartons" onchange="updateQuoteItem('${item.id}', 'ctQty', this.value)" ${isMedical ? 'disabled' : ''}> 
+                                <span class="text-xs ${isMedical ? 'text-gray-300' : 'text-gray-500'}">CT</span>
+                                <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none bg-gray-50 focus:bg-white ml-1" value="${item.eaQty}" title="Ea" onchange="updateQuoteItem('${item.id}', 'eaQty', this.value)"> 
+                                <span class="text-xs text-gray-500">EA</span>
                             </div>
                             <div class="print-only hidden text-center">
                                 <span class="font-bold">${totalEa}</span> <span class="text-[10px] text-gray-500">EA</span>
-                                ${item.ctQty > 0 ? `<br><span class="text-[10px] text-gray-400">(${item.ctQty}CT + ${item.eaQty}EA)</span>` : ''}
+                                <!-- Medical 제품이 아닌 경우에만 괄호 내 CT 수량 표시 -->
+                                ${(!isMedical && item.ctQty > 0) ? `<br><span class="text-[10px] text-gray-400">(${item.ctQty}CT + ${item.eaQty}EA)</span>` : ''}
                             </div>
                         </td>
                         <td class="py-2 px-2 text-right align-top">
@@ -1234,6 +1245,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 const prodObj = allProductsList.find(p => p.id === item.productId);
                 const displayItemName = item.productId === 'CUSTOM' ? (item.customName || 'Custom Item') : (prodObj ? prodObj.name : '');
                 
+                const isMedical = prodObj && prodObj.type === 'medical';
                 const ctSize = prodObj ? getCtSize(prodObj) : 1;
                 const ctQty = parseInt(item.ctQty, 10) || 0;
                 const eaQty = parseInt(item.eaQty, 10) || 0;
@@ -1241,7 +1253,13 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 
                 body += `${index + 1}. ${displayItemName} ${item.isFoc ? '(FOC)' : ''}\n`;
                 if (item.color) body += `   - Option/Color: ${item.color}\n`;
-                body += `   - Quantity: ${totalEa} EA ( ${item.ctQty} CT + ${item.eaQty} EA )\n`;
+                
+                // 이메일 공유에서도 Medical 제품은 (CT + EA) 표기 생략
+                if (!isMedical && item.ctQty > 0) {
+                    body += `   - Quantity: ${totalEa} EA ( ${item.ctQty} CT + ${item.eaQty} EA )\n`;
+                } else {
+                    body += `   - Quantity: ${totalEa} EA\n`;
+                }
                 
                 if (item.isFoc) {
                     body += `   - Unit Price: FOC\n\n`;
