@@ -285,8 +285,8 @@
                     <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Quotation Generator</h2>
                     <div class="space-x-2 flex">
                         <button onclick="addQuoteItem()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium transition-colors">+ Add Item</button>
-                        <button onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors">Print / Save PDF</button>
-                        <button onclick="shareViaEmail()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center gap-1">
+                        <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Print / Save PDF</button>
+                        <button id="btn-share" onclick="shareViaEmail()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                             Share (Email)
                         </button>
@@ -294,13 +294,11 @@
                 </div>
                 
                 <div class="bg-gray-50 p-4 border border-gray-200 flex flex-wrap gap-6 items-center">
-                    <!-- UI 통일: 견적서 전용 통화 선택을 제거하고, 상단 테이블 통화를 따르도록 안내 -->
                     <div class="flex items-center gap-2 border-r border-gray-300 pr-6 text-sm text-gray-600">
                         <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
                         견적서 가격은 상단의 <strong class="text-gray-900 mx-1">테이블 설정(USD/KRW 및 환율)</strong>과 100% 동일하게 자동 적용됩니다.
                     </div>
                     
-                    <!-- Region & Incoterms -->
                     <div class="flex items-center gap-2 border-r border-gray-300 pr-6">
                         <label class="text-sm font-bold text-gray-700">Region:</label>
                         <select id="quote-region" class="border border-gray-300 p-1.5 text-sm bg-white" onchange="changeRegion()">
@@ -318,7 +316,6 @@
                         <span class="text-xs text-gray-500">* EXW applies a 3% discount to the unit price</span>
                     </div>
                     
-                    <!-- Special Discount -->
                     <div class="flex items-center gap-2 border-l border-gray-300 pl-6 ml-auto">
                         <label class="text-sm font-bold text-gray-700">Special Discount (%):</label>
                         <input type="number" id="quote-discount" min="0" max="100" class="border border-gray-300 p-1.5 text-sm bg-white w-16 text-right" value="0" onchange="renderQuoteTable()">
@@ -398,7 +395,7 @@
                 </table>
 
                 <!-- Totals -->
-                <div class="flex justify-between items-start mt-6 pt-4 border-t border-gray-300">
+                <div class="flex justify-between items-start mt-6 pt-4 border-t border-gray-300 relative">
                     <div class="w-1/2 pr-4">
                         <p class="font-bold text-gray-900 mb-2 border-l-4 border-gray-900 pl-2">BANK INFORMATION</p>
                         <div contenteditable="true" class="border border-dashed border-gray-300 p-3 text-xs bg-gray-50 focus:bg-white outline-none min-h-[80px] no-print" id="bank-info-edit">Bank name : NongHyup Bank / Yeoksam branch
@@ -421,7 +418,13 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                         </div>
                     </div>
                     
-                    <div class="w-1/2 max-w-[280px]">
+                    <div class="w-1/2 max-w-[320px]">
+                        <!-- FOC Warning Box -->
+                        <div id="foc-warning" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2 shadow-sm no-print">
+                            <svg class="w-4 h-4 flex-shrink-0 mt-0.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <div id="foc-warning-text" class="leading-tight"></div>
+                        </div>
+
                         <div class="flex justify-between items-center py-2 text-sm">
                             <span class="text-gray-600">Subtotal:</span>
                             <span><span id="quote-currency-label1" class="text-xs mr-1 text-gray-400"></span><span id="quote-subtotal" class="font-medium">0</span></span>
@@ -526,6 +529,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         let appliedKrwRate = 1400;
         let globalUniqueProducts = [];
         let globalMedicalProducts = [];
+        window.isFocLimitExceeded = false; // FOC 상태 추적 변수
 
         const productImageMap = {
             "Cellular water ampoule booster 120ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoulbooster120.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxib29zdGVyMTIwLmpwZyIsImlhdCI6MTc4MDYyNzM4NCwiZXhwIjoyMDk1OTg3Mzg0fQ.YgYQumgSOVgFPo5h4rPdJgWEvU-DW-GBbrWWlGIGI2o",
@@ -1081,12 +1085,44 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             return options;
         }
 
+        function checkFocLimit(subTotal, focTotal, currency) {
+            const warningEl = document.getElementById('foc-warning');
+            const warningTextEl = document.getElementById('foc-warning-text');
+            const btnPrint = document.getElementById('btn-print');
+            const btnShare = document.getElementById('btn-share');
+            
+            const curLabel = currency === 'USD' ? '$' : '₩';
+            
+            if (focTotal > 0 && subTotal === 0) {
+                warningEl.classList.remove('hidden');
+                warningTextEl.innerHTML = `<strong class="block mb-1">FOC Limit Error</strong>Cannot add FOC items without paid items.`;
+                window.isFocLimitExceeded = true;
+            } else if (focTotal > subTotal * 0.05) {
+                warningEl.classList.remove('hidden');
+                const limitAmt = subTotal * 0.05;
+                warningTextEl.innerHTML = `<strong class="block mb-1">FOC Limit Exceeded (Max 5%)</strong>Subtotal: ${curLabel}${formatQuoteNumber(subTotal)}<br>FOC Value: ${curLabel}${formatQuoteNumber(focTotal)}<br>Limit: ${curLabel}${formatQuoteNumber(limitAmt)}`;
+                window.isFocLimitExceeded = true;
+            } else {
+                warningEl.classList.add('hidden');
+                window.isFocLimitExceeded = false;
+            }
+
+            if (window.isFocLimitExceeded) {
+                btnPrint.disabled = true;
+                btnShare.disabled = true;
+            } else {
+                btnPrint.disabled = false;
+                btnShare.disabled = false;
+            }
+        }
+
         function renderQuoteTable() {
             try {
                 const tbody = document.getElementById('quote-tbody');
                 tbody.innerHTML = '';
                 
                 let subTotal = 0;
+                let focTotalValue = 0; // FOC 금액 계산을 위한 변수
                 const targetCurrency = currentCurrency; 
                 const incoterms = document.getElementById('quote-incoterms')?.value || 'FOB';
                 const discountRate = parseFloat(document.getElementById('quote-discount')?.value) || 0;
@@ -1094,6 +1130,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 if(quoteItems.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 italic text-sm no-print">Click "+ Add Item" to generate quotation.</td></tr>`;
                     updateTotals(0, discountRate, targetCurrency, incoterms);
+                    checkFocLimit(0, 0, targetCurrency);
                     return;
                 }
 
@@ -1109,7 +1146,13 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     
                     let appliedUnitPrice = Number(item.unitPrice) || 0;
                     if (incoterms === 'EXW') appliedUnitPrice *= 0.97;
-                    if (item.isFoc) appliedUnitPrice = 0;
+                    
+                    // FOC 가치 누적 계산
+                    const originalAmount = appliedUnitPrice * totalEa;
+                    if (item.isFoc) {
+                        focTotalValue += originalAmount;
+                        appliedUnitPrice = 0;
+                    }
                     
                     const amount = appliedUnitPrice * totalEa;
                     subTotal += amount;
@@ -1124,7 +1167,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     });
 
                     let displayItemName = item.productId === 'CUSTOM' ? (item.customName || 'Custom Item') : (prodObj ? prodObj.name : '');
-                    const formattedUnitPrice = Math.round(appliedUnitPrice).toString();
+                    const formattedUnitPrice = Math.round(appliedUnitPrice || Number(item.unitPrice)).toString();
 
                     tr.innerHTML = `
                         <td class="py-2 px-2 text-center print-only-cell hidden text-gray-700">${index + 1}</td>
@@ -1142,7 +1185,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                         </td>
                         <td class="py-2 px-2 text-center align-top">
                             <div class="flex items-center justify-center gap-1 no-print">
-                                <!-- Medical 제품일 경우 CT 입력 비활성화 및 스타일 변경 -->
                                 <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none ${isMedical ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-50 focus:bg-white'}" value="${item.ctQty}" title="Cartons" onchange="updateQuoteItem('${item.id}', 'ctQty', this.value)" ${isMedical ? 'disabled' : ''}> 
                                 <span class="text-xs ${isMedical ? 'text-gray-300' : 'text-gray-500'}">CT</span>
                                 <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none bg-gray-50 focus:bg-white ml-1" value="${item.eaQty}" title="Ea" onchange="updateQuoteItem('${item.id}', 'eaQty', this.value)"> 
@@ -1150,7 +1192,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                             </div>
                             <div class="print-only hidden text-center">
                                 <span class="font-bold">${totalEa}</span> <span class="text-[10px] text-gray-500">EA</span>
-                                <!-- Medical 제품이 아닌 경우에만 괄호 내 CT 수량 표시 -->
                                 ${(!isMedical && item.ctQty > 0) ? `<br><span class="text-[10px] text-gray-400">(${item.ctQty}CT + ${item.eaQty}EA)</span>` : ''}
                             </div>
                         </td>
@@ -1174,6 +1215,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 });
 
                 updateTotals(subTotal, discountRate, targetCurrency, incoterms);
+                checkFocLimit(subTotal, focTotalValue, targetCurrency);
+                
             } catch (err) {
                 console.error("Quotation Generation Error:", err);
                 const tbody = document.getElementById('quote-tbody');
@@ -1210,6 +1253,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         }
 
         function printQuotation() {
+            if (window.isFocLimitExceeded) return;
+
             const comp = document.getElementById('cust-company').value.trim();
             const name = document.getElementById('cust-name').value.trim();
             const addr = document.getElementById('cust-address').value.trim();
@@ -1231,8 +1276,10 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         }
 
         function shareViaEmail() {
+            if (window.isFocLimitExceeded) return;
+
             if (quoteItems.length === 0) {
-                alert("Please add items to the quotation before sharing.");
+                console.warn("Please add items to the quotation before sharing.");
                 return;
             }
 
