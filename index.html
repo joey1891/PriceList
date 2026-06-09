@@ -1374,13 +1374,28 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             document.getElementById('quote-to-print').innerHTML = toHtml || '<span class="text-gray-400 italic">No customer info provided.</span>';
             document.getElementById('bank-info-print').innerHTML = document.getElementById('bank-info-edit').innerHTML;
             document.getElementById('quote-remarks-print').innerHTML = document.getElementById('quote-remarks-edit').innerHTML;
-            document.getElementById('quote-date-print').textContent = document.getElementById('quote-date').textContent;
-            document.getElementById('quote-no-print').textContent = document.getElementById('quote-no').textContent;
+            
+            const quoteDate = document.getElementById('quote-date').textContent.trim();
+            const quoteNo = document.getElementById('quote-no').textContent.trim();
+            
+            document.getElementById('quote-date-print').textContent = quoteDate;
+            document.getElementById('quote-no-print').textContent = quoteNo;
             
             // 프린트창 띄우기 직전에 데이터베이스에 견적서 저장
             await saveQuotationToDB();
 
+            // 인쇄/PDF 저장 시 기본 파일명 설정을 위해 일시적으로 문서 타이틀 변경
+            const originalTitle = document.title;
+            // 파일명에 사용할 수 없는 특수문자 제거 및 공백 처리
+            const safeCompName = comp ? comp.replace(/[\/\\?%*:|"<>]/g, '').replace(/\s+/g, '_') : 'Company';
+            document.title = `${quoteDate}_${quoteNo}_${safeCompName}`;
+
             window.print();
+            
+            // 인쇄 창이 닫힌 후 원래 타이틀로 복구
+            setTimeout(() => {
+                document.title = originalTitle;
+            }, 1000);
         }
 
         async function shareViaEmail() {
