@@ -84,12 +84,21 @@
         @media print {
             body { background-color: #ffffff; margin: 0; padding: 0; }
             #lock-screen, #ai-chat-container, #ai-fab, #toast-container, .no-print { display: none !important; }
-            /* Hide top content sections */
-            #main-content > div:not(#quotation-section) { display: none !important; }
             
             #main-content { padding: 0 !important; margin: 0 !important; display: block !important; }
-            #quotation-section { margin-top: 0 !important; padding-top: 0 !important; border: none !important; }
-            #print-area {
+            
+            /* Hide all direct children of main-content by default in print */
+            #main-content > div { display: none !important; }
+            
+            /* Show ONLY the section that has the print-active-section class */
+            #main-content > div.print-active-section { 
+                display: block !important; 
+                margin-top: 0 !important; 
+                padding-top: 0 !important; 
+                border: none !important; 
+            }
+            
+            .print-area-wrapper {
                 box-shadow: none !important;
                 padding: 0 !important;
                 margin: 0 auto !important;
@@ -101,6 +110,10 @@
             .print-only-inline { display: inline !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
+
+        .pdf-text-section h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 6px; margin-top: 16px; color: #111827; }
+        .pdf-text-section p { font-size: 11px; color: #374151; margin-bottom: 6px; line-height: 1.4; }
+        .pdf-text-section strong { color: #111827; }
     </style>
 </head>
 <body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white relative">
@@ -187,6 +200,7 @@
         </div>
         <div class="overflow-x-auto table-container bg-white mb-4">
             <table class="w-full text-left border-collapse cosmetic-table unified-table">
+                <!-- ... table config ... -->
                 <colgroup>
                     <col style="width: 5%;"><col style="width: 25%;"><col style="width: 8%;"><col style="width: 8%;"><col style="width: 8%;">
                     <col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;">
@@ -228,6 +242,7 @@
         </div>
         <div class="overflow-x-auto table-container bg-white mb-4">
             <table class="w-full text-left border-collapse unified-table">
+                <!-- ... table config ... -->
                 <colgroup>
                     <col style="width: 4%;"><col style="width: 16%;"><col style="width: 12%;">
                     <col style="width: 7%;"><col style="width: 4%;"><col style="width: 4%;"><col style="width: 4%;"><col style="width: 4%;">
@@ -309,12 +324,14 @@
             </table>
         </div>
 
-        <!-- 4. QUOTATION GENERATOR -->
-        <div id="quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
+        <!-- ========================================================= -->
+        <!-- 4. MAIN QUOTATION GENERATOR (Cosmetic & Medical)          -->
+        <!-- ========================================================= -->
+        <div id="quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900 print-active-section">
             <!-- Controls (Not printed) -->
             <div class="no-print mb-8">
                 <div class="flex justify-between items-end mb-4">
-                    <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Quotation Generator</h2>
+                    <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Main Quotation Generator <span class="text-sm text-gray-500 font-light tracking-normal lowercase ml-2">(Cosmetics & Medical)</span></h2>
                     <div class="space-x-2 flex">
                         <button onclick="addQuoteItem()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium transition-colors">+ Add Item</button>
                         <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
@@ -383,8 +400,7 @@
             </div>
 
             <!-- Print Area (Proforma Invoice) -->
-            <div id="print-area" class="bg-white p-12 mx-auto shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100" style="max-w: 210mm; min-height: 297mm;">
-                
+            <div id="print-area" class="print-area-wrapper bg-white p-12 mx-auto shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100" style="max-w: 210mm; min-height: 297mm;">
                 <!-- Header: Logo & Title -->
                 <div class="flex justify-between items-start mb-10 border-b-2 border-gray-900 pb-6">
                     <div>
@@ -492,6 +508,167 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 </div>
             </div>
         </div>
+
+        <!-- ========================================================= -->
+        <!-- 5. RAW MATERIALS QUOTATION GENERATOR (Independent System) -->
+        <!-- ========================================================= -->
+        <div id="raw-quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
+            <!-- Controls (Not printed) -->
+            <div class="no-print mb-8">
+                <div class="flex justify-between items-end mb-4">
+                    <h2 class="text-2xl text-blue-900 font-montserrat uppercase tracking-wider font-semibold">Proprietary Raw Materials <br> Quotation Generator</h2>
+                    <div class="space-x-2 flex">
+                        <button onclick="addRawQuoteItem()" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-900 text-sm font-medium transition-colors border border-blue-200">+ Add Raw Item</button>
+                        <button id="btn-print-raw" onclick="printRawQuotation()" class="px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
+                        <button id="btn-share-raw" onclick="shareRawViaEmail()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-50 min-w-[140px]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Share (Email)
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 p-4 border border-blue-200 flex flex-wrap gap-6 items-center">
+                    <div class="flex items-center gap-2 border-r border-blue-300 pr-6 text-sm text-blue-800">
+                        <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                        원료 전용 견적 시스템입니다. 상단의 원료 테이블 가격과 연동됩니다.
+                    </div>
+                    
+                    <div class="flex items-center gap-2 border-r border-blue-300 pr-6">
+                        <label class="text-sm font-bold text-blue-900">Incoterms:</label>
+                        <select id="raw-quote-incoterms" class="border border-blue-300 p-1.5 text-sm bg-white" onchange="renderRawQuoteTable()">
+                            <option value="EXW">EXW</option>
+                            <option value="FOB">FOB</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Details Input Container (Raw Materials) -->
+            <div class="mb-8 bg-blue-50 p-6 border border-blue-200 no-print">
+                <p class="font-bold text-blue-900 mb-4 border-l-4 border-blue-900 pl-2">CUSTOMER INFORMATION (RAW MATERIALS)</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Company Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="raw-cust-company" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. Medifab Partners Inc.">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Nationality <span class="text-red-500">*</span></label>
+                        <input type="text" id="raw-cust-nationality" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. South Korea, USA">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Contact Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="raw-cust-name" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. John Doe">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Email Address <span class="text-red-500">*</span></label>
+                        <input type="email" id="raw-cust-email" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. contact@company.com">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Company Address <span class="text-red-500">*</span></label>
+                        <input type="text" id="raw-cust-address" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. 123 Business Rd, Seoul, Korea">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Print Area (Raw Materials Official Quotation) -->
+            <div id="raw-print-area" class="print-area-wrapper bg-white p-12 mx-auto shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100" style="max-w: 210mm; min-height: 297mm;">
+                <!-- Header: Title -->
+                <div class="mb-8 border-b-2 border-gray-900 pb-6">
+                    <h1 class="text-2xl font-montserrat tracking-wide text-gray-900 uppercase font-bold text-center mb-6">OFFICIAL QUOTATION: PREMIUM BIO-MATERIAL SOLUTIONS</h1>
+                    
+                    <table class="w-full text-sm text-left">
+                        <tbody>
+                            <tr>
+                                <td class="font-bold text-gray-700 w-24 py-1">Date:</td>
+                                <td class="py-1"><span id="raw-quote-date" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">YYYY-MM-DD</span><span id="raw-quote-date-print" class="print-only-inline"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-gray-700 py-1">Quote No:</td>
+                                <td class="py-1"><span id="raw-quote-no" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">RM-QT-2026-001</span><span id="raw-quote-no-print" class="print-only-inline"></span></td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-gray-700 py-1">Subject:</td>
+                                <td class="py-1 font-medium">2026 Official Price List for Proprietary Raw Materials</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-gray-700 py-1">Validity:</td>
+                                <td class="py-1">Through December 31, 2026</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-gray-700 py-1">Supplier:</td>
+                                <td class="py-1">Medifab Co., Ltd.</td>
+                            </tr>
+                            <tr>
+                                <td class="font-bold text-gray-700 py-1 align-top pt-2">To:</td>
+                                <td class="py-1 pt-2">
+                                    <div id="raw-quote-to-print" class="whitespace-pre-wrap text-sm border border-transparent min-h-[3rem] print-only"></div>
+                                    <div class="no-print text-gray-400 italic text-xs">(Customer Info will be rendered here upon print)</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mb-6 text-sm text-gray-800 leading-relaxed">
+                    We are pleased to submit the following official offer for our high-purity, bio-engineered raw materials. These products are manufactured under strict quality control protocols to ensure maximum efficacy and safety for advanced aesthetic and medical applications.
+                </div>
+
+                <h3 class="font-montserrat font-bold text-gray-900 text-sm mb-3">1. Quotation Details</h3>
+                
+                <!-- Raw Quote Table -->
+                <table class="w-full text-left border-collapse mb-8">
+                    <thead>
+                        <tr class="bg-gray-100 border-t-2 border-b-2 border-gray-900 text-xs uppercase tracking-wider text-gray-700">
+                            <th class="py-2 px-2 text-center w-[5%] no-print">Del</th>
+                            <th class="py-2 px-2 w-[25%]">Product Name</th>
+                            <th class="py-2 px-2 text-center w-[15%]">Grade</th>
+                            <th class="py-2 px-2 text-center w-[12%]">Form</th>
+                            <th class="py-2 px-2 text-center w-[10%]">Unit</th>
+                            <th class="py-2 px-2 text-center w-[10%]">Qty</th>
+                            <th class="py-2 px-2 text-right w-[11%]">U.Price (<span id="raw-quote-th-currency1">USD</span>)</th>
+                            <th class="py-2 px-2 text-right w-[12%]">Amount (<span id="raw-quote-th-currency2">USD</span>)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="raw-quote-tbody" class="text-sm">
+                        <!-- Raw Items will be injected here -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="border-t-2 border-gray-900">
+                            <td colspan="7" class="py-3 text-right font-bold text-gray-900 no-print">GRAND TOTAL:</td>
+                            <td colspan="6" class="py-3 text-right font-bold text-gray-900 print-only">GRAND TOTAL:</td>
+                            <td class="py-3 px-2 text-right font-bold text-lg text-gray-900"><span id="raw-quote-currency-label" class="text-sm mr-1"></span><span id="raw-quote-grandtotal">0</span></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <!-- Fixed PDF Text Sections -->
+                <div class="pdf-text-section">
+                    <h3>2. Ingredient Specifications & Grade Definitions</h3>
+                    <p><strong>Carboxymethyl Chitosan (Chitogen™):</strong> A high-purity, water-soluble derivative of chitosan. Carboxymethylation ensures excellent solubility at physiological pH, enhanced moisture retention, and superior biocompatibility compared to standard chitosan.</p>
+                    <p><strong>Decellularized Extracellular Matrix (dECM) (Regentrix™):</strong> A tissue-derived bioactive scaffold that preserves the native structural proteins and growth factors required for tissue repair and cellular signaling.</p>
+                    <p><strong>dECM & Carboxymethyl Chitosan Complex (Chitogenix™):</strong> A synergistic formulation combining the regenerative potential of dECM with the antibacterial and film-forming properties of Carboxymethyl Chitosan.</p>
+
+                    <h3>3. Quality Assurance & Compliance</h3>
+                    <p><strong>Cosmetic Grade:</strong> Manufactured in accordance with ISO 22716 and CGMP guidelines. Optimized for high-end aesthetic formulations, skin boosters, and functional cosmetics.</p>
+                    <p><strong>Pharmaceutical Grade:</strong> Produced under rigorous KGMP (Korea Good Manufacturing Practice) standards. Features advanced purification to ensure ultra-low endotoxin levels and high-batch-to-batch consistency for medical-grade applications.</p>
+
+                    <h3>4. Commercial Terms</h3>
+                    <ul class="list-disc pl-5 text-[11px] color-[#374151] mb-6 space-y-1">
+                        <li><strong>Payment Terms:</strong> 100% T/T (Wire Transfer) in advance</li>
+                        <li><strong>Lead Time:</strong> Standard lead time is 4 to 6 weeks upon receipt of a firm Purchase Order (PO)</li>
+                        <li><strong>Shipping Terms:</strong> <span id="raw-incoterms-display">EXW</span> Incheon/Seoul, South Korea.</li>
+                    </ul>
+
+                    <p class="mt-8 mb-10">We are committed to providing the highest quality materials for your innovation. Please contact us for further technical dossiers or custom formulation inquiries.</p>
+                    
+                    <div class="text-right">
+                        <div class="border-b border-gray-400 w-48 ml-auto mb-2"></div>
+                        <p class="text-xs text-gray-700 font-bold">Authorized Signature</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Medifab Co., Ltd.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- AI Chat UI -->
@@ -523,7 +700,11 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const todayStr = new Date().toLocaleDateString('en-US', options);
         document.getElementById('current-date').textContent = `Today: ${todayStr}`;
-        document.getElementById('quote-date').textContent = new Date().toISOString().split('T')[0];
+        
+        // Setup initial dates
+        const isoDate = new Date().toISOString().split('T')[0];
+        document.getElementById('quote-date').textContent = isoDate;
+        document.getElementById('raw-quote-date').textContent = isoDate;
 
         // --- PASSWORD LOGIC ---
         function checkPassword() {
@@ -567,38 +748,26 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             toast.innerHTML = `${icon} <span>${message}</span>`;
             container.appendChild(toast);
 
-            // Animate in
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-y-full', 'opacity-0');
-            });
-
-            // Remove after 3.5 seconds
+            requestAnimationFrame(() => { toast.classList.remove('translate-y-full', 'opacity-0'); });
             setTimeout(() => {
                 toast.classList.add('translate-y-full', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
         }
 
-        // --- BUTTON LOADING STATE UTILITY ---
         function setButtonLoading(buttonId, isLoading) {
             const btn = document.getElementById(buttonId);
             if (!btn) return;
-            
             if (isLoading) {
-                if (!btn.dataset.originalText) {
-                    btn.dataset.originalText = btn.innerHTML;
-                }
+                if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
                 btn.disabled = true;
                 btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
             } else {
                 btn.disabled = false;
-                if (btn.dataset.originalText) {
-                    btn.innerHTML = btn.dataset.originalText;
-                }
+                if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
             }
         }
 
-        // --- IMAGE MODAL ---
         function openImageModal(imgSrc) {
             const modal = document.getElementById('image-modal');
             document.getElementById('modal-img').src = imgSrc;
@@ -617,7 +786,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- GLOBAL STATE ---
-        let currentCurrency = 'USD'; // Live Dashboard AND Quotation Currency
+        let currentCurrency = 'USD'; 
         let liveKrwRate = 1400;
         let appliedKrwRate = 1400;
         let globalUniqueProducts = [];
@@ -649,7 +818,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             "Echrever": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/echrever.avif?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9lY2hyZXZlci5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4MTAwNDkwNCwiZXhwIjoyMDk2MzY0OTA0fQ.gTqgle5g_hgh9Cp-oRP2OexYmpMUa47QaTYXorlJYyM"
         };
 
-        // --- Bank Info Setups ---
         const bankInfoOverseas = `Bank name : NongHyup Bank / Yeoksam branch
 Bank address: 351 Gangnamdaero, Seocho-dong, Seocho-gu, Seoul, Korea
 SWIFT CODE: NACFKRSE
@@ -680,7 +848,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
 
         // --- Fetching Data & Updating Global State... ---
         async function initDashboard() {
-            // 1. 환율 정보 로드
             try {
                 const exRes = await fetch('https://open.er-api.com/v6/latest/USD');
                 const exData = await exRes.json();
@@ -691,20 +858,17 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 if (liveOption) liveOption.textContent = `Live (₩${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate)})`;
             } catch (e) {
                 document.getElementById('live-rate').textContent = `Rate Load Failed (Default: ₩1,400)`;
-                console.error("Exchange API Error:", e);
                 liveKrwRate = 1400;
                 appliedKrwRate = 1400;
             }
 
-            // 2. Cosmetic Data Load
+            // Cosmetic Data Load
             try {
                 const { data: dbProducts, error: prodErr } = await supabaseClient
                     .from('products')
                     .select(`sub_category, name_en, ct_quantity, product_prices (currency, b2c_msrp, b2c_promotion, b2b_tier1_1_to_10_ct, b2b_tier2_10_to_30_ct, b2b_tier3_30_to_70_ct)`)
                     .order('created_at', { ascending: true });
-                    
                 if (prodErr) throw prodErr;
-
                 const uniqueProductsMap = new Map();
                 if (dbProducts && dbProducts.length > 0) {
                     dbProducts.forEach(product => {
@@ -717,85 +881,41 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                         if (displayName && !uniqueProductsMap.has(displayName)) uniqueProductsMap.set(displayName, product);
                     });
                     globalUniqueProducts = Array.from(uniqueProductsMap.values());
-                } else {
-                    throw new Error("No cosmetic data found in database");
-                }
+                } else throw new Error("No cosmetic data found");
             } catch (err) {
-                console.warn("Cosmetic Data Load Error, using fallback data:", err);
-                globalUniqueProducts = [
-                    { sub_category: 'Device-face', display_name: 'Core impact (WH/PK/DW/BK/BG)', ct_quantity: '1CT', product_prices: [{ currency: 'USD', b2c_msrp: 650, b2c_promotion: 500, b2b_tier1_1_to_10_ct: 300, b2b_tier2_10_to_30_ct: 280, b2b_tier3_30_to_70_ct: 250 }] },
-                    { sub_category: 'Product-face', display_name: 'Cellular water ampoule booster 60ml', ct_quantity: '50CT', product_prices: [{ currency: 'USD', b2c_msrp: 60, b2c_promotion: 50, b2b_tier1_1_to_10_ct: 30, b2b_tier2_10_to_30_ct: 25, b2b_tier3_30_to_70_ct: 20 }] },
-                    { sub_category: 'Product-face', display_name: 'Plan tox lifting ampoule 30ml', ct_quantity: '50CT', product_prices: [{ currency: 'USD', b2c_msrp: 80, b2c_promotion: 65, b2b_tier1_1_to_10_ct: 40, b2b_tier2_10_to_30_ct: 35, b2b_tier3_30_to_70_ct: 30 }] },
-                    { sub_category: 'Product-face', display_name: 'Phyto protein volumizing ampoule 30ml', ct_quantity: '50CT', product_prices: [{ currency: 'USD', b2c_msrp: 85, b2c_promotion: 70, b2b_tier1_1_to_10_ct: 45, b2b_tier2_10_to_30_ct: 40, b2b_tier3_30_to_70_ct: 35 }] }
-                ];
+                globalUniqueProducts = [];
             }
 
-            // 3. Medical Data Load
+            // Medical Data Load
             try {
                 const { data: dbMedicals, error: medErr } = await supabaseClient
                     .from('medical_aesthetic_products')
                     .select('*')
                     .order('sort_order', { ascending: true });
-                    
                 if (medErr) throw medErr;
-                
-                if (dbMedicals && dbMedicals.length > 0) {
-                    globalMedicalProducts = dbMedicals;
-                } else {
-                    throw new Error("No medical data found in database");
-                }
+                if (dbMedicals && dbMedicals.length > 0) globalMedicalProducts = dbMedicals;
+                else throw new Error("No medical data found");
             } catch (err) {
-                console.warn("Medical Data Load Error, using fallback data:", err);
-                globalMedicalProducts = [
-                    { item: 'Crystal', ingredients: 'Chitosan-based', type: 'Filler', specs: '1.0ml', clinic_msrp: 120, clinic_promotion: 100, dist_1000: 60, dist_3000: 55, dist_5000: 50, dist_10000: 45, oem_10000: 40, oem_30000: 35, oem_50000: 30, currency: 'USD' },
-                    { item: 'Crystal Plus', ingredients: 'Chitosan-based', type: 'Filler', specs: '1.0ml', clinic_msrp: 130, clinic_promotion: 110, dist_1000: 65, dist_3000: 60, dist_5000: 55, dist_10000: 50, oem_10000: 45, oem_30000: 40, oem_50000: 35, currency: 'USD' },
-                    { item: 'Scalp MD', ingredients: 'dECM', type: 'Skin Booster', specs: '5.0ml * 5ea', clinic_msrp: 200, clinic_promotion: 180, dist_1000: 100, dist_3000: 90, dist_5000: 80, dist_10000: 75, oem_10000: 70, oem_30000: 60, oem_50000: 55, currency: 'USD' },
-                    { item: 'Echrever', ingredients: 'DVS Filler', type: 'Collagen Stimulator', specs: '200mg * 1ea', clinic_msrp: 150, clinic_promotion: 130, dist_1000: 75, dist_3000: 70, dist_5000: 65, dist_10000: 60, oem_10000: null, oem_30000: null, oem_50000: null, currency: 'USD' }
-                ];
+                globalMedicalProducts = [];
             }
 
-            // --- Override DB data for Echrever to ensure standard enforcement ---
-            globalMedicalProducts = globalMedicalProducts.map(p => {
-                if (p.item && p.item.toLowerCase().includes('echrever')) {
-                    return { ...p, ingredients: 'DVS Filler', oem_10000: null, oem_30000: null, oem_50000: null };
-                }
-                return p;
-            });
-
-            // --- Inject Echrever into Medical Products if completely missing ---
+            // --- Inject Echrever into Medical Products if missing ---
             if (!globalMedicalProducts.some(p => p.item && p.item.toLowerCase().includes('echrever'))) {
                 globalMedicalProducts.push({
-                    item: 'Echrever', 
-                    ingredients: 'DVS Filler', 
-                    type: 'Collagen Stimulator', 
-                    specs: '200mg * 1ea', 
-                    clinic_msrp: 150, 
-                    clinic_promotion: 130, 
-                    dist_1000: 75, 
-                    dist_3000: 70, 
-                    dist_5000: 65, 
-                    dist_10000: 60, 
-                    oem_10000: null, 
-                    oem_30000: null, 
-                    oem_50000: null, 
-                    currency: 'USD'
+                    item: 'Echrever', ingredients: 'DVS Filler', type: 'Collagen Stimulator', specs: '200mg * 1ea', 
+                    clinic_msrp: 150, clinic_promotion: 130, dist_1000: 75, dist_3000: 70, dist_5000: 65, dist_10000: 60, oem_10000: null, oem_30000: null, oem_50000: null, currency: 'USD'
                 });
             }
 
-            // 4. Raw Materials Data Load
+            // Raw Materials Data Load
             try {
                 const { data: dbRaw, error: rawErr } = await supabaseClient
                     .from('raw_materials')
                     .select('*')
                     .order('product_name', { ascending: true });
-                
-                if (rawErr || !dbRaw || dbRaw.length === 0) {
-                    throw new Error("Raw materials table missing or empty");
-                } else {
-                    globalRawMaterials = dbRaw;
-                }
+                if (rawErr || !dbRaw || dbRaw.length === 0) throw new Error("Raw materials table missing");
+                else globalRawMaterials = dbRaw;
             } catch (err) {
-                console.warn("Raw Materials Load Error, using fallback data:", err);
                 globalRawMaterials = [
                     { id: 'RM1', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 9500 },
                     { id: 'RM2', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Medical", form: "Solution", unit: "2%/1L", unit_price_usd: 20000 },
@@ -807,7 +927,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 ];
             }
 
-            // 모든 데이터 로딩 후 렌더링 실행
             renderTableData();
             renderMedicalTableData();
             renderRawMaterialsTableData();
@@ -817,11 +936,11 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         // --- Defining UI Helpers and Callbacks... ---
         function changeExchangeRate(val) {
             appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
-            // 상단 테이블 3개와 하단 견적서를 모두 동기화 재렌더링
             renderTableData();
             renderMedicalTableData();
             renderRawMaterialsTableData();
             renderQuoteTable(); 
+            renderRawQuoteTable();
         }
 
         function setCurrency(currency) {
@@ -844,11 +963,11 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 rateContainer.classList.add('flex');
             }
             
-            // 상단 테이블 3개와 하단 견적서를 모두 동기화 재렌더링
             renderTableData();
             renderMedicalTableData();
             renderRawMaterialsTableData();
             renderQuoteTable();
+            renderRawQuoteTable();
         }
 
         function formatCurrency(amount, roundKrwToThousands = false) {
@@ -977,19 +1096,13 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         function renderMedicalTableData() {
             const tbody = document.getElementById('medical-table-body');
             tbody.innerHTML = '';
-            
             if (!globalMedicalProducts || globalMedicalProducts.length === 0) return;
 
-            // 통화(Currency) 값이 DB에서 누락되었을 경우를 대비한 유연한 매핑 로직
             const filteredData = globalMedicalProducts.map(p => {
                 const nativeCurrency = (p.currency || 'USD').toUpperCase();
                 let rate = 1;
-                
-                if (nativeCurrency === 'USD' && currentCurrency === 'KRW') {
-                    rate = appliedKrwRate;
-                } else if (nativeCurrency === 'KRW' && currentCurrency === 'USD') {
-                    rate = 1 / appliedKrwRate;
-                }
+                if (nativeCurrency === 'USD' && currentCurrency === 'KRW') rate = appliedKrwRate;
+                else if (nativeCurrency === 'KRW' && currentCurrency === 'USD') rate = 1 / appliedKrwRate;
 
                 return {
                     ...p,
@@ -1114,7 +1227,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         }
 
         // ==========================================
-        // 4. QUOTATION GENERATOR LOGIC
+        // 4. MAIN QUOTATION GENERATOR LOGIC
         // ==========================================
         let allProductsList = [];
         let quoteItems = [];
@@ -1124,15 +1237,11 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             allProductsList = [];
             const addedNames = new Set();
             
-            // Cosmetic Data
             (globalUniqueProducts || []).forEach(p => {
                 if (!p || !p.display_name) return;
-                
                 let prefix = '[Beauty]';
                 const lowerName = p.display_name.toLowerCase();
-                if (lowerName.includes('core impact') || lowerName.includes('hyper shot')) {
-                    prefix = '[Device]';
-                }
+                if (lowerName.includes('core impact') || lowerName.includes('hyper shot')) prefix = '[Device]';
                 
                 const fullName = `${prefix} ${p.display_name}`;
                 if (!addedNames.has(fullName)) {
@@ -1141,7 +1250,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 }
             });
             
-            // Medical Data
             (globalMedicalProducts || []).forEach(p => {
                 if (!p || !p.item) return;
                 const fullName = `[Medical] ${p.item}`;
@@ -1151,18 +1259,10 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 }
             });
 
-            // Raw Materials Data
-            (globalRawMaterials || []).forEach(p => {
-                if (!p || !p.product_name) return;
-                const fullName = `[Raw] ${p.product_name} (${p.grade} / ${p.form} / ${p.unit})`;
-                if (!addedNames.has(fullName)) {
-                    const uniqueId = `raw_${p.product_name.replace(/[^a-zA-Z0-9]/g, '')}_${p.grade}_${p.form}_${p.unit}`.replace(/\s+/g, '');
-                    allProductsList.push({ id: uniqueId, name: fullName, type: 'raw', raw: p });
-                    addedNames.add(fullName);
-                }
-            });
+            // Note: We don't push Raw Materials to the Main Quote anymore to keep them independent.
 
             renderQuoteTable();
+            renderRawQuoteTable(); // Also render the raw quote table initially
         }
 
         function getCtSize(productObj) {
@@ -1264,13 +1364,9 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             } else if (prodObj.type === 'medical') {
                 const p = prodObj.raw;
                 const nativeCurrency = p.currency || 'USD';
-                
                 let rate = 1;
-                if (nativeCurrency === 'USD' && currentCurrency === 'KRW') {
-                    rate = appliedKrwRate;
-                } else if (nativeCurrency === 'KRW' && currentCurrency === 'USD') {
-                    rate = 1 / appliedKrwRate;
-                }
+                if (nativeCurrency === 'USD' && currentCurrency === 'KRW') rate = appliedKrwRate;
+                else if (nativeCurrency === 'KRW' && currentCurrency === 'USD') rate = 1 / appliedKrwRate;
 
                 const c_msrp = (Number(p.clinic_msrp) || 0) * rate;
                 const c_promo = (Number(p.clinic_promotion) || 0) * rate;
@@ -1300,10 +1396,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     else if (totalEa > 0 && d_1k) finalPrice = d_1k;
                     else finalPrice = d_1k || c_msrp;
                 }
-            } else if (prodObj.type === 'raw') {
-                const p = prodObj.raw;
-                let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
-                finalPrice = (Number(p.unit_price_usd) || 0) * rate;
             }
 
             return Math.round(finalPrice);
@@ -1337,8 +1429,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     <option value="oem_30000" ${tier==='oem_30000'?'selected':''}>OEM (30k)</option>
                     <option value="oem_50000" ${tier==='oem_50000'?'selected':''}>OEM (50k)</option>
                 `;
-            } else if (prodObj.type === 'raw') {
-                options += `<option value="standard" selected>Standard Price</option>`;
             }
             return options;
         }
@@ -1525,24 +1615,25 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             else exwNotice.classList.add('hidden');
         }
 
-        // --- ENHANCED SAVE QUOTATION LOGIC ---
         async function saveQuotationToDB() {
             try {
+                const parseNum = (val) => parseFloat((val || '0').replace(/,/g, '')) || 0;
+
                 const quoteData = {
-                    quote_no: document.getElementById('quote-no').textContent,
-                    quote_date: document.getElementById('quote-date').textContent,
+                    quote_no: document.getElementById('quote-no').textContent.trim() || 'UNKNOWN_QUOTE',
+                    quote_date: document.getElementById('quote-date').textContent.trim() || new Date().toISOString().split('T')[0],
                     currency: currentCurrency,
                     region: document.getElementById('quote-region').value,
                     incoterms: document.getElementById('quote-incoterms').value,
-                    customer_company: document.getElementById('cust-company').value,
-                    customer_nationality: document.getElementById('cust-nationality').value,
-                    customer_name: document.getElementById('cust-name').value,
-                    customer_address: document.getElementById('cust-address').value,
-                    customer_email: document.getElementById('cust-email').value,
-                    subtotal: parseFloat(document.getElementById('quote-subtotal').textContent.replace(/,/g, '')),
-                    discount_rate: parseFloat(document.getElementById('quote-discount-display').textContent),
-                    discount_amount: parseFloat(document.getElementById('quote-discount-amount').textContent.replace(/,/g, '')),
-                    grand_total: parseFloat(document.getElementById('quote-grandtotal').textContent.replace(/,/g, '')),
+                    customer_company: document.getElementById('cust-company').value.trim(),
+                    customer_nationality: document.getElementById('cust-nationality').value.trim(),
+                    customer_name: document.getElementById('cust-name').value.trim(),
+                    customer_address: document.getElementById('cust-address').value.trim(),
+                    customer_email: document.getElementById('cust-email').value.trim(),
+                    subtotal: parseNum(document.getElementById('quote-subtotal').textContent),
+                    discount_rate: parseNum(document.getElementById('quote-discount-display').textContent),
+                    discount_amount: parseNum(document.getElementById('quote-discount-amount').textContent),
+                    grand_total: parseNum(document.getElementById('quote-grandtotal').textContent),
                     bank_info: document.getElementById('bank-info-edit').innerText,
                     remarks: document.getElementById('quote-remarks-edit').innerText
                 };
@@ -1586,28 +1677,25 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     .insert(itemsToSave);
 
                 if (itemsError) throw itemsError;
-                
-                console.log("견적서가 Supabase 데이터베이스에 성공적으로 저장되었습니다.");
-                showToast('Quotation successfully saved to database.', 'success');
                 return true;
 
             } catch (err) {
                 console.error("DB 저장 중 에러 발생:", err);
-                showToast('Database Error: ' + err.message, 'error');
+                const errorMsg = err.details || err.message || JSON.stringify(err);
+                showToast('Database Error: ' + errorMsg, 'error');
                 return false;
             }
         }
 
-        // --- ENHANCED PRINT QUOTATION ---
         async function printQuotation() {
             if (window.isFocLimitExceeded) return;
-
-            if (quoteItems.length === 0) {
-                showToast('Please add items to the quotation.', 'error');
-                return;
-            }
+            if (quoteItems.length === 0) { showToast('Please add items to the quotation.', 'error'); return; }
 
             setButtonLoading('btn-print', true);
+
+            // Active section switching for smart printing
+            document.getElementById('quotation-section').classList.add('print-active-section');
+            document.getElementById('raw-quotation-section').classList.remove('print-active-section');
 
             const comp = document.getElementById('cust-company').value.trim();
             const nationality = document.getElementById('cust-nationality').value.trim();
@@ -1632,31 +1720,23 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             document.getElementById('quote-date-print').textContent = quoteDate;
             document.getElementById('quote-no-print').textContent = quoteNo;
             
-            // 데이터베이스 저장 실행
-            await saveQuotationToDB();
+            const saved = await saveQuotationToDB();
+            if(saved) showToast('Main Quotation successfully saved to database.', 'success');
 
             const originalTitle = document.title;
             const safeCompName = comp ? comp.replace(/[\/\\?%*:|"<>]/g, '').replace(/\s+/g, '_') : 'Company';
             document.title = `${quoteDate}_${quoteNo}_${safeCompName}`;
 
-            // 다이얼로그 호출 전 로딩 상태 해제
             setButtonLoading('btn-print', false);
 
             window.print();
             
-            setTimeout(() => {
-                document.title = originalTitle;
-            }, 1000);
+            setTimeout(() => { document.title = originalTitle; }, 1000);
         }
 
-        // --- ENHANCED SHARE VIA EMAIL ---
         async function shareViaEmail() {
             if (window.isFocLimitExceeded) return;
-
-            if (quoteItems.length === 0) {
-                showToast('Please add items to the quotation before sharing.', 'error');
-                return;
-            }
+            if (quoteItems.length === 0) { showToast('Please add items to the quotation before sharing.', 'error'); return; }
 
             setButtonLoading('btn-share', true);
 
@@ -1669,7 +1749,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             const grandTotal = document.getElementById('quote-grandtotal').textContent;
             const incoterms = document.getElementById('quote-incoterms').value;
             const remarks = document.getElementById('quote-remarks-edit').innerText.trim();
-            
             const custName = document.getElementById('cust-name').value.trim();
 
             const subject = `Quotation from MEDIFAB GLOBAL - ${quoteNo}`;
@@ -1690,18 +1769,11 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 
                 body += `${index + 1}. ${displayItemName} ${item.isFoc ? '(FOC)' : ''}\n`;
                 if (item.color) body += `   - Option/Color: ${item.color}\n`;
+                if (!isNonCtProduct && item.ctQty > 0) body += `   - Quantity: ${totalEa} EA ( ${item.ctQty} CT + ${item.eaQty} EA )\n`;
+                else body += `   - Quantity: ${totalEa} EA\n`;
                 
-                if (!isNonCtProduct && item.ctQty > 0) {
-                    body += `   - Quantity: ${totalEa} EA ( ${item.ctQty} CT + ${item.eaQty} EA )\n`;
-                } else {
-                    body += `   - Quantity: ${totalEa} EA\n`;
-                }
-                
-                if (item.isFoc) {
-                    body += `   - Unit Price: FOC\n\n`;
-                } else {
-                    body += `   - Unit Price: ${curLabel}${formatQuoteNumber(item.unitPrice)}\n\n`;
-                }
+                if (item.isFoc) body += `   - Unit Price: FOC\n\n`;
+                else body += `   - Unit Price: ${curLabel}${formatQuoteNumber(item.unitPrice)}\n\n`;
             });
 
             body += `----------------------------------------\n`;
@@ -1712,26 +1784,300 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             }
             body += `GRAND TOTAL: ${curLabel}${grandTotal}\n`;
             body += `----------------------------------------\n\n`;
-            
-            if (remarks) {
-                body += `[Remarks]\n${remarks}\n\n`;
-            }
+            if (remarks) body += `[Remarks]\n${remarks}\n\n`;
+            body += `If you have any questions, please let us know.\n\nBest regards,\nMEDIFAB GLOBAL`;
 
-            body += `If you have any questions, please let us know.\n\n`;
-            body += `Best regards,\nMEDIFAB GLOBAL`;
-
-            // 데이터베이스 저장 실행
-            await saveQuotationToDB();
+            const saved = await saveQuotationToDB();
+            if(saved) showToast('Main Quotation successfully saved to database.', 'success');
 
             const mailtoLink = `mailto:${document.getElementById('cust-email').value || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            
             setButtonLoading('btn-share', false);
-            
             window.location.href = mailtoLink;
         }
 
         // ==========================================
-        // 5. MEDIFAB AI ASSISTANT
+        // 5. RAW MATERIALS QUOTATION GENERATOR LOGIC
+        // ==========================================
+        let rawQuoteItems = [];
+        let rawQuoteIdCounter = 0;
+
+        function addRawQuoteItem() {
+            rawQuoteIdCounter++;
+            rawQuoteItems.push({
+                id: 'rawqi_' + rawQuoteIdCounter,
+                rawId: '', 
+                qty: 0,
+                unitPrice: 0,
+                manualPrice: false
+            });
+            renderRawQuoteTable();
+        }
+
+        function removeRawQuoteItem(id) {
+            rawQuoteItems = rawQuoteItems.filter(item => item.id !== id);
+            renderRawQuoteTable();
+        }
+
+        function updateRawQuoteItem(id, field, value) {
+            const item = rawQuoteItems.find(i => i.id === id);
+            if (!item) return;
+
+            if (field === 'qty') {
+                item.qty = Math.max(0, parseInt(value, 10) || 0);
+            } else if (field === 'unitPrice') {
+                item.unitPrice = Math.max(0, parseFloat(value) || 0);
+                item.manualPrice = true;
+            } else if (field === 'rawId') {
+                item.rawId = value;
+                item.manualPrice = false;
+            }
+            renderRawQuoteTable();
+        }
+
+        function renderRawQuoteTable() {
+            try {
+                const tbody = document.getElementById('raw-quote-tbody');
+                tbody.innerHTML = '';
+                
+                let grandTotal = 0;
+                const targetCurrency = currentCurrency; 
+                const incoterms = document.getElementById('raw-quote-incoterms')?.value || 'EXW';
+                
+                const curLabel = targetCurrency === 'USD' ? '$' : '₩';
+                document.getElementById('raw-quote-th-currency1').textContent = targetCurrency;
+                document.getElementById('raw-quote-th-currency2').textContent = targetCurrency;
+                document.getElementById('raw-quote-currency-label').textContent = curLabel;
+                document.getElementById('raw-incoterms-display').textContent = incoterms;
+
+                if(rawQuoteItems.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-gray-400 italic text-sm no-print">Click "+ Add Raw Item" to generate a raw materials quotation.</td></tr>`;
+                    document.getElementById('raw-quote-grandtotal').textContent = '0';
+                    return;
+                }
+
+                rawQuoteItems.forEach((item) => {
+                    const rawObj = globalRawMaterials.find(p => p.id === item.rawId);
+                    
+                    if (!item.manualPrice && rawObj) {
+                        let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
+                        let basePrice = (Number(rawObj.unit_price_usd) || 0) * rate;
+                        if (incoterms === 'EXW') basePrice *= 0.97;
+                        item.unitPrice = Math.round(basePrice);
+                    } else if (!item.manualPrice && !rawObj) {
+                        item.unitPrice = 0;
+                    }
+
+                    const amount = (item.unitPrice || 0) * (item.qty || 0);
+                    grandTotal += amount;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-gray-200 text-sm";
+                    
+                    let prodOptions = `<option value="">Select Raw Material...</option>`;
+                    globalRawMaterials.forEach(p => { 
+                        prodOptions += `<option value="${p.id}" ${p.id === item.rawId ? 'selected' : ''}>${escapeHtml(p.product_name)} - ${escapeHtml(p.grade)} (${escapeHtml(p.form)}/${escapeHtml(p.unit)})</option>`; 
+                    });
+
+                    let gradeText = rawObj ? rawObj.grade : '-';
+                    let formText = rawObj ? rawObj.form : '-';
+                    let unitText = rawObj ? rawObj.unit : '-';
+
+                    tr.innerHTML = `
+                        <td class="py-2 px-2 text-center no-print align-top"><button onclick="removeRawQuoteItem('${item.id}')" class="text-red-500 hover:text-red-700 font-bold px-2">&times;</button></td>
+                        <td class="py-2 px-2 align-top">
+                            <select class="w-full border p-1.5 text-xs outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" onchange="updateRawQuoteItem('${item.id}', 'rawId', this.value)">
+                                ${prodOptions}
+                            </select>
+                            <div class="print-only hidden font-medium text-gray-900">${rawObj ? escapeHtml(rawObj.product_name) : '-'}</div>
+                        </td>
+                        <td class="py-2 px-2 text-center align-top text-gray-600">${escapeHtml(gradeText)}</td>
+                        <td class="py-2 px-2 text-center align-top text-gray-600">${escapeHtml(formText)}</td>
+                        <td class="py-2 px-2 text-center align-top text-gray-600">${escapeHtml(unitText)}</td>
+                        <td class="py-2 px-2 text-center align-top">
+                            <div class="flex items-center justify-center gap-1 no-print">
+                                <input type="number" min="0" class="w-16 border p-1 text-xs text-center outline-none bg-gray-50 focus:bg-white" value="${item.qty}" title="Qty" onchange="updateRawQuoteItem('${item.id}', 'qty', this.value)"> 
+                            </div>
+                            <div class="print-only hidden text-center font-bold">${item.qty}</div>
+                        </td>
+                        <td class="py-2 px-2 text-right align-top">
+                            <div class="no-print float-right w-full max-w-[100px]">
+                                <input type="number" step="any" class="w-full border p-1 text-xs text-right outline-none bg-gray-50 focus:bg-white" value="${item.unitPrice}" onchange="updateRawQuoteItem('${item.id}', 'unitPrice', this.value)">
+                            </div>
+                            <span class="print-only hidden">${formatQuoteNumber(item.unitPrice)}</span>
+                        </td>
+                        <td class="py-2 px-2 text-right font-medium text-gray-900 align-top">${formatQuoteNumber(amount)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('raw-quote-grandtotal').textContent = formatQuoteNumber(grandTotal);
+                
+            } catch (err) {
+                console.error("Raw Quotation Generation Error:", err);
+            }
+        }
+
+        async function saveRawQuotationToDB() {
+            try {
+                const parseNum = (val) => parseFloat((val || '0').replace(/,/g, '')) || 0;
+
+                const quoteData = {
+                    quote_no: document.getElementById('raw-quote-no').textContent.trim() || 'UNKNOWN_QUOTE',
+                    quote_date: document.getElementById('raw-quote-date').textContent.trim() || new Date().toISOString().split('T')[0],
+                    currency: currentCurrency,
+                    region: 'Raw_Material',
+                    incoterms: document.getElementById('raw-quote-incoterms').value,
+                    customer_company: document.getElementById('raw-cust-company').value.trim(),
+                    customer_nationality: document.getElementById('raw-cust-nationality').value.trim(),
+                    customer_name: document.getElementById('raw-cust-name').value.trim(),
+                    customer_address: document.getElementById('raw-cust-address').value.trim(),
+                    customer_email: document.getElementById('raw-cust-email').value.trim(),
+                    subtotal: parseNum(document.getElementById('raw-quote-grandtotal').textContent),
+                    discount_rate: 0,
+                    discount_amount: 0,
+                    grand_total: parseNum(document.getElementById('raw-quote-grandtotal').textContent),
+                    bank_info: "Standard Medifab Bank Account",
+                    remarks: "Proprietary Raw Materials Official Quotation"
+                };
+
+                const { data: quoteResult, error: quoteError } = await supabaseClient
+                    .from('quotations')
+                    .insert([quoteData])
+                    .select();
+
+                if (quoteError) throw quoteError;
+                if (!quoteResult || quoteResult.length === 0) throw new Error("견적서 저장 후 ID를 받아오지 못했습니다.");
+                const savedQuoteId = quoteResult[0].id;
+
+                const itemsToSave = rawQuoteItems.map((item, index) => {
+                    const rawObj = globalRawMaterials.find(p => p.id === item.rawId);
+                    const displayItemName = rawObj ? `${rawObj.product_name} (${rawObj.grade} / ${rawObj.form})` : 'Unknown Raw Material';
+                    const amount = (item.unitPrice || 0) * (item.qty || 0);
+
+                    return {
+                        quotation_id: savedQuoteId,
+                        product_id: item.rawId,
+                        product_name: displayItemName,
+                        color: rawObj ? rawObj.unit : '',
+                        ct_qty: 0,
+                        ea_qty: item.qty,
+                        total_ea: item.qty,
+                        unit_price: item.unitPrice,
+                        is_foc: false,
+                        amount: amount,
+                        item_index: index + 1
+                    };
+                });
+
+                const { error: itemsError } = await supabaseClient
+                    .from('quotation_items')
+                    .insert(itemsToSave);
+
+                if (itemsError) throw itemsError;
+                return true;
+
+            } catch (err) {
+                console.error("DB 저장 중 에러 발생:", err);
+                const errorMsg = err.details || err.message || JSON.stringify(err);
+                showToast('Raw Quote Database Error: ' + errorMsg, 'error');
+                return false;
+            }
+        }
+
+        async function printRawQuotation() {
+            if (rawQuoteItems.length === 0) { showToast('Please add raw material items to the quotation.', 'error'); return; }
+
+            setButtonLoading('btn-print-raw', true);
+
+            // Active section switching for smart printing
+            document.getElementById('raw-quotation-section').classList.add('print-active-section');
+            document.getElementById('quotation-section').classList.remove('print-active-section');
+
+            const comp = document.getElementById('raw-cust-company').value.trim();
+            const nationality = document.getElementById('raw-cust-nationality').value.trim();
+            const name = document.getElementById('raw-cust-name').value.trim();
+            const addr = document.getElementById('raw-cust-address').value.trim();
+            const email = document.getElementById('raw-cust-email').value.trim();
+
+            let toHtml = '';
+            if (comp) toHtml += `<span class="font-bold text-base block mb-1">${escapeHtml(comp)}</span>`;
+            if (nationality) toHtml += `<span class="block text-sm font-medium text-gray-700 mb-1">Nationality: ${escapeHtml(nationality)}</span>`;
+            if (name) toHtml += `<span class="block">ATTN: ${escapeHtml(name)}</span>`;
+            if (addr) toHtml += `<span class="block">${escapeHtml(addr)}</span>`;
+            if (email) toHtml += `<span class="block">Email: ${escapeHtml(email)}</span>`;
+
+            document.getElementById('raw-quote-to-print').innerHTML = toHtml || '<span class="text-gray-400 italic">No customer info provided.</span>';
+            
+            const quoteDate = document.getElementById('raw-quote-date').textContent.trim();
+            const quoteNo = document.getElementById('raw-quote-no').textContent.trim();
+            
+            document.getElementById('raw-quote-date-print').textContent = quoteDate;
+            document.getElementById('raw-quote-no-print').textContent = quoteNo;
+            
+            const saved = await saveRawQuotationToDB();
+            if(saved) showToast('Raw Quotation successfully saved to database.', 'success');
+
+            const originalTitle = document.title;
+            const safeCompName = comp ? comp.replace(/[\/\\?%*:|"<>]/g, '').replace(/\s+/g, '_') : 'Company';
+            document.title = `${quoteDate}_${quoteNo}_${safeCompName}_RawMaterials`;
+
+            setButtonLoading('btn-print-raw', false);
+
+            window.print();
+            
+            setTimeout(() => { document.title = originalTitle; }, 1000);
+        }
+
+        async function shareRawViaEmail() {
+            if (rawQuoteItems.length === 0) { showToast('Please add items to the quotation before sharing.', 'error'); return; }
+
+            setButtonLoading('btn-share-raw', true);
+
+            const quoteNo = document.getElementById('raw-quote-no').textContent;
+            const targetCurrency = currentCurrency;
+            const curLabel = targetCurrency === 'USD' ? '$' : '₩';
+            const grandTotal = document.getElementById('raw-quote-grandtotal').textContent;
+            const incoterms = document.getElementById('raw-quote-incoterms').value;
+            const custName = document.getElementById('raw-cust-name').value.trim();
+
+            const subject = `[MEDIFAB] Official Quotation for Proprietary Raw Materials - ${quoteNo}`;
+            let body = `Hello ${custName ? custName : 'there'},\n\nWe are pleased to submit the following official offer for our high-purity, bio-engineered raw materials.\n\n`;
+            body += `[Quotation No: ${quoteNo}]\n`;
+            body += `[Currency: ${targetCurrency}]\n`;
+            body += `[Incoterms: ${incoterms}]\n\n`;
+
+            rawQuoteItems.forEach((item, index) => {
+                const rawObj = globalRawMaterials.find(p => p.id === item.rawId);
+                const displayItemName = rawObj ? rawObj.product_name : 'Unknown Item';
+                const gradeFormUnit = rawObj ? `(${rawObj.grade} / ${rawObj.form} / ${rawObj.unit})` : '';
+                
+                body += `${index + 1}. ${displayItemName} ${gradeFormUnit}\n`;
+                body += `   - Quantity: ${item.qty}\n`;
+                body += `   - Unit Price: ${curLabel}${formatQuoteNumber(item.unitPrice)}\n\n`;
+            });
+
+            body += `----------------------------------------\n`;
+            body += `GRAND TOTAL: ${curLabel}${grandTotal}\n`;
+            body += `----------------------------------------\n\n`;
+            
+            body += `[Commercial Terms]\n`;
+            body += `- Payment Terms: 100% T/T (Wire Transfer) in advance\n`;
+            body += `- Lead Time: Standard lead time is 4 to 6 weeks upon receipt of a firm PO\n`;
+            body += `- Shipping Terms: ${incoterms} Incheon/Seoul, South Korea.\n\n`;
+
+            body += `If you require further technical dossiers or have custom formulation inquiries, please let us know.\n\n`;
+            body += `Best regards,\nMEDIFAB Co., Ltd.`;
+
+            const saved = await saveRawQuotationToDB();
+            if(saved) showToast('Raw Quotation successfully saved to database.', 'success');
+
+            const mailtoLink = `mailto:${document.getElementById('raw-cust-email').value || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            setButtonLoading('btn-share-raw', false);
+            window.location.href = mailtoLink;
+        }
+
+        // ==========================================
+        // 6. MEDIFAB AI ASSISTANT
         // ==========================================
         function toggleChat() {
             const chatContainer = document.getElementById('ai-chat-container'), fab = document.getElementById('ai-fab');
