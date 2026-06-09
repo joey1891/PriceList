@@ -893,7 +893,6 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             return isNaN(num) || num === 0 ? 1 : num;
         }
 
-        // 가격 티어 옵션 렌더링 함수 추가
         function getTierOptionsHtml(item) {
             if (!item.productId || item.productId === 'CUSTOM') return '';
             const prodObj = allProductsList.find(p => p.id === item.productId);
@@ -926,10 +925,12 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             return options;
         }
 
-        // Core fix for Currency Applications (Native vs Target) + Tier Overrides
+        // =====================================================================
+        // CORE FIX: NaN 방지 처리 및 통화 변환 정합성 보완
+        // =====================================================================
         function calculateUnitPrice(item) {
             try {
-                if (item.manualPrice) return item.unitPrice;
+                if (item.manualPrice) return parseFloat(item.unitPrice) || 0;
                 if (!item.productId || item.productId === 'CUSTOM') return 0;
 
                 const prodObj = allProductsList.find(p => p.id === item.productId);
@@ -938,71 +939,85 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 const targetCurrency = document.getElementById('quote-target-currency').value || 'USD';
 
                 const ctSize = getCtSize(prodObj.raw);
-                const totalEa = (parseInt(item.ctQty) || 0) * ctSize + (parseInt(item.eaQty) || 0);
+                const ctQty = parseInt(item.ctQty, 10) || 0;
+                const eaQty = parseInt(item.eaQty, 10) || 0;
+                const totalEa = (ctQty * ctSize) + eaQty;
 
                 let nativePrice = 0;
                 let nativeCurrency = 'USD';
                 const tier = item.priceTier || 'auto';
 
                 if (prodObj.type === 'cosmetic') {
-                    // Find if product has price natively in target currency
+                    // Cosmetic: DB에는 주로 USD 가격이 저장되어 있음.
                     const pricesArray = Array.isArray(prodObj.raw.product_prices) ? prodObj.raw.product_prices : [];
-                    let targetPriceObj = pricesArray.find(pr => pr.currency === targetCurrency);
-                    let priceObj = targetPriceObj;
-                    
-                    if (targetPriceObj) {
-                        nativeCurrency = targetCurrency;
-                    } else {
-                        priceObj = pricesArray.find(pr => pr.currency === 'USD') || {};
-                        nativeCurrency = 'USD';
-                    }
+                    let priceObj = pricesArray.find(pr => pr.currency === 'USD') || {};
+                    nativeCurrency = 'USD'; 
 
-                    if (tier === 'msrp') nativePrice = priceObj.b2c_msrp;
-                    else if (tier === 'promo') nativePrice = priceObj.b2c_promotion;
-                    else if (tier === 'b2b1') nativePrice = priceObj.b2b_tier1_1_to_10_ct;
-                    else if (tier === 'b2b2') nativePrice = priceObj.b2b_tier2_10_to_30_ct;
-                    else if (tier === 'b2b3') nativePrice = priceObj.b2b_tier3_30_to_70_ct;
+                    // 빈 값(null/undefined)은 모두 0으로 안전하게 치환
+                    const msrp = Number(priceObj.b2c_msrp) || 0;
+                    const promo = Number(priceObj.b2c_promotion) || 0;
+                    const b2b1 = Number(priceObj.b2b_tier1_1_to_10_ct) || 0;
+                    const b2b2 = Number(priceObj.b2b_tier2_10_to_30_ct) || 0;
+                    const b2b3 = Number(priceObj.b2b_tier3_30_to_70_ct) || 0;
+
+                    if (tier === 'msrp') nativePrice = msrp;
+                    else if (tier === 'promo') nativePrice = promo;
+                    else if (tier === 'b2b1') nativePrice = b2b1;
+                    else if (tier === 'b2b2') nativePrice = b2b2;
+                    else if (tier === 'b2b3') nativePrice = b2b3;
                     else {
+                        // Auto (By Qty)
                         const totalCt = totalEa / ctSize;
-                        if (totalCt >= 30 && priceObj.b2b_tier3_30_to_70_ct) nativePrice = priceObj.b2b_tier3_30_to_70_ct;
-                        else if (totalCt >= 10 && priceObj.b2b_tier2_10_to_30_ct) nativePrice = priceObj.b2b_tier2_10_to_30_ct;
-                        else if (totalCt > 0 && priceObj.b2b_tier1_1_to_10_ct) nativePrice = priceObj.b2b_tier1_1_to_10_ct;
-                        else nativePrice = priceObj.b2b_tier1_1_to_10_ct || priceObj.b2c_msrp || 0;
+                        if (totalCt >= 30 && b2b3) nativePrice = b2b3;
+                        else if (totalCt >= 10 && b2b2) nativePrice = b2b2;
+                        else if (totalCt > 0 && b2b1) nativePrice = b2b1;
+                        else nativePrice = b2b1 || msrp;
                     }
                 } else {
+                    // Medical
                     const p = prodObj.raw;
-                    nativeCurrency = p.currency || 'KRW';
+                    nativeCurrency = p.currency || 'USD'; 
 
-                    if (tier === 'clinic_msrp') nativePrice = p.clinic_msrp;
-                    else if (tier === 'clinic_promo') nativePrice = p.clinic_promotion;
-                    else if (tier === 'dist_1000') nativePrice = p.dist_1000;
-                    else if (tier === 'dist_3000') nativePrice = p.dist_3000;
-                    else if (tier === 'dist_5000') nativePrice = p.dist_5000;
-                    else if (tier === 'dist_10000') nativePrice = p.dist_10000;
-                    else if (tier === 'oem_10000') nativePrice = p.oem_10000;
-                    else if (tier === 'oem_30000') nativePrice = p.oem_30000;
-                    else if (tier === 'oem_50000') nativePrice = p.oem_50000;
+                    const clinic_msrp = Number(p.clinic_msrp) || 0;
+                    const clinic_promo = Number(p.clinic_promotion) || 0;
+                    const dist_1000 = Number(p.dist_1000) || 0;
+                    const dist_3000 = Number(p.dist_3000) || 0;
+                    const dist_5000 = Number(p.dist_5000) || 0;
+                    const dist_10000 = Number(p.dist_10000) || 0;
+                    const oem_10000 = Number(p.oem_10000) || 0;
+                    const oem_30000 = Number(p.oem_30000) || 0;
+                    const oem_50000 = Number(p.oem_50000) || 0;
+
+                    if (tier === 'clinic_msrp') nativePrice = clinic_msrp;
+                    else if (tier === 'clinic_promo') nativePrice = clinic_promo;
+                    else if (tier === 'dist_1000') nativePrice = dist_1000;
+                    else if (tier === 'dist_3000') nativePrice = dist_3000;
+                    else if (tier === 'dist_5000') nativePrice = dist_5000;
+                    else if (tier === 'dist_10000') nativePrice = dist_10000;
+                    else if (tier === 'oem_10000') nativePrice = oem_10000;
+                    else if (tier === 'oem_30000') nativePrice = oem_30000;
+                    else if (tier === 'oem_50000') nativePrice = oem_50000;
                     else {
-                        if (totalEa >= 50000 && p.oem_50000) nativePrice = p.oem_50000;
-                        else if (totalEa >= 30000 && p.oem_30000) nativePrice = p.oem_30000;
-                        else if (totalEa >= 10000) nativePrice = p.oem_10000 || p.dist_10000 || 0;
-                        else if (totalEa >= 5000 && p.dist_5000) nativePrice = p.dist_5000;
-                        else if (totalEa >= 3000 && p.dist_3000) nativePrice = p.dist_3000;
-                        else if (totalEa > 0 && p.dist_1000) nativePrice = p.dist_1000;
-                        else nativePrice = p.dist_1000 || p.clinic_msrp || 0;
+                        // Auto (By Qty)
+                        if (totalEa >= 50000 && oem_50000) nativePrice = oem_50000;
+                        else if (totalEa >= 30000 && oem_30000) nativePrice = oem_30000;
+                        else if (totalEa >= 10000) nativePrice = oem_10000 || dist_10000;
+                        else if (totalEa >= 5000 && dist_5000) nativePrice = dist_5000;
+                        else if (totalEa >= 3000 && dist_3000) nativePrice = dist_3000;
+                        else if (totalEa > 0 && dist_1000) nativePrice = dist_1000;
+                        else nativePrice = dist_1000 || clinic_msrp;
                     }
                 }
 
-                // Cross-currency application logic
-                if (nativeCurrency === targetCurrency) {
-                    return nativePrice;
-                } else if (nativeCurrency === 'USD' && targetCurrency === 'KRW') {
-                    return nativePrice * appliedKrwRate;
+                // 타겟 통화(Quotation)에 맞추어 환율 최종 적용 (위쪽 가격표 정합성과 완전 동일)
+                let finalPrice = nativePrice;
+                if (nativeCurrency === 'USD' && targetCurrency === 'KRW') {
+                    finalPrice = nativePrice * appliedKrwRate;
                 } else if (nativeCurrency === 'KRW' && targetCurrency === 'USD') {
-                    return nativePrice / appliedKrwRate;
+                    finalPrice = nativePrice / appliedKrwRate;
                 }
 
-                return nativePrice;
+                return finalPrice;
             } catch(e) {
                 console.error("Error calculating price:", e);
                 return 0;
@@ -1031,23 +1046,40 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             renderQuoteTable();
         }
 
+        // =====================================================================
+        // CORE FIX: 타입 안전성 추가 (문자열 입력을 강제 파싱하여 에러 방지)
+        // =====================================================================
         function updateQuoteItem(id, field, value, isManual = false) {
             const item = quoteItems.find(i => i.id === id);
             if (!item) return;
             
-            item[field] = value;
+            // 수량 필드는 무조건 숫자로 파싱하여 예기치 않은 NaN 크래시 방지
+            if (field === 'ctQty' || field === 'eaQty') {
+                item[field] = parseInt(value, 10) || 0;
+            } else if (field === 'isFoc') {
+                item.isFoc = value === true || value === 'true'; 
+            } else {
+                item[field] = value;
+            }
+
             if (isManual && field === 'unitPrice') {
                 item.manualPrice = true;
                 item.unitPrice = parseFloat(value) || 0;
             } else if (field === 'productId') {
                 item.manualPrice = false;
-                item.priceTier = 'auto'; // 리셋
+                item.priceTier = 'auto'; // 제품 변경 시 기본값 복귀
+                item.customName = '';
+                item.unitPrice = 0;
             } else if (field === 'priceTier') {
                 item.manualPrice = false;
             }
+            
             renderQuoteTable();
         }
 
+        // =====================================================================
+        // CORE FIX: 렌더링 시 try/catch 블록 내에서 포맷 에러 발생 안하도록 안전하게 보호
+        // =====================================================================
         function renderQuoteTable() {
             try {
                 const tbody = document.getElementById('quote-tbody');
@@ -1060,17 +1092,21 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
 
                 if(quoteItems.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 italic text-sm no-print">Click "+ Add Item" to generate quotation.</td></tr>`;
+                    updateTotals(0, discountRate, targetCurrency, incoterms);
+                    return;
                 }
 
                 quoteItems.forEach((item, index) => {
                     const prodObj = allProductsList.find(p => p.id === item.productId);
                     const ctSize = prodObj ? getCtSize(prodObj.raw) : 1;
-                    const totalEa = (parseInt(item.ctQty) || 0) * ctSize + (parseInt(item.eaQty) || 0);
+                    const ctQty = parseInt(item.ctQty, 10) || 0;
+                    const eaQty = parseInt(item.eaQty, 10) || 0;
+                    const totalEa = (ctQty * ctSize) + eaQty;
                     
                     if (!item.manualPrice) item.unitPrice = calculateUnitPrice(item);
                     
-                    let appliedUnitPrice = item.unitPrice;
-                    if (incoterms === 'EXW') appliedUnitPrice = item.unitPrice * 0.97;
+                    let appliedUnitPrice = Number(item.unitPrice) || 0;
+                    if (incoterms === 'EXW') appliedUnitPrice = appliedUnitPrice * 0.97;
                     if (item.isFoc) appliedUnitPrice = 0;
                     
                     const amount = appliedUnitPrice * totalEa;
@@ -1084,6 +1120,10 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     allProductsList.forEach(p => { prodOptions += `<option value="${p.id}" ${p.id === item.productId ? 'selected' : ''}>${escapeHtml(p.name)}</option>`; });
 
                     let displayItemName = item.productId === 'CUSTOM' ? (item.customName || 'Custom Item') : (prodObj ? prodObj.name : '');
+
+                    // Safe toFixed execution to prevent unexpected rendering stops
+                    const safeAppliedUnitPrice = isNaN(appliedUnitPrice) ? 0 : appliedUnitPrice;
+                    const unitPriceVal = safeAppliedUnitPrice.toFixed(targetCurrency === 'USD' ? 2 : 0);
 
                     tr.innerHTML = `
                         <td class="py-2 px-2 text-center print-only-cell hidden text-gray-700">${index + 1}</td>
@@ -1119,40 +1159,48 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                                     ${getTierOptionsHtml(item)}
                                 </select>
                                 ` : ''}
-                                <input type="number" class="w-full border p-1 text-xs text-right outline-none ${item.isFoc ? 'bg-gray-200 text-gray-400' : 'bg-gray-50 focus:bg-white'}" value="${appliedUnitPrice.toFixed(targetCurrency === 'USD' ? 2 : 0)}" onchange="updateQuoteItem('${item.id}', 'unitPrice', this.value, true)" ${item.isFoc ? 'readonly' : ''}>
+                                <input type="number" class="w-full border p-1 text-xs text-right outline-none ${item.isFoc ? 'bg-gray-200 text-gray-400' : 'bg-gray-50 focus:bg-white'}" value="${unitPriceVal}" onchange="updateQuoteItem('${item.id}', 'unitPrice', this.value, true)" ${item.isFoc ? 'readonly' : ''}>
                             </div>
-                            <span class="print-only hidden">${item.isFoc ? 'FOC' : formatQuoteNumber(appliedUnitPrice, targetCurrency)}</span>
+                            <span class="print-only hidden">${item.isFoc ? 'FOC' : formatQuoteNumber(safeAppliedUnitPrice, targetCurrency)}</span>
                         </td>
                         <td class="py-2 px-2 text-right font-medium text-gray-900 align-top">${item.isFoc ? '0.00' : formatQuoteNumber(amount, targetCurrency)}</td>
                     `;
                     tbody.appendChild(tr);
                 });
 
-                const discountAmount = subTotal * (discountRate / 100);
-                const grandTotal = subTotal - discountAmount;
-
-                document.getElementById('quote-subtotal').textContent = formatQuoteNumber(subTotal, targetCurrency);
-                document.getElementById('quote-discount-display').textContent = discountRate;
-                document.getElementById('quote-discount-amount').textContent = formatQuoteNumber(discountAmount, targetCurrency);
-                document.getElementById('quote-grandtotal').textContent = formatQuoteNumber(grandTotal, targetCurrency);
-                
-                const discountRow = document.getElementById('quote-discount-row');
-                if (discountRate > 0) discountRow.classList.remove('hidden');
-                else discountRow.classList.add('hidden');
-
-                const curLabel = targetCurrency === 'USD' ? '$' : '₩';
-                document.getElementById('quote-currency-label').textContent = curLabel;
-                document.getElementById('quote-currency-label1').textContent = curLabel;
-                document.getElementById('quote-currency-label2').textContent = curLabel;
-                
-                document.getElementById('quote-incoterms-print').textContent = incoterms;
-                const exwNotice = document.getElementById('exw-notice');
-                if (incoterms === 'EXW') exwNotice.classList.remove('hidden');
-                else exwNotice.classList.add('hidden');
+                updateTotals(subTotal, discountRate, targetCurrency, incoterms);
                 
             } catch(e) {
                 console.error("Rendering Quote Table Error:", e);
+                // 에러 발생으로 인해 렌더링이 중단되면 화면이 지워지는 듯한 현상을 방지하고자 에러 메시지 표출
+                const tbody = document.getElementById('quote-tbody');
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-red-500 font-medium text-sm">에러가 발생하여 항목을 표시할 수 없습니다. (${e.message})</td></tr>`;
             }
+        }
+
+        // 총계 렌더링 헬퍼 함수
+        function updateTotals(subTotal, discountRate, targetCurrency, incoterms) {
+            const discountAmount = subTotal * (discountRate / 100);
+            const grandTotal = subTotal - discountAmount;
+
+            document.getElementById('quote-subtotal').textContent = formatQuoteNumber(subTotal, targetCurrency);
+            document.getElementById('quote-discount-display').textContent = discountRate;
+            document.getElementById('quote-discount-amount').textContent = formatQuoteNumber(discountAmount, targetCurrency);
+            document.getElementById('quote-grandtotal').textContent = formatQuoteNumber(grandTotal, targetCurrency);
+            
+            const discountRow = document.getElementById('quote-discount-row');
+            if (discountRate > 0) discountRow.classList.remove('hidden');
+            else discountRow.classList.add('hidden');
+
+            const curLabel = targetCurrency === 'USD' ? '$' : '₩';
+            document.getElementById('quote-currency-label').textContent = curLabel;
+            document.getElementById('quote-currency-label1').textContent = curLabel;
+            document.getElementById('quote-currency-label2').textContent = curLabel;
+            
+            document.getElementById('quote-incoterms-print').textContent = incoterms;
+            const exwNotice = document.getElementById('exw-notice');
+            if (incoterms === 'EXW') exwNotice.classList.remove('hidden');
+            else exwNotice.classList.add('hidden');
         }
 
         function printQuotation() {
@@ -1203,7 +1251,9 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 const displayItemName = item.productId === 'CUSTOM' ? (item.customName || 'Custom Item') : (prodObj ? prodObj.name : '');
                 
                 const ctSize = prodObj ? getCtSize(prodObj.raw) : 1;
-                const totalEa = (parseInt(item.ctQty) || 0) * ctSize + (parseInt(item.eaQty) || 0);
+                const ctQty = parseInt(item.ctQty, 10) || 0;
+                const eaQty = parseInt(item.eaQty, 10) || 0;
+                const totalEa = (ctQty * ctSize) + eaQty;
                 
                 body += `${index + 1}. ${displayItemName} ${item.isFoc ? '(FOC)' : ''}\n`;
                 if (item.color) body += `   - Option/Color: ${item.color}\n`;
