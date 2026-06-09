@@ -105,7 +105,6 @@
 </head>
 <body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white">
 
-    <!-- Lock Screen -->
     <div id="lock-screen" class="flex items-center justify-center">
         <div class="bg-white p-10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 max-w-sm w-full text-center">
             <h2 class="text-2xl text-gray-900 mb-2 font-montserrat tracking-widest uppercase">MEDIFAB</h2>
@@ -122,7 +121,6 @@
         </div>
     </div>
 
-    <!-- Image Modal -->
     <div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeImageModal(event)">
         <div class="relative max-w-4xl max-h-[90vh] p-4 flex flex-col items-center">
             <button class="absolute -top-10 right-0 text-white hover:text-gray-300 text-3xl" onclick="closeImageModal(event)">&times;</button>
@@ -130,7 +128,6 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <div id="main-content" class="p-6 md:p-12 max-w-[100rem] mx-auto flex flex-col gap-10">
         
         <!-- Header Section -->
@@ -565,6 +562,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             setTimeout(() => { modal.classList.add('hidden'); document.getElementById('modal-img').src = ''; }, 300);
         }
 
+        // --- STREAMING_CHUNK:Database Initialization... ---
         // --- SUPABASE CONFIG ---
         const SUPABASE_URL = 'https://rayhgqcpupwmwpymtkwg.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
@@ -632,6 +630,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             renderQuoteTable(); 
         }
 
+        // --- STREAMING_CHUNK:Fetching Data & Updating Global State... ---
         async function initDashboard() {
             // 1. 환율 정보 로드
             try {
@@ -703,15 +702,23 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     { item: 'Crystal', ingredients: 'Chitosan-based', type: 'Filler', specs: '1.0ml', clinic_msrp: 120, clinic_promotion: 100, dist_1000: 60, dist_3000: 55, dist_5000: 50, dist_10000: 45, oem_10000: 40, oem_30000: 35, oem_50000: 30, currency: 'USD' },
                     { item: 'Crystal Plus', ingredients: 'Chitosan-based', type: 'Filler', specs: '1.0ml', clinic_msrp: 130, clinic_promotion: 110, dist_1000: 65, dist_3000: 60, dist_5000: 55, dist_10000: 50, oem_10000: 45, oem_30000: 40, oem_50000: 35, currency: 'USD' },
                     { item: 'Scalp MD', ingredients: 'dECM', type: 'Skin Booster', specs: '5.0ml * 5ea', clinic_msrp: 200, clinic_promotion: 180, dist_1000: 100, dist_3000: 90, dist_5000: 80, dist_10000: 75, oem_10000: 70, oem_30000: 60, oem_50000: 55, currency: 'USD' },
-                    { item: 'Echrever', ingredients: 'PLLA', type: 'Collagen Stimulator', specs: '200mg * 1ea', clinic_msrp: 150, clinic_promotion: 130, dist_1000: 75, dist_3000: 70, dist_5000: 65, dist_10000: 60, oem_10000: 55, oem_30000: 50, oem_50000: 45, currency: 'USD' }
+                    { item: 'Echrever', ingredients: 'DVS Filler', type: 'Collagen Stimulator', specs: '200mg * 1ea', clinic_msrp: 150, clinic_promotion: 130, dist_1000: 75, dist_3000: 70, dist_5000: 65, dist_10000: 60, oem_10000: null, oem_30000: null, oem_50000: null, currency: 'USD' }
                 ];
             }
 
-            // --- Inject Echrever into Medical Products if missing ---
+            // --- Override DB data for Echrever to ensure standard enforcement ---
+            globalMedicalProducts = globalMedicalProducts.map(p => {
+                if (p.item && p.item.toLowerCase().includes('echrever')) {
+                    return { ...p, ingredients: 'DVS Filler', oem_10000: null, oem_30000: null, oem_50000: null };
+                }
+                return p;
+            });
+
+            // --- Inject Echrever into Medical Products if completely missing ---
             if (!globalMedicalProducts.some(p => p.item && p.item.toLowerCase().includes('echrever'))) {
                 globalMedicalProducts.push({
                     item: 'Echrever', 
-                    ingredients: 'PLLA', 
+                    ingredients: 'DVS Filler', 
                     type: 'Collagen Stimulator', 
                     specs: '200mg * 1ea', 
                     clinic_msrp: 150, 
@@ -720,9 +727,9 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     dist_3000: 70, 
                     dist_5000: 65, 
                     dist_10000: 60, 
-                    oem_10000: 55, 
-                    oem_30000: 50, 
-                    oem_50000: 45, 
+                    oem_10000: null, 
+                    oem_30000: null, 
+                    oem_50000: null, 
                     currency: 'USD'
                 });
             }
@@ -759,6 +766,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             initQuotationSystem();
         }
 
+        // --- STREAMING_CHUNK:Defining UI Helpers and Callbacks... ---
         function changeExchangeRate(val) {
             appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
             // 상단 테이블 3개와 하단 견적서를 모두 동기화 재렌더링
@@ -804,7 +812,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         }
         
         function formatMedCurrency(amount) {
-            if (amount === null || amount === undefined) return '<span class="text-black">sample</span>';
+            if (amount === null || amount === undefined || amount === '-') return '<span class="text-black">-</span>';
             return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(amount));
         }
         
@@ -833,6 +841,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         // ==========================================
         // 1. RENDER COSMETIC TABLE
         // ==========================================
+        // --- STREAMING_CHUNK:Rendering Cosmetic Data Logics... ---
         function renderTableData() {
             const tbody = document.getElementById('price-table-body');
             tbody.innerHTML = '';
@@ -918,6 +927,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         // ==========================================
         // 2. RENDER MEDICAL AESTHETIC TABLE
         // ==========================================
+        // --- STREAMING_CHUNK:Rendering Medical Aesthetic Logic... ---
         function renderMedicalTableData() {
             const tbody = document.getElementById('medical-table-body');
             tbody.innerHTML = '';
@@ -943,9 +953,9 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     dist_3000: p.dist_3000 ? p.dist_3000 * rate : null,
                     dist_5000: p.dist_5000 ? p.dist_5000 * rate : null,
                     dist_10000: p.dist_10000 ? p.dist_10000 * rate : null,
-                    oem_10000: p.oem_10000 ? p.oem_10000 * rate : null,
-                    oem_30000: p.oem_30000 ? p.oem_30000 * rate : null,
-                    oem_50000: p.oem_50000 ? p.oem_50000 * rate : null
+                    oem_10000: p.oem_10000 !== null ? p.oem_10000 * rate : null,
+                    oem_30000: p.oem_30000 !== null ? p.oem_30000 * rate : null,
+                    oem_50000: p.oem_50000 !== null ? p.oem_50000 * rate : null
                 };
             });
 
@@ -1004,6 +1014,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         // ==========================================
         // 3. RENDER RAW MATERIALS TABLE
         // ==========================================
+        // --- STREAMING_CHUNK:Rendering Raw Materials Logic... ---
         function renderRawMaterialsTableData() {
             const tbody = document.getElementById('raw-materials-table-body');
             tbody.innerHTML = '';
@@ -1061,6 +1072,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         // ==========================================
         // 4. QUOTATION GENERATOR LOGIC (SYNCHRONIZED WITH TABLES)
         // ==========================================
+        // --- STREAMING_CHUNK:Configuring Quotation Generating Core... ---
         let allProductsList = [];
         let quoteItems = [];
         let quoteItemIdCounter = 0;
@@ -1171,6 +1183,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             renderQuoteTable();
         }
 
+        // --- STREAMING_CHUNK:Calculating Advanced Quote Fields... ---
         function calculateUnitPrice(item, totalEa) {
             if (item.manualPrice) return item.unitPrice;
             if (!item.productId || item.productId === 'CUSTOM') return 0;
@@ -1233,9 +1246,9 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 else if (tier === 'dist_3000') finalPrice = d_3k;
                 else if (tier === 'dist_5000') finalPrice = d_5k;
                 else if (tier === 'dist_10000') finalPrice = d_10k;
-                else if (tier === 'oem_10000') finalPrice = o_10k;
-                else if (tier === 'oem_30000') finalPrice = o_30k;
-                else if (tier === 'oem_50000') finalPrice = o_50k;
+                else if (tier === 'oem_10000') finalPrice = o_10k !== null ? o_10k : d_10k;
+                else if (tier === 'oem_30000') finalPrice = o_30k !== null ? o_30k : d_10k;
+                else if (tier === 'oem_50000') finalPrice = o_50k !== null ? o_50k : d_10k;
                 else {
                     if (totalEa >= 50000 && o_50k) finalPrice = o_50k;
                     else if (totalEa >= 30000 && o_30k) finalPrice = o_30k;
@@ -1319,6 +1332,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             }
         }
 
+        // --- STREAMING_CHUNK:Rendering Quotation Component View... ---
         function renderQuoteTable() {
             try {
                 const tbody = document.getElementById('quote-tbody');
@@ -1442,6 +1456,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             }
         }
 
+        // --- STREAMING_CHUNK:Defining Quotation Export Logics... ---
         function updateTotals(subTotal, discountRate, targetCurrency, incoterms) {
             const discountAmount = subTotal * (discountRate / 100);
             const grandTotal = subTotal - discountAmount;
@@ -1653,6 +1668,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
         // ==========================================
         // 5. MEDIFAB AI ASSISTANT
         // ==========================================
+        // --- STREAMING_CHUNK:AI Chat Handler Loading... ---
         function toggleChat() {
             const chatContainer = document.getElementById('ai-chat-container'), fab = document.getElementById('ai-fab');
             if (chatContainer.classList.contains('hidden')) {
