@@ -619,7 +619,8 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 if (dbProducts) {
                     dbProducts.forEach(product => {
                         let displayName = product.name_en;
-                        if (displayName && displayName.includes("Core impact (BK/WH/DW/BG)")) displayName = displayName.replace("Core impact (BK/WH/DW/BG)", "Core impact (WH/PK/DW/BK)");
+                        if (displayName && displayName.includes("Core impact (BK/WH/DW/BG)")) displayName = displayName.replace("Core impact (BK/WH/DW/BG)", "Core impact (WH/PK/DW/BK/BG)");
+                        if (displayName && displayName.includes("Core impact (WH/PK/DW/BK)")) displayName = displayName.replace("Core impact (WH/PK/DW/BK)", "Core impact (WH/PK/DW/BK/BG)");
                         if (displayName && displayName.includes("Core impact PK")) return; 
                         if (displayName && displayName.includes("Cellular water ampoule booster 50ml")) displayName = displayName.replace("Cellular water ampoule booster 50ml", "Cellular water ampoule booster 60ml");
                         product.display_name = displayName;
@@ -905,7 +906,14 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             // Cosmetic Data
             (globalUniqueProducts || []).forEach(p => {
                 if (!p || !p.display_name) return;
-                const fullName = `[Beauty] ${p.display_name}`;
+                
+                let prefix = '[Beauty]';
+                const lowerName = p.display_name.toLowerCase();
+                if (lowerName.includes('core impact') || lowerName.includes('hyper shot')) {
+                    prefix = '[Device]';
+                }
+                
+                const fullName = `${prefix} ${p.display_name}`;
                 if (!addedNames.has(fullName)) {
                     allProductsList.push({ id: 'cos_' + p.display_name, name: fullName, type: 'cosmetic', raw: p });
                     addedNames.add(fullName);
@@ -967,6 +975,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             } else if (field === 'productId') {
                 item.productId = value;
                 item.customName = '';
+                item.color = ''; // 상품 변경 시 기존에 선택된 색상 초기화
                 item.priceTier = 'auto';
                 item.manualPrice = false;
                 
@@ -1180,6 +1189,22 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                     let displayItemName = item.productId === 'CUSTOM' ? (item.customName || 'Custom Item') : (prodObj ? prodObj.name : '');
                     const formattedUnitPrice = Math.round(appliedUnitPrice || Number(item.unitPrice)).toString();
 
+                    let colorInputHtml = '';
+                    const isCoreImpact = displayItemName.includes('Core impact');
+                    const isHyperShot = displayItemName.includes('Hyper shot');
+
+                    if (isCoreImpact) {
+                        const options = ['', 'WH', 'PK', 'DW', 'BK', 'BG'];
+                        let optsHtml = options.map(opt => `<option value="${opt}" ${item.color === opt ? 'selected' : ''}>${opt || 'Select Color'}</option>`).join('');
+                        colorInputHtml = `<select class="w-full border p-1 text-xs text-center outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" onchange="updateQuoteItem('${item.id}', 'color', this.value)">${optsHtml}</select>`;
+                    } else if (isHyperShot) {
+                        const options = ['', 'PK', 'BG'];
+                        let optsHtml = options.map(opt => `<option value="${opt}" ${item.color === opt ? 'selected' : ''}>${opt || 'Select Color'}</option>`).join('');
+                        colorInputHtml = `<select class="w-full border p-1 text-xs text-center outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" onchange="updateQuoteItem('${item.id}', 'color', this.value)">${optsHtml}</select>`;
+                    } else {
+                        colorInputHtml = `<input type="text" class="w-full border p-1 text-xs text-center outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" value="${escapeHtml(item.color)}" placeholder="None" onchange="updateQuoteItem('${item.id}', 'color', this.value)">`;
+                    }
+
                     tr.innerHTML = `
                         <td class="py-2 px-2 text-center print-only-cell hidden text-gray-700">${index + 1}</td>
                         <td class="py-2 px-2 text-center no-print"><button onclick="removeQuoteItem('${item.id}')" class="text-red-500 hover:text-red-700 font-bold px-2">&times;</button></td>
@@ -1191,7 +1216,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                             <div class="print-only hidden font-medium text-gray-900">${escapeHtml(displayItemName)}</div>
                         </td>
                         <td class="py-2 px-2 text-center align-top">
-                            <input type="text" class="w-full border p-1 text-xs text-center outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" value="${escapeHtml(item.color)}" placeholder="None" onchange="updateQuoteItem('${item.id}', 'color', this.value)">
+                            ${colorInputHtml}
                             <span class="print-only hidden">${escapeHtml(item.color) || '-'}</span>
                         </td>
                         <td class="py-2 px-2 text-center align-top">
