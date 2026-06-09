@@ -109,6 +109,26 @@
             .print-only-cell { display: table-cell !important; }
             .print-only-inline { display: inline !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+            /* Specific styles for legal contracts to ensure proper formatting */
+            .legal-contract {
+                font-family: 'Times New Roman', Times, serif;
+                font-size: 11pt;
+                line-height: 1.6;
+                color: #000;
+                text-align: justify;
+                max-width: 210mm;
+                margin: 0 auto;
+                padding: 20mm;
+            }
+            .legal-contract h1 { font-size: 16pt; text-align: center; font-weight: bold; margin-bottom: 24pt; text-transform: uppercase; }
+            .legal-contract h2 { font-size: 12pt; font-weight: bold; margin-top: 18pt; margin-bottom: 6pt; }
+            .legal-contract p { margin-bottom: 10pt; }
+            .legal-contract .clause { margin-left: 20pt; margin-bottom: 8pt; }
+            .legal-contract table { width: 100%; border-collapse: collapse; margin-top: 10pt; margin-bottom: 15pt; }
+            .legal-contract th, .legal-contract td { border: 1px solid #000; padding: 6pt; text-align: left; }
+            .legal-contract th { background-color: #f0f0f0; font-weight: bold; }
+            .page-break { page-break-before: always; }
         }
 
         .pdf-text-section h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 6px; margin-top: 16px; color: #111827; }
@@ -669,6 +689,209 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
                 </div>
             </div>
         </div>
+
+        <!-- ========================================================= -->
+        <!-- 6. STANDARD CONTRACT SYSTEM (Independent)                 -->
+        <!-- ========================================================= -->
+        <div id="contract-system-section" class="mt-16 pt-8 border-t-2 border-gray-900 print-active-section">
+            <div class="no-print mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+                    <div>
+                        <h2 class="text-2xl text-emerald-900 font-montserrat uppercase tracking-wider font-bold">Standard Contract System</h2>
+                        <p class="text-sm text-emerald-700 mt-1">Generate Distributorship Agreements based on OEM-capable Medical Aesthetic Products.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="printContract()" class="px-6 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-sm tracking-widest uppercase font-medium transition-colors shadow-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                            Generate & Print Contract
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 1: Configuration -->
+                <div class="bg-gray-50 border border-gray-200 p-6 mb-6">
+                    <h3 class="font-bold text-gray-900 mb-4 border-l-4 border-emerald-600 pl-2 text-lg">1. Contract Configuration</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <!-- Contract Type -->
+                        <div class="md:col-span-1 bg-white p-4 border border-gray-200 shadow-sm">
+                            <label class="block text-sm font-bold text-gray-800 mb-2">Contract Type <span class="text-red-500">*</span></label>
+                            <select id="contract-type" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" onchange="handleContractTypeChange()">
+                                <option value="simple">Simple Distribution (단순 유통)</option>
+                                <option value="exclusive">Exclusive Distribution (독점 유통)</option>
+                                <option value="odm">OEM/ODM Agreement (ODM 계약)</option>
+                            </select>
+                            <p class="text-[10px] text-gray-500 mt-1">Determines exclusivity clauses and terminology.</p>
+                        </div>
+                        
+                        <!-- Contract Terms -->
+                        <div class="md:col-span-2 bg-white p-4 border border-gray-200 shadow-sm grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-2">Contract Validity (Years)</label>
+                                <input type="number" id="contract-years" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" value="3" min="1">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-2">Down Payment (USD)</label>
+                                <input type="number" id="contract-downpayment" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" value="10000" min="0" onchange="updateAnnexDownPayment(this.value)">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-2">Advance Payment (%)</label>
+                                <input type="number" id="contract-advance-pct" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" value="50" min="0" max="100">
+                                <p class="text-[10px] text-gray-500 mt-1">Paid upon Proforma Invoice receipt.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-800 mb-2">Min. Qty per Order (Units)</label>
+                                <input type="number" id="contract-min-order" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" value="1000" min="0" onchange="updateAnnexMinOrder(this.value)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distributor Info -->
+                    <div class="bg-white p-4 border border-gray-200 shadow-sm">
+                        <label class="block text-sm font-bold text-gray-800 mb-3">Distributor Information (Party B)</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <input type="text" id="contract-dist-name" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" placeholder="Company Name (e.g., ABC Medicals)">
+                            </div>
+                            <div>
+                                <input type="text" id="contract-dist-country" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" placeholder="Country / Territory">
+                            </div>
+                            <div>
+                                <input type="text" id="contract-dist-reg" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" placeholder="Business Registration Number">
+                            </div>
+                            <div>
+                                <input type="text" id="contract-dist-rep" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" placeholder="Representative Name">
+                            </div>
+                            <div class="md:col-span-2">
+                                <input type="text" id="contract-dist-address" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-emerald-600" placeholder="Full Legal Address">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: ANNEX I UI (The Core Focus) -->
+                <div class="bg-white border-2 border-gray-800 p-8 shadow-md relative">
+                    <div class="absolute top-0 right-0 bg-gray-800 text-white px-3 py-1 text-xs font-bold uppercase tracking-widest">ANNEX I PREVIEW</div>
+                    <h3 class="font-bold text-gray-900 mb-6 text-xl text-center font-montserrat underline underline-offset-4">ANNEX I</h3>
+                    
+                    <!-- 1. Down Payment -->
+                    <div class="mb-6">
+                        <h4 class="font-bold text-sm mb-2">1. Down Payment</h4>
+                        <table class="w-[300px] border-collapse text-sm">
+                            <tr>
+                                <td class="border border-gray-400 p-2 bg-gray-100 font-medium">Down Payment amount</td>
+                                <td class="border border-gray-400 p-2"><span id="annex-display-downpayment">10,000</span> USD</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- 2. Product Selection -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-end mb-2">
+                            <h4 id="annex-product-title" class="font-bold text-sm">2. Product, Private Label and pricing</h4>
+                            <button onclick="addContractProduct()" class="text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1 border border-emerald-300 transition-colors">+ Add Product</button>
+                        </div>
+                        <p id="annex-product-desc" class="text-xs text-gray-600 mb-2">2.1. All pricing is based on an individual unit price.<br>2.2. Pricing levels will be effective from the date of signing of this Agreement.<br>2.3. The Product and the Private Label is defined in the table below:</p>
+                        
+                        <table class="w-full border-collapse text-sm mb-2">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="border border-gray-400 p-2 text-center w-8">Del</th>
+                                    <th id="th-product-name" class="border border-gray-400 p-2">Original Product (OEM Base)</th>
+                                    <th id="th-private-label" class="border border-gray-400 p-2">Private Label Name</th>
+                                    <th class="border border-gray-400 p-2 w-32">Price (USD)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contract-product-tbody">
+                                <!-- Contract products injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 3. MOQ -->
+                    <div class="mb-6">
+                        <h4 class="font-bold text-sm mb-2">3. MOQ</h4>
+                        <p class="text-xs text-gray-600 mb-2">The date the first Purchase Order received by the MANUFACTURER will be the starting date for counting the MOQ years. The annual MOQ will be as follows:</p>
+                        <table class="w-full border-collapse text-sm text-center">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="border border-gray-400 p-2">MOQ Year 1</th>
+                                    <th class="border border-gray-400 p-2">MOQ Year 2</th>
+                                    <th class="border border-gray-400 p-2">MOQ Year 3</th>
+                                    <th class="border border-gray-400 p-2">MOQ Year 4</th>
+                                    <th class="border border-gray-400 p-2">MOQ Year 5</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="moq-y1" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="5000"></td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="moq-y2" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="10000"></td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="moq-y3" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="15000"></td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="moq-y4" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="20000"></td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="moq-y5" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="25000"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 4. FOC -->
+                    <div class="mb-6">
+                        <h4 class="font-bold text-sm mb-2">4. FOC</h4>
+                        <p class="text-xs text-gray-600 mb-2">DISTRIBUTOR will be provided with the following FOC each time the below conditions are met.</p>
+                        <table class="w-full border-collapse text-sm text-center">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="border border-gray-400 p-2 text-left">Condition</th>
+                                    <th class="border border-gray-400 p-2 w-20">FOC (%)</th>
+                                    <th class="border border-gray-400 p-2 w-24">FOC (qty)</th>
+                                    <th class="border border-gray-400 p-2 w-1/3">Delivery</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-gray-400 p-2 text-left">Achieve total order quantity of <span class="font-bold border-b border-gray-400 px-1" id="foc-cond-1">5,000</span> Unit within an MOQ Year 1</td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-pct-1" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="5"></td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-qty-1" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="250"></td>
+                                    <td class="border border-gray-400 p-2 text-left text-xs" rowspan="5">FOC to be delivered with the corresponding Order that meets the condition</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-400 p-2 text-left">Achieve total order quantity of <span class="font-bold border-b border-gray-400 px-1" id="foc-cond-2">10,000</span> Unit within an MOQ Year 2</td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-pct-2" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="5"></td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-qty-2" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="500"></td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-400 p-2 text-left">Achieve total order quantity of <span class="font-bold border-b border-gray-400 px-1" id="foc-cond-3">15,000</span> Unit within an MOQ Year 3</td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-pct-3" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="5"></td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-qty-3" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="750"></td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-400 p-2 text-left">Achieve total order quantity of <span class="font-bold border-b border-gray-400 px-1" id="foc-cond-4">20,000</span> Unit within an MOQ Year 4</td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-pct-4" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="5"></td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-qty-4" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="1000"></td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-gray-400 p-2 text-left">Achieve total order quantity of <span class="font-bold border-b border-gray-400 px-1" id="foc-cond-5">25,000</span> Unit within an MOQ Year 5</td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-pct-5" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="5"></td>
+                                    <td class="border border-gray-400 p-1"><input type="number" id="foc-qty-5" class="w-full text-center border-none focus:ring-1 focus:ring-emerald-500 p-1" value="1250"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 5. Min Order -->
+                    <div>
+                        <h4 class="font-bold text-sm mb-1">5. Minimum quantity per order</h4>
+                        <p class="text-sm">The minimum quantity per order will be <span id="annex-display-minorder" class="font-bold border-b border-gray-400 px-1">1,000</span> units for each product type of the Private Label.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Print Area (Hidden in UI, displayed when window.print is called) -->
+            <div id="contract-print-area" class="print-area-wrapper bg-white mx-auto print-only">
+                <!-- Contract content generated by JS will go here -->
+            </div>
+        </div>
+
     </div>
 
     <!-- AI Chat UI -->
@@ -931,9 +1154,9 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             renderMedicalTableData();
             renderRawMaterialsTableData();
             initQuotationSystem();
+            initContractSystem(); // Initialize the new contract system
         }
 
-        // --- Defining UI Helpers and Callbacks... ---
         function changeExchangeRate(val) {
             appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
             renderTableData();
@@ -1696,6 +1919,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             // Active section switching for smart printing
             document.getElementById('quotation-section').classList.add('print-active-section');
             document.getElementById('raw-quotation-section').classList.remove('print-active-section');
+            document.getElementById('contract-system-section').classList.remove('print-active-section');
 
             const comp = document.getElementById('cust-company').value.trim();
             const nationality = document.getElementById('cust-nationality').value.trim();
@@ -1992,6 +2216,7 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             // Active section switching for smart printing
             document.getElementById('raw-quotation-section').classList.add('print-active-section');
             document.getElementById('quotation-section').classList.remove('print-active-section');
+            document.getElementById('contract-system-section').classList.remove('print-active-section');
 
             const comp = document.getElementById('raw-cust-company').value.trim();
             const nationality = document.getElementById('raw-cust-nationality').value.trim();
@@ -2028,56 +2253,522 @@ Beneficiary Address : #1-417, 418, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, R
             setTimeout(() => { document.title = originalTitle; }, 1000);
         }
 
-        async function shareRawViaEmail() {
-            if (rawQuoteItems.length === 0) { showToast('Please add items to the quotation before sharing.', 'error'); return; }
+        // ==========================================
+        // 6. STANDARD CONTRACT SYSTEM LOGIC
+        // ==========================================
+        let contractProductsData = [];
+        let contractProducts = [];
+        let contractIdCounter = 0;
 
-            setButtonLoading('btn-share-raw', true);
+        function buildContractProductsData() {
+            const type = document.getElementById('contract-type').value;
+            contractProductsData = [];
+            const addedNames = new Set();
+            
+            if (type === 'odm') {
+                globalMedicalProducts.forEach(p => {
+                    if (!p || !p.item) return;
+                    if (!addedNames.has(p.item)) {
+                        contractProductsData.push({
+                            id: 'med_' + p.item,
+                            name: p.item,
+                            defaultPrice: p.oem_10000 || p.dist_10000 || p.dist_5000 || 0,
+                            type: 'medical'
+                        });
+                        addedNames.add(p.item);
+                    }
+                });
+            } else {
+                globalUniqueProducts.forEach(p => {
+                    if (!p || !p.display_name) return;
+                    let prefix = '[Beauty]';
+                    if (p.display_name && (p.display_name.toLowerCase().includes('core impact') || p.display_name.toLowerCase().includes('hyper shot'))) prefix = '[Device]';
+                    const fullName = `${prefix} ${p.display_name}`;
+                    
+                    if (!addedNames.has(fullName)) {
+                        const pricesArray = Array.isArray(p.product_prices) ? p.product_prices : [];
+                        const usdPrice = pricesArray.find(pr => pr.currency === 'USD') || {};
+                        contractProductsData.push({
+                            id: 'cos_' + p.display_name,
+                            name: fullName,
+                            defaultPrice: usdPrice.b2b_tier1_1_to_10_ct || usdPrice.b2c_msrp || 0,
+                            type: 'cosmetic'
+                        });
+                        addedNames.add(fullName);
+                    }
+                });
+                globalMedicalProducts.forEach(p => {
+                    if (!p || !p.item) return;
+                    const fullName = `[Medical] ${p.item}`;
+                    if (!addedNames.has(fullName)) {
+                        contractProductsData.push({
+                            id: 'med_' + p.item,
+                            name: fullName,
+                            defaultPrice: p.dist_1000 || p.clinic_msrp || 0,
+                            type: 'medical'
+                        });
+                        addedNames.add(fullName);
+                    }
+                });
+            }
+        }
 
-            const quoteNo = document.getElementById('raw-quote-no').textContent;
-            const targetCurrency = currentCurrency;
-            const curLabel = targetCurrency === 'USD' ? '$' : '₩';
-            const grandTotal = document.getElementById('raw-quote-grandtotal').textContent;
-            const incoterms = document.getElementById('raw-quote-incoterms').value;
-            const custName = document.getElementById('raw-cust-name').value.trim();
+        function handleContractTypeChange() {
+            buildContractProductsData();
+            contractProducts = []; 
+            renderContractProducts();
+        }
 
-            const subject = `[MEDIFAB] Official Quotation for Proprietary Raw Materials - ${quoteNo}`;
-            let body = `Hello ${custName ? custName : 'there'},\n\nWe are pleased to submit the following official offer for our high-purity, bio-engineered raw materials.\n\n`;
-            body += `[Quotation No: ${quoteNo}]\n`;
-            body += `[Currency: ${targetCurrency}]\n`;
-            body += `[Incoterms: ${incoterms}]\n\n`;
+        function initContractSystem() {
+            handleContractTypeChange();
 
-            rawQuoteItems.forEach((item, index) => {
-                const rawObj = globalRawMaterials.find(p => p.id === item.rawId);
-                const displayItemName = rawObj ? rawObj.product_name : 'Unknown Item';
-                const gradeFormUnit = rawObj ? `(${rawObj.grade} / ${rawObj.form} / ${rawObj.unit})` : '';
-                
-                body += `${index + 1}. ${displayItemName} ${gradeFormUnit}\n`;
-                body += `   - Quantity: ${item.qty}\n`;
-                body += `   - Unit Price: ${curLabel}${formatQuoteNumber(item.unitPrice)}\n\n`;
+            // Initial render
+            updateAnnexDownPayment(document.getElementById('contract-downpayment').value);
+            updateAnnexMinOrder(document.getElementById('contract-min-order').value);
+            
+            // Add listeners to sync FOC conditions with MOQ values
+            for(let i=1; i<=5; i++) {
+                document.getElementById(`moq-y${i}`).addEventListener('input', function(e) {
+                    document.getElementById(`foc-cond-${i}`).textContent = new Intl.NumberFormat().format(e.target.value);
+                });
+                // Initial sync
+                document.getElementById(`foc-cond-${i}`).textContent = new Intl.NumberFormat().format(document.getElementById(`moq-y${i}`).value);
+            }
+        }
+
+        function updateAnnexDownPayment(val) {
+            const num = parseFloat(val) || 0;
+            document.getElementById('annex-display-downpayment').textContent = new Intl.NumberFormat('en-US').format(num);
+        }
+
+        function updateAnnexMinOrder(val) {
+            const num = parseInt(val, 10) || 0;
+            document.getElementById('annex-display-minorder').textContent = new Intl.NumberFormat('en-US').format(num);
+        }
+
+        function addContractProduct() {
+            contractIdCounter++;
+            contractProducts.push({
+                id: 'cp_' + contractIdCounter,
+                productId: '',
+                privateLabelName: '',
+                price: 0
+            });
+            renderContractProducts();
+        }
+
+        function removeContractProduct(id) {
+            contractProducts = contractProducts.filter(p => p.id !== id);
+            renderContractProducts();
+        }
+
+        function updateContractProduct(id, field, value) {
+            const prod = contractProducts.find(p => p.id === id);
+            if (!prod) return;
+
+            if (field === 'productId') {
+                prod.productId = value;
+                const source = contractProductsData.find(p => p.id === value);
+                if (source) prod.price = source.defaultPrice;
+            } else if (field === 'price') {
+                prod.price = parseFloat(value) || 0;
+            } else {
+                prod[field] = value;
+            }
+            renderContractProducts();
+        }
+
+        function renderContractProducts() {
+            const type = document.getElementById('contract-type').value;
+            const isOdm = type === 'odm';
+            
+            document.getElementById('annex-product-title').textContent = isOdm ? '2. Product, Private Label and pricing' : '2. Product and pricing';
+            document.getElementById('annex-product-desc').innerHTML = isOdm 
+                ? '2.1. All pricing is based on an individual unit price.<br>2.2. Pricing levels will be effective from the date of signing of this Agreement.<br>2.3. The Product and the Private Label is defined in the table below:'
+                : '2.1. All pricing is based on an individual unit price.<br>2.2. Pricing levels will be effective from the date of signing of this Agreement.<br>2.3. The Product is defined in the table below:';
+
+            document.getElementById('th-product-name').textContent = isOdm ? 'Original Product (OEM Base)' : 'Product Name';
+            document.getElementById('th-private-label').style.display = isOdm ? 'table-cell' : 'none';
+
+            const tbody = document.getElementById('contract-product-tbody');
+            tbody.innerHTML = '';
+
+            if (contractProducts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${isOdm ? 4 : 3}" class="border border-gray-400 p-4 text-center text-gray-500 text-xs italic">No products added. Click "+ Add Product".</td></tr>`;
+                return;
+            }
+
+            let optionsHtml = '<option value="">Select Product...</option>';
+            contractProductsData.forEach(p => {
+                optionsHtml += `<option value="${p.id}">${escapeHtml(p.name)}</option>`;
             });
 
-            body += `----------------------------------------\n`;
-            body += `GRAND TOTAL: ${curLabel}${grandTotal}\n`;
-            body += `----------------------------------------\n\n`;
+            contractProducts.forEach(prod => {
+                const tr = document.createElement('tr');
+                let rowHtml = `
+                    <td class="border border-gray-400 p-1 text-center"><button onclick="removeContractProduct('${prod.id}')" class="text-red-500 hover:text-red-700 text-lg leading-none">&times;</button></td>
+                    <td class="border border-gray-400 p-1">
+                        <select class="w-full border-none focus:ring-1 focus:ring-emerald-500 p-1 text-sm bg-transparent" onchange="updateContractProduct('${prod.id}', 'productId', this.value)">
+                            ${optionsHtml.replace(`value="${prod.productId}"`, `value="${prod.productId}" selected`)}
+                        </select>
+                    </td>
+                `;
+                
+                if (isOdm) {
+                    rowHtml += `
+                        <td class="border border-gray-400 p-1">
+                            <input type="text" class="w-full border-none focus:ring-1 focus:ring-emerald-500 p-1 text-sm bg-transparent" placeholder="Enter brand name..." value="${escapeHtml(prod.privateLabelName)}" onchange="updateContractProduct('${prod.id}', 'privateLabelName', this.value)">
+                        </td>
+                    `;
+                }
+                
+                rowHtml += `
+                    <td class="border border-gray-400 p-1">
+                        <input type="number" class="w-full border-none focus:ring-1 focus:ring-emerald-500 p-1 text-sm bg-transparent text-right" value="${prod.price}" onchange="updateContractProduct('${prod.id}', 'price', this.value)">
+                    </td>
+                `;
+                tr.innerHTML = rowHtml;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function generateContractHTML() {
+            // Collect Data
+            const type = document.getElementById('contract-type').value;
+            const years = document.getElementById('contract-years').value || 3;
+            const downPayment = document.getElementById('contract-downpayment').value || 0;
+            const advPct = document.getElementById('contract-advance-pct').value || 50;
+            const remPct = 100 - advPct;
+            const minOrder = document.getElementById('contract-min-order').value || 0;
+
+            const distName = document.getElementById('contract-dist-name').value.trim() || '[Distributor Company Name]';
+            const distCountry = document.getElementById('contract-dist-country').value.trim() || '[Country/Territory]';
+            const distReg = document.getElementById('contract-dist-reg').value.trim() || '[Registration No.]';
+            const distRep = document.getElementById('contract-dist-rep').value.trim() || '[Representative Name]';
+            const distAddress = document.getElementById('contract-dist-address').value.trim() || '[Distributor Address]';
+
+            const today = new Date();
+            const dateStr = `${today.getDate()} day of ${today.toLocaleString('default', { month: 'long' })}, ${today.getFullYear()}`;
+
+            const isExclusive = type === 'exclusive';
+            const isOdm = type === 'odm';
             
-            body += `[Commercial Terms]\n`;
-            body += `- Payment Terms: 100% T/T (Wire Transfer) in advance\n`;
-            body += `- Lead Time: Standard lead time is 4 to 6 weeks upon receipt of a firm PO\n`;
-            body += `- Shipping Terms: ${incoterms} Incheon/Seoul, South Korea.\n\n`;
+            const contractTitle = isExclusive ? 'EXCLUSIVE DISTRIBUTORSHIP AGREEMENT' : 
+                                 (isOdm ? 'OEM/ODM MANUFACTURING AND DISTRIBUTION AGREEMENT' : 'DISTRIBUTORSHIP AGREEMENT');
+            const roleStr = isExclusive ? 'exclusive distributor' : 'distributor';
+            
+            const annexTitle2 = isOdm ? "2. Product, Private Label and Pricing" : "2. Product and Pricing";
+            const annexParagraph = isOdm 
+                ? "<p>2.3. The Product and the Private Label is defined in the table below:</p>"
+                : "<p>2.3. The Product is defined in the table below:</p>";
 
-            body += `If you require further technical dossiers or have custom formulation inquiries, please let us know.\n\n`;
-            body += `Best regards,\nMEDIFAB Co., Ltd.`;
+            let tableHeader = isOdm 
+                ? `<tr><th>Brand</th><th>Type</th><th>Model</th><th>Private Label</th><th>Price (USD)</th></tr>`
+                : `<tr><th>Category</th><th>Product Name</th><th>Price (USD)</th></tr>`;
+            
+            // Build Product Rows for Annex I
+            let productRowsHTML = '';
+            if (contractProducts.length > 0) {
+                contractProducts.forEach(p => {
+                    const source = contractProductsData.find(src => src.id === p.productId);
+                    const baseName = source ? source.name : 'Unknown Base';
+                    if (isOdm) {
+                        const brandName = p.privateLabelName || '[Not Specified]';
+                        productRowsHTML += `
+                            <tr>
+                                <td>${escapeHtml(brandName)}</td>
+                                <td>Fillers</td>
+                                <td>${escapeHtml(baseName)}</td>
+                                <td>${escapeHtml(brandName)}</td>
+                                <td>${p.price}</td>
+                            </tr>
+                        `;
+                    } else {
+                        const cat = source ? (source.type === 'medical' ? 'Medical' : 'Cosmetic') : '-';
+                        productRowsHTML += `
+                            <tr>
+                                <td>${cat}</td>
+                                <td>${escapeHtml(baseName)}</td>
+                                <td>${p.price}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            } else {
+                productRowsHTML = `<tr><td colspan="${isOdm ? 5 : 3}" style="text-align:center;">[No products selected in UI]</td></tr>`;
+            }
 
-            const saved = await saveRawQuotationToDB();
-            if(saved) showToast('Raw Quotation successfully saved to database.', 'success');
+            // HTML Template for Contract
+            let contractHTML = `
+                <div class="legal-contract">
+                    <h1>${contractTitle}</h1>
+                    <p>This Distribution Agreement and its Annex (hereinafter referred to as “Agreement”) is entered into this <strong>${dateStr}</strong>,</p>
+                    <p><strong>BETWEEN:</strong> Medifab Co., Ltd.<br>
+                    (Hereinafter referred to as “MANUFACTURER”) a company organized and existing under the laws of the Republic of Korea, with its legal place of business at Room 417, Daeryung Techno Town 20th, 5, Gasan digital 1-ro, Geumcheon-gu, Seoul, Republic of Korea, duly represented by Mr. WONJONG SIN</p>
+                    <p><strong>AND:</strong> ${escapeHtml(distName)}<br>
+                    (Hereinafter referred to as “DISTRIBUTOR”), a company organized and existing under the laws of ${escapeHtml(distCountry)} with its legal place of business at ${escapeHtml(distAddress)}, and business registration number ${escapeHtml(distReg)}, duly represented by ${escapeHtml(distRep)}.</p>
+                    
+                    <p>The MANUFACTURER and the DISTRIBUTOR will be collectively referred to as PARTIES and individually as PARTY.</p>
+                    <p style="text-align:center; font-weight:bold; margin: 20pt 0;">[WITNESSETH]</p>
+                    <p>WHEREAS, MANUFACTURER, as the producer of the Product, wishes to appoint DISTRIBUTOR as the ${roleStr} for [Private Label] in the Territory as defined in ANNEX 1 of this Agreement.</p>
+                    <p>WHEREAS, DISTRIBUTOR wishes to accept such appointment as the ${roleStr}.</p>
+                    <p>NOW THEREFORE, in consideration of the principle of reciprocity and mutual benefit contained herein, the Parties hereto agree as follows:</p>
 
-            const mailtoLink = `mailto:${document.getElementById('raw-cust-email').value || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            setButtonLoading('btn-share-raw', false);
-            window.location.href = mailtoLink;
+                    <h2>Article 1┃ Definitions</h2>
+                    <p>In this Agreement except where the context otherwise requires, the following terms and expressions shall have the meanings respectively defined as follows:</p>
+                    <div class="clause">
+                        <p>“Agreement” shall mean this agreement with all the terms for the contract of ${contractTitle} and its Annex.</p>
+                        <p>“Delivery Point” means MANUFACTURER’s facilities at EXW or FOB as agreed per order.</p>
+                        <p>“FOC” means Free of Charge, products provided by the MANUFACTURER to the DISTRIBUTOR with no costs under conditions defined in ANNEX 1 of this Agreement.</p>
+                        <p>“MOQ” means minimum order quantity per year as defined in ANNEX 1 of this Agreement.</p>
+                        <p>“MOQ Year” shall mean each year counted from the date of obtaining legal registration in the Territory or upon receipt by the MANUFACTURER of the first Purchase Order for Territories that do not need legal registration of the Product.</p>
+                        <p>“Private Label” shall mean the Product manufactured by the MANUFACTURER but delivered in the brand name of the DISTRIBUTOR’s choice as defined in ANNEX 1 of this agreement, to be supplied by the MANUFACTURER to the DISTRIBUTOR under this Agreement.</p>
+                        <p>“Product” shall mean the product, as defined in ANNEX 1 of this Agreement, to be supplied by the MANUFACTURER to the DISTRIBUTOR under this Agreement.</p>
+                        <p>“Territory” shall mean solely <strong>${escapeHtml(distCountry)}</strong>.</p>
+                        <p>“Trademark” means any trademark, logo, service mark or other commercial designation, whether or not registered, used to represent or describe the Private Label of the MANUFACTURER.</p>
+                    </div>
+
+                    <h2>Article 2┃ Appointment and Acceptance</h2>
+                    <div class="clause">
+                        <p>2.1 During the term and subject to the conditions hereinafter set forth, MANUFACTURER hereby appoints DISTRIBUTOR as an ${roleStr} for Private Label in Territory, and DISTRIBUTOR accepts such appointment during the term of this Agreement. ${isExclusive ? 'MANUFACTURER shall not either directly or indirectly sell Private Label in Territory without the prior consent of DISTRIBUTOR.' : ''}</p>
+                        ${isExclusive ? '<p>2.2 MANUFACTURER shall not either directly or indirectly sell the product equal to Private Label in Territory without the prior consent of DISTRIBUTOR.</p>' : ''}
+                        <p>${isExclusive ? '2.3' : '2.2'} The ${isExclusive ? 'exclusive ' : ''}distribution right may cease at the end of the year, in which the DISTRIBUTOR fails to meet the annual MOQ requirements as specified in Article 8.1 and ANNEX 1 of this Agreement.</p>
+                        ${isExclusive ? '<p>2.4 Without the prior written consent of MANUFACTURER, DISTRIBUTOR, its subsidiary or affiliate shall not manufacture, distribute, purchase, sell, resell or otherwise handle products which, in the reasonable opinion of MANUFACTURER, compete with the Private Label.</p>' : ''}
+                    </div>
+
+                    <h2>Article 3┃ Relationship of Parties</h2>
+                    <div class="clause">
+                        <p>3.1 DISTRIBUTOR is an independent contractor and is not the legal representative or agent of the MANUFACTURER for any purpose and shall have no right to authority (except as expressly provided in this Agreement) to incur, assume or create in writing or otherwise, any warranty over any of MANUFACTURER’s employees, all of whom are entirely under the control of the MANUFACTURER, who shall be responsible for their acts and omissions. Within the scope of the Agreement, the DISTRIBUTOR shall dispose freely of its activities and business hours and shall itself procure the necessary means of operations.</p>
+                        <p>3.2 The DISTRIBUTOR shall purchase and sell the Product in its own name and for its own account.</p>
+                        <p>3.3 Nothing contained in this Agreement shall be deemed to create any partnership or joint venture relationship between the parties.</p>
+                    </div>
+
+                    <h2>Article 4┃ DISTRIBUTOR’s Duties and Responsibilities</h2>
+                    <div class="clause">
+                        <p>4.1 DISTRIBUTOR shall provide a Down Payment, as defined in ANNEX 1 of this Agreement within 30 days of signing of this contract in payment terms of T/T to the MANUFACTURER to be used for preparations in the production of the Private Label. The Down Payment shall be paid to MANUFACTURER by the DISTRIBUTOR at the time of signing of this Agreement. Payment for the initial purchase order after execution of this Agreement shall be deducted from the Down Payment. The Down Payment will be returned to the DISTRIBUTOR as deduction from the purchase orders. Once the balance is met, the DISTRIBUTOR will follow normal payment as defined on Article 6 and Article 7.</p>
+                        <p>4.2 DISTRIBUTOR, on behalf of the MANUFACTURER, shall make legal registration of the Private Label as a medical device and as deemed proper by the laws applicable in the Territory at their own expenditure. The DISTRIBUTOR will provide a copy of the registration certificate to the MANUFACTURER once registration is complete.</p>
+                        <p>4.3 DISTRIBUTOR shall provide an Annual Purchase Plan within 30 days of signing of this Agreement and consequently at the beginning of each year. The Annual Purchase Plan will provide detailed order quantities by type of Private Label and by month that will meet the annual MOQ agreed upon in ANNEX 1. Any modifications or changes to the Annual Purchase Plan shall be notified immediately to the MANUFACTURER without delay.</p>
+                        <p>4.4 DISTRIBUTOR shall make appropriate changes to the Private Label packaging as deemed proper by the laws applicable in the Territory, including but not limited to sticker labels in the official language of the Territory.</p>
+                        <p>4.5 DISTRIBUTOR shall explore, develop, and promote the sale of Private Label and shall make good faith efforts to increase sales of Private Label within Territory. To achieve such purpose, DISTRIBUTOR will keep MANUFACTURER informed of the status of the sales progress, make recommendations and suggestions to MANUFACTURER, and assist and cooperate with MANUFACTURER.</p>
+                        <p>4.6 Without the prior written consent of MANUFACTURER, DISTRIBUTOR, its subsidiary or affiliate shall not, directly and indirectly, sell Private Label to any other areas than the said Territory.</p>
+                        <p>4.7 DISTRIBUTOR shall be responsible as the first point of contact for providing Private Label technical support to the customer and/or end-users on the correct use of Private Label based on information supplied by MANUFACTURER. DISTRIBUTOR shall establish and operate a direct line of communication to MANUFACTURER in all matters relevant to vigilance and/or post-market surveillance concerning the Private Label.</p>
+                        <p>4.8 The DISTRIBUTOR shall be obligated to regularly inform MANUFACTURER in detail about its activity, the names and addresses of its customers, the market situation in the Territory, customers’ requests, the popularity of the Product, the activities of competitors and any other circumstances which are important for the business success of the Product in the Territory.</p>
+                        <p>4.9 MANUFACTURER may, from time to time during the term of this Agreement, upon 30 days' notice to the DISTRIBUTOR, require the DISTRIBUTOR to discontinue the sale and/or distribution of one or more Products which MANUFACTURER may determine to be inappropriate or unsuitable for distribution in the Territory.</p>
+                    </div>
+
+                    <h2>Article 5┃ MANUFACTURER’s Duties and Responsibilities</h2>
+                    <div class="clause">
+                        <p>5.1 MANUFACTURER (a) shall use its best efforts to assist and cooperate with DISTRIBUTOR in the registration, developing and promoting the sale of the Private Label in Territory, (b) shall expeditiously provide any other materials, requested by DISTRIBUTOR necessary for DISTRIBUTOR’s performance of its duties under the Agreement, (c) shall also provide any information, which is now has or may be received by it in the future which is likely to be of interest, use, or benefit to DISTRIBUTOR to sales of Private Label in Territory, and (d) MANUFACTURER shall provide all necessary paperwork for DISTRIBUTOR’s import license to ${escapeHtml(distCountry)} without delay.</p>
+                        <p>5.2 MANUFACTURER will provide documents necessary for the registration of the Private Label in the English language.</p>
+                        ${isExclusive ? '<p>5.3 MANUFACTURER shall not sell Private Label in the Territory.</p>' : ''}
+                    </div>
+
+                    <h2>Article 6┃ Price, FOC and Payment</h2>
+                    <div class="clause">
+                        <p>6.1 Currency of the payment shall be in USD and the unit price is based on EXW or FOB as agreed. This price will not change during this Agreement unless mutually agreed.</p>
+                        <p>6.2 The FOC policy shall be as specified in ANNEX 1.</p>
+                        <p>6.3 All the payments shall be made by DISTRIBUTOR to MANUFACTURER by T/T in advance to MANUFACTURER's designated account.</p>
+                        <p>6.4 DISTRIBUTOR shall be liable for and shall pay any tax, duty, charge or any other impost of a similar nature imposed upon MANUFACTURER and/or DISTRIBUTOR, in accordance with the laws applicable in the Territory.</p>
+                    </div>
+
+                    <h2>Article 7┃ Orders and Shipments</h2>
+                    <div class="clause">
+                        <p>7.1 In placing orders with MANUFACTURER, DISTRIBUTOR shall clearly describe the products and quantity required in the Purchase Order. DISTRIBUTOR shall comply with minimum quantity per order as specified in ANNEX 1.</p>
+                        <p>7.2 MANUFACTURER shall issue a Proforma Invoice with the details of bank account and delivery date upon receipt of the Purchase Order of DISTRIBUTOR. <strong>${advPct}%</strong> payment in advance shall be transacted to the appointed bank account within 1 (one) week upon receipt of the Proforma Invoice. The remaining balance of <strong>${remPct}%</strong> shall be transacted before delivery of the Private Label.</p>
+                        <p>7.3 If the MANUFACTURER fails to deliver any or all of the products by the dates of delivery within the period specified in the Purchase Order, the DISTRIBUTOR may deduct from the Contract Price, as liquidated damages, 0.15% of the delivered price of the delayed products for each day until actual delivery up to 30% of the delivered price of the delayed products.</p>
+                        <p>7.4 All deliveries of Private Label sold by MANUFACTURER to DISTRIBUTOR pursuant to this Agreement shall be made based on agreed Delivery Point, and title to and risk of loss of Private Label shall pass from MANUFACTURER to DISTRIBUTOR at Delivery Point.</p>
+                    </div>
+
+                    <h2>Article 8┃ Minimum Purchase</h2>
+                    <div class="clause">
+                        <p>8.1 DISTRIBUTOR undertakes to purchase annual MOQ. The MOQ shall be as specified in ANNEX 1. For clarification, the purchased MOQ is the quantity which has been fully paid in each year by the DISTRIBUTOR to the MANUFACTURER.</p>
+                        <p>8.2 The minimum quantity per order during the Agreement period shall be as specified in ANNEX 1.</p>
+                        <p>8.3 If DISTRIBUTOR fails to purchase the minimum quantity as stipulated in Article 8.1, MANUFACTURER may terminate this Agreement as pursuant to Article 12.</p>
+                    </div>
+
+                    <div class="page-break"></div>
+
+                    <h2>Article 9┃ Term</h2>
+                    <div class="clause">
+                        <p>9.1 This Agreement shall become effective upon (i) execution of this Agreement AND (ii) full payment of Down Payment by the DISTRIBUTOR to the MANUFACTURER, and shall continue in full force and effect for the period of <strong>${years}</strong> years from the date the first Purchase Order is received by the Manufacturer. The term can be terminated during the Agreement period as pursuant to Article 12.</p>
+                        <p>9.2 This Agreement may be extended through mutual agreement between the Parties in written form. The Party who wishes to extend this Agreement may inform the other Party in written form within 60 (sixty) days before the date of termination of this Agreement and an addendum to this Agreement will be signed between both Parties.</p>
+                    </div>
+
+                    <h2>Article 10┃ Entire Agreement</h2>
+                    <p>This Agreement contains the entire understanding of the Parties and there are no commitments, agreements, or understandings between the Parties other than those expressly set forth herein. This Agreement shall not be altered, waived, modified, or amended except in writing signed by the parties hereto.</p>
+
+                    <h2>Article 11┃ Trademarks</h2>
+                    <div class="clause">
+                        <p>11.1 DISTRIBUTOR recognizes that any of trademarks, designs, copyrights, patent, trade secret and other proprietary rights (collectively, “Proprietary Rights”), used on or embodied in Private Label shall remain the exclusive property of MANUFACTURER or DISTRIBUTOR as agreed per Private Label ownership. DISTRIBUTOR shall not have or acquire any right, title or interest in MANUFACTURER's Proprietary Rights.</p>
+                        <p>11.2 DISTRIBUTOR shall not alter, deface, remove, cover or mutilate in any manner the trademark, serial or model numbers, brand or MANUFACTURER's name attached or affixed to any of Private Label, without the consent of MANUFACTURER. However with consent of MANUFACTURER, DISTRIBUTOR can use its own package with its own brand name within the borders of Territory.</p>
+                    </div>
+
+                    <h2>Article 12┃ Termination</h2>
+                    <div class="clause">
+                        <p>12.1 This Agreement may be terminated at the option of MANUFACTURER, effective upon 30 days prior written notice of termination given to DISTRIBUTOR, in the event any of the following occurs: (a) bankruptcy or insolvency of DISTRIBUTOR, (b) failure to obtain legal registration, (c) failure to meet annual MOQ requirements, (d) falsifying or tampering with the Private Label, (e) breach of assignment constraints.</p>
+                        <p>12.2 All payments owed to MANUFACTURER upon termination shall become immediately due and payable.</p>
+                        <p>12.3 This Agreement may be terminated at the option of DISTRIBUTOR, effective upon 30 days prior written notice, if MANUFACTURER fails to deliver goods repeatedly without notice or ceases operations.</p>
+                    </div>
+
+                    <h2>Article 13┃ Governing Law & Arbitration</h2>
+                    <div class="clause">
+                        <p>13.1 This Agreement shall be interpreted and governed by the laws of the Republic of Korea.</p>
+                        <p>13.2 All disputes, controversies or differences which may arise between the parties out of or in relation to or in connection with this Agreement or for the breach thereof shall be in the first instance resolved through friendly negotiations. If no settlement can be reached within thirty (30) days, the dispute shall be submitted to the Korean Commercial Arbitration Board in Seoul, Korea. The award rendered by the arbitrator(s) shall be final and binding.</p>
+                    </div>
+
+                    <p style="margin-top: 40pt;">IN WITNESS WHEREOF, the Parties hereto have caused this Agreement to be executed in two (2) originals as of the date first above written.</p>
+                    
+                    <table style="margin-top: 30pt; border: none;">
+                        <tr>
+                            <td style="border: none; width: 50%;">
+                                <p><strong>Signed for and on behalf of the MANUFACTURER</strong></p>
+                                <br><br><br>
+                                <p>Authorized Signature</p>
+                                <p>Name: WONJONG SIN</p>
+                                <p>Title: CEO</p>
+                            </td>
+                            <td style="border: none; width: 50%;">
+                                <p><strong>Signed for and on behalf of the DISTRIBUTOR</strong></p>
+                                <br><br><br>
+                                <p>Authorized Signature</p>
+                                <p>Name: ${escapeHtml(distRep)}</p>
+                                <p>Title: Representative</p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="page-break"></div>
+
+                    <h1 style="text-align:center; font-weight:bold;">ANNEX I</h1>
+                    
+                    <h3>1. Down Payment</h3>
+                    <table>
+                        <tr>
+                            <th style="width: 50%;">Down Payment amount</th>
+                            <td>${new Intl.NumberFormat('en-US').format(downPayment)} USD</td>
+                        </tr>
+                    </table>
+
+                    <h3>${annexTitle2}</h3>
+                    <p>2.1. All pricing is based on an individual unit price.</p>
+                    <p>2.2. Pricing levels will be effective from the date of signing of this Agreement.</p>
+                    ${annexParagraph}
+                    <table>
+                        ${tableHeader}
+                        ${productRowsHTML}
+                    </table>
+
+                    <h3>3. MOQ</h3>
+                    <p>The date the first Purchase Order received by the MANUFACTURER will be the starting date for counting the MOQ years. The annual MOQ will be as follows:</p>
+                    <table>
+                        <tr>
+                            <th>MOQ Year 1</th>
+                            <th>MOQ Year 2</th>
+                            <th>MOQ Year 3</th>
+                            <th>MOQ Year 4</th>
+                            <th>MOQ Year 5</th>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center">${new Intl.NumberFormat().format(document.getElementById('moq-y1').value || 0)}</td>
+                            <td style="text-align:center">${new Intl.NumberFormat().format(document.getElementById('moq-y2').value || 0)}</td>
+                            <td style="text-align:center">${new Intl.NumberFormat().format(document.getElementById('moq-y3').value || 0)}</td>
+                            <td style="text-align:center">${new Intl.NumberFormat().format(document.getElementById('moq-y4').value || 0)}</td>
+                            <td style="text-align:center">${new Intl.NumberFormat().format(document.getElementById('moq-y5').value || 0)}</td>
+                        </tr>
+                    </table>
+
+                    <h3>4. FOC</h3>
+                    <p>DISTRIBUTOR will be provided with the following FOC each time the below conditions are met.</p>
+                    <table>
+                        <tr>
+                            <th>Condition</th>
+                            <th>FOC (%)</th>
+                            <th>FOC (qty)</th>
+                            <th>Delivery</th>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order qty of ${new Intl.NumberFormat().format(document.getElementById('moq-y1').value || 0)} Unit within MOQ Year 1</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-1').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-1').value || 0}</td>
+                            <td rowspan="5" style="vertical-align:middle; text-align:center;">FOC to be delivered with the corresponding Order that meets the condition</td>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order qty of ${new Intl.NumberFormat().format(document.getElementById('moq-y2').value || 0)} Unit within MOQ Year 2</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-2').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-2').value || 0}</td>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order qty of ${new Intl.NumberFormat().format(document.getElementById('moq-y3').value || 0)} Unit within MOQ Year 3</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-3').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-3').value || 0}</td>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order qty of ${new Intl.NumberFormat().format(document.getElementById('moq-y4').value || 0)} Unit within MOQ Year 4</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-4').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-4').value || 0}</td>
+                        </tr>
+                        <tr>
+                            <td>Achieve total order qty of ${new Intl.NumberFormat().format(document.getElementById('moq-y5').value || 0)} Unit within MOQ Year 5</td>
+                            <td style="text-align:center">${document.getElementById('foc-pct-5').value || 0}%</td>
+                            <td style="text-align:center">${document.getElementById('foc-qty-5').value || 0}</td>
+                        </tr>
+                    </table>
+
+                    <h3>5. Minimum quantity per order</h3>
+                    <p>The minimum quantity per order will be <strong>${new Intl.NumberFormat('en-US').format(minOrder)}</strong> units for each product type of the Private Label.</p>
+                </div>
+            `;
+
+            if (!isOdm) {
+                contractHTML = contractHTML.replace(/\[Private Label\]/g, 'the Product');
+                contractHTML = contractHTML.replace(/Private Label/g, 'Product');
+            }
+
+            document.getElementById('contract-print-area').innerHTML = contractHTML;
+        }
+
+        function printContract() {
+            // Validate basic info
+            if (!document.getElementById('contract-dist-name').value.trim()) {
+                showToast('Please enter the Distributor Company Name.', 'error');
+                return;
+            }
+
+            // Generate HTML
+            generateContractHTML();
+
+            // Set active print section
+            document.getElementById('contract-system-section').classList.add('print-active-section');
+            document.getElementById('quotation-section').classList.remove('print-active-section');
+            document.getElementById('raw-quotation-section').classList.remove('print-active-section');
+
+            // Temporarily hide the UI part of the contract system for printing just the contract text
+            const contractUI = document.querySelector('#contract-system-section > .no-print');
+            const annexUI = document.querySelector('#contract-system-section > .bg-white.border-2');
+            
+            // Note: .no-print hides them automatically in print CSS, but since the annexUI isn't marked .no-print directly
+            // I should ensure only #contract-print-area is visible. 
+            // In the print CSS, I have `#main-content > div.print-active-section { display: block !important; }`
+            // and `print-only` elements are `display: block`.
+            
+            // To ensure the "screen-only" Annex I isn't printed alongside the real one:
+            annexUI.classList.add('no-print');
+
+            const comp = document.getElementById('contract-dist-name').value.trim();
+            const originalTitle = document.title;
+            const safeCompName = comp.replace(/[\/\\?%*:|"<>]/g, '').replace(/\s+/g, '_');
+            document.title = `Standard_Contract_${safeCompName}`;
+
+            window.print();
+            
+            setTimeout(() => { 
+                document.title = originalTitle; 
+                annexUI.classList.remove('no-print');
+            }, 1000);
         }
 
         // ==========================================
-        // 6. MEDIFAB AI ASSISTANT
+        // 7. MEDIFAB AI ASSISTANT
         // ==========================================
         function toggleChat() {
             const chatContainer = document.getElementById('ai-chat-container'), fab = document.getElementById('ai-fab');
