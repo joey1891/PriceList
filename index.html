@@ -78,12 +78,20 @@
         .med-product-img { width: 44px; height: 44px; object-fit: contain; }
         .placeholder-img { width: 36px; height: 36px; border-radius: 4px; background-color: #f3f4f6; border: 1px dashed #d1d5db; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px; font-weight: bold; }
 
+        /* Table Print Enhancements */
+        body.print-table-mode .unified-table { min-width: 0 !important; width: 100% !important; }
+        body.print-table-mode .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
+        body.print-table-mode .unified-table th, body.print-table-mode .unified-table td { padding: 6px 4px !important; font-size: 9px !important; line-height: 1.2 !important; }
+        body.print-table-mode .unified-table tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+        body.print-table-mode .unified-table thead { display: table-header-group !important; }
+        body.print-table-mode h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
+
         /* Print and Quotation Styles */
         .print-only, .print-only-cell, .print-only-inline { display: none; }
         
         @media print {
             body { background-color: #ffffff; margin: 0; padding: 0; }
-            #lock-screen, #ai-chat-container, #ai-fab, #toast-container, .no-print { display: none !important; }
+            #lock-screen, #toast-container, .no-print { display: none !important; }
             
             #main-content { padding: 0 !important; margin: 0 !important; display: block !important; }
             
@@ -109,6 +117,7 @@
             .print-only-cell { display: table-cell !important; }
             .print-only-inline { display: inline !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .page-break { page-break-before: always; }
         }
 
         .pdf-text-section h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 6px; margin-top: 16px; color: #111827; }
@@ -195,131 +204,149 @@
         </div>
 
         <!-- 1. Cosmetic Product Line -->
-        <div class="mt-2 flex justify-between items-end">
-            <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Beauty Device / Cosmetic Product Line</h2>
-        </div>
-        <div class="overflow-x-auto table-container bg-white mb-4">
-            <table class="w-full text-left border-collapse cosmetic-table unified-table">
-                <colgroup>
-                    <col style="width: 5%;"><col style="width: 25%;"><col style="width: 8%;"><col style="width: 8%;"><col style="width: 8%;">
-                    <col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;">
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-left bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Item</th>
-                        <th rowspan="3" class="py-3 px-4 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Vol.</th>
-                        <th rowspan="3" class="py-3 px-4 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Qty</th>
-                        <th rowspan="3" class="py-3 px-4 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">CT</th>
-                        <th colspan="2" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">B2C</th>
-                        <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">B2B Wholesale</th>
-                    </tr>
-                    <tr>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest font-light border-b border-gray-700">Promo</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1-10 CT</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10-30 CT</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">30+ CT</th>
-                    </tr>
-                    <tr>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">70%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">40%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">35%</th>
-                    </tr>
-                </thead>
-                <tbody id="price-table-body" class="bg-transparent">
-                    <tr class="loading-row"><td colspan="10" class="text-center py-10 text-black font-light text-sm italic">Fetching cosmetic data from server...</td></tr>
-                </tbody>
-            </table>
+        <div id="section-cosmetic" class="mb-8 mt-2">
+            <div class="flex justify-between items-end mb-3">
+                <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Beauty Device / Cosmetic Product Line</h2>
+                <button onclick="printTableSection('section-cosmetic', 'Cosmetics_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Print / PDF
+                </button>
+            </div>
+            <div class="overflow-x-auto table-container bg-white">
+                <table class="w-full text-left border-collapse cosmetic-table unified-table">
+                    <colgroup>
+                        <col style="width: 5%;"><col style="width: 25%;"><col style="width: 8%;"><col style="width: 8%;"><col style="width: 8%;">
+                        <col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;"><col style="width: 9.2%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
+                            <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-left bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Item</th>
+                            <th rowspan="3" class="py-3 px-4 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Vol.</th>
+                            <th rowspan="3" class="py-3 px-4 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Qty</th>
+                            <th rowspan="3" class="py-3 px-4 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">CT</th>
+                            <th colspan="2" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">B2C</th>
+                            <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">B2B Wholesale</th>
+                        </tr>
+                        <tr>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest font-light border-b border-gray-700">Promo</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1-10 CT</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10-30 CT</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">30+ CT</th>
+                        </tr>
+                        <tr>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">70%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">40%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">35%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="price-table-body" class="bg-transparent">
+                        <tr class="loading-row"><td colspan="10" class="text-center py-10 text-black font-light text-sm italic">Fetching cosmetic data from server...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- 2. Medical Aesthetic Product Line -->
-        <div class="mt-8 flex justify-between items-end">
-            <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Medical Aesthetic Product Line</h2>
-        </div>
-        <div class="overflow-x-auto table-container bg-white mb-4">
-            <table class="w-full text-left border-collapse unified-table">
-                <colgroup>
-                    <col style="width: 4%;"><col style="width: 16%;"><col style="width: 12%;">
-                    <col style="width: 7%;"><col style="width: 4%;"><col style="width: 4%;"><col style="width: 4%;"><col style="width: 4%;">
-                    <col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;">
-                    <col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;">
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Item</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Ingr.</th>
-                        <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Type</th>
-                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Pkg.</th>
-                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Vol.</th>
-                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Qty</th>
-                        <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">CT</th>
-                        <th colspan="2" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Clinic</th>
-                        <th colspan="4" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Distributor</th>
-                        <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">OEM</th>
-                    </tr>
-                    <tr>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">Promo</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">3,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">5,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">30,000</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">50,000</th>
-                    </tr>
-                    <tr>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">80%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">42%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">37%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">34%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">33%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">30%</th>
-                        <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">27%</th>
-                    </tr>
-                </thead>
-                <tbody id="medical-table-body" class="text-sm bg-transparent">
-                    <tr class="loading-row"><td colspan="17" class="text-center py-10 text-black font-light text-sm italic">Fetching medical data from server...</td></tr>
-                </tbody>
-            </table>
+        <div id="section-medical" class="mb-8 mt-8">
+            <div class="flex justify-between items-end mb-3">
+                <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Medical Aesthetic Product Line</h2>
+                <button onclick="printTableSection('section-medical', 'Medical_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Print / PDF
+                </button>
+            </div>
+            <div class="overflow-x-auto table-container bg-white">
+                <table class="w-full text-left border-collapse unified-table">
+                    <colgroup>
+                        <col style="width: 4%;"><col style="width: 16%;"><col style="width: 12%;">
+                        <col style="width: 7%;"><col style="width: 4%;"><col style="width: 4%;"><col style="width: 4%;"><col style="width: 4%;">
+                        <col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;">
+                        <col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
+                            <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Item</th>
+                            <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Ingr.</th>
+                            <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Type</th>
+                            <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Pkg.</th>
+                            <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Vol.</th>
+                            <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Qty</th>
+                            <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">CT</th>
+                            <th colspan="2" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Clinic</th>
+                            <th colspan="4" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Distributor</th>
+                            <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">OEM</th>
+                        </tr>
+                        <tr>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">Promo</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1,000</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">3,000</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">5,000</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">30,000</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">50,000</th>
+                        </tr>
+                        <tr>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">80%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">42%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">37%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">34%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">33%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">30%</th>
+                            <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">27%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="medical-table-body" class="text-sm bg-transparent">
+                        <tr class="loading-row"><td colspan="17" class="text-center py-10 text-black font-light text-sm italic">Fetching medical data from server...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- 3. Proprietary Raw Materials Product Line -->
-        <div class="mt-8 flex justify-between items-end">
-            <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Proprietary Raw Materials</h2>
-        </div>
-        <div class="overflow-x-auto table-container bg-white mb-12">
-            <table class="w-full text-left border-collapse unified-table">
-                <colgroup>
-                    <col style="width: 5%;">   <!-- Img -->
-                    <col style="width: 15%;">  <!-- Name -->
-                    <col style="width: 25%;">  <!-- Active Ingredient -->
-                    <col style="width: 15%;">  <!-- Grade -->
-                    <col style="width: 10%;">  <!-- Form -->
-                    <col style="width: 15%;">  <!-- Unit -->
-                    <col style="width: 15%;">  <!-- Price -->
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
-                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Product Name</th>
-                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Active Ingredient(s)</th>
-                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Grade</th>
-                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Form</th>
-                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Unit</th>
-                        <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Unit Price</th>
-                    </tr>
-                </thead>
-                <tbody id="raw-materials-table-body" class="text-sm bg-transparent">
-                    <tr class="loading-row"><td colspan="7" class="text-center py-10 text-black font-light text-sm italic">Fetching raw materials data...</td></tr>
-                </tbody>
-            </table>
+        <div id="section-raw" class="mb-12 mt-8">
+            <div class="flex justify-between items-end mb-3">
+                <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Proprietary Raw Materials</h2>
+                <button onclick="printTableSection('section-raw', 'RawMaterials_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Print / PDF
+                </button>
+            </div>
+            <div class="overflow-x-auto table-container bg-white">
+                <table class="w-full text-left border-collapse unified-table">
+                    <colgroup>
+                        <col style="width: 5%;">   <!-- Img -->
+                        <col style="width: 15%;">  <!-- Name -->
+                        <col style="width: 25%;">  <!-- Active Ingredient -->
+                        <col style="width: 15%;">  <!-- Grade -->
+                        <col style="width: 10%;">  <!-- Form -->
+                        <col style="width: 15%;">  <!-- Unit -->
+                        <col style="width: 15%;">  <!-- Price -->
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
+                            <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Product Name</th>
+                            <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Active Ingredient(s)</th>
+                            <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Grade</th>
+                            <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Form</th>
+                            <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Unit</th>
+                            <th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Unit Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="raw-materials-table-body" class="text-sm bg-transparent">
+                        <tr class="loading-row"><td colspan="7" class="text-center py-10 text-black font-light text-sm italic">Fetching raw materials data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- ========================================================= -->
@@ -333,10 +360,6 @@
                     <div class="space-x-2 flex">
                         <button onclick="addQuoteItem()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium transition-colors">+ Add Item</button>
                         <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
-                        <button id="btn-share" onclick="shareViaEmail()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            Share (Email)
-                        </button>
                     </div>
                 </div>
                 
@@ -631,19 +654,6 @@ Beneficiary : MediFab Co., LTD</div>
                 toast.classList.add('translate-y-full', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
-        }
-
-        function setButtonLoading(buttonId, isLoading) {
-            const btn = document.getElementById(buttonId);
-            if (!btn) return;
-            if (isLoading) {
-                if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
-                btn.disabled = true;
-                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...`;
-            } else {
-                btn.disabled = false;
-                if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
-            }
         }
 
         function openImageModal(imgSrc) {
@@ -1205,7 +1215,6 @@ Beneficiary : MediFab Co., LTD</div>
             const warningEl = document.getElementById('foc-warning');
             const warningTextEl = document.getElementById('foc-warning-text');
             const btnPrint = document.getElementById('btn-print');
-            const btnShare = document.getElementById('btn-share');
             const curLabel = currency === 'USD' ? '$' : '₩';
             
             if (focTotal > 0 && subTotal === 0) {
@@ -1215,7 +1224,7 @@ Beneficiary : MediFab Co., LTD</div>
             } else {
                 warningEl.classList.add('hidden'); window.isFocLimitExceeded = false;
             }
-            btnPrint.disabled = window.isFocLimitExceeded; btnShare.disabled = window.isFocLimitExceeded;
+            btnPrint.disabled = window.isFocLimitExceeded;
         }
 
         function renderQuoteTable() {
@@ -1413,6 +1422,41 @@ Beneficiary : MediFab Co., LTD</div>
             document.title = `RawMaterials_Quotation`;
             window.print();
             setTimeout(() => { document.title = originalTitle; }, 1000);
+        }
+
+        function printTableSection(sectionId, titleName) {
+            document.body.classList.add('print-table-mode');
+            
+            // Inject style to enforce Landscape mode specifically for tables
+            const style = document.createElement('style');
+            style.id = 'print-landscape-style';
+            style.innerHTML = '@media print { @page { size: landscape; margin: 10mm; } #main-content { padding: 0 !important; gap: 0 !important; max-width: 100% !important; } }';
+            document.head.appendChild(style);
+
+            // Hide all other sections
+            const allDirectChildren = document.querySelectorAll('#main-content > div');
+            allDirectChildren.forEach(child => child.classList.add('no-print'));
+            
+            const targetSection = document.getElementById(sectionId);
+            targetSection.classList.remove('no-print');
+            targetSection.classList.add('print-active-section');
+            
+            // Set Print Title
+            const originalTitle = document.title;
+            const quoteDate = document.getElementById('quote-date').textContent.trim();
+            document.title = `${titleName}_${quoteDate}`;
+            
+            window.print();
+            
+            // Restore everything
+            setTimeout(() => {
+                document.title = originalTitle;
+                document.body.classList.remove('print-table-mode');
+                allDirectChildren.forEach(child => child.classList.remove('no-print'));
+                targetSection.classList.remove('print-active-section');
+                const styleEl = document.getElementById('print-landscape-style');
+                if (styleEl) styleEl.remove();
+            }, 1000);
         }
 
     </script>
