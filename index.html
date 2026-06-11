@@ -78,14 +78,6 @@
         .med-product-img { width: 44px; height: 44px; object-fit: contain; }
         .placeholder-img { width: 36px; height: 36px; border-radius: 4px; background-color: #f3f4f6; border: 1px dashed #d1d5db; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px; font-weight: bold; }
 
-        /* Table Print Enhancements */
-        body.print-table-mode .unified-table { min-width: 0 !important; width: 100% !important; }
-        body.print-table-mode .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
-        body.print-table-mode .unified-table th, body.print-table-mode .unified-table td { padding: 6px 4px !important; font-size: 9px !important; line-height: 1.2 !important; }
-        body.print-table-mode .unified-table tr { page-break-inside: avoid !important; break-inside: avoid !important; }
-        body.print-table-mode .unified-table thead { display: table-header-group !important; }
-        body.print-table-mode h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
-
         /* Print and Quotation Styles */
         .print-only, .print-only-cell, .print-only-inline { display: none; }
         
@@ -207,10 +199,16 @@
         <div id="section-cosmetic" class="mb-8 mt-2">
             <div class="flex justify-between items-end mb-3">
                 <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Beauty Device / Cosmetic Product Line</h2>
-                <button onclick="printTableSection('section-cosmetic', 'Cosmetics_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                    Print / PDF
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="shareViaEmail('Cosmetics Price List')" class="no-print px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        Share (Email)
+                    </button>
+                    <button onclick="printTableSection('section-cosmetic', 'Cosmetics_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Print / PDF
+                    </button>
+                </div>
             </div>
             <div class="overflow-x-auto table-container bg-white">
                 <table class="w-full text-left border-collapse cosmetic-table unified-table">
@@ -254,10 +252,16 @@
         <div id="section-medical" class="mb-8 mt-8">
             <div class="flex justify-between items-end mb-3">
                 <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Medical Aesthetic Product Line</h2>
-                <button onclick="printTableSection('section-medical', 'Medical_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                    Print / PDF
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="shareViaEmail('Medical Aesthetic Price List')" class="no-print px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        Share (Email)
+                    </button>
+                    <button onclick="printTableSection('section-medical', 'Medical_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Print / PDF
+                    </button>
+                </div>
             </div>
             <div class="overflow-x-auto table-container bg-white">
                 <table class="w-full text-left border-collapse unified-table">
@@ -315,10 +319,16 @@
         <div id="section-raw" class="mb-12 mt-8">
             <div class="flex justify-between items-end mb-3">
                 <h2 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider">Proprietary Raw Materials</h2>
-                <button onclick="printTableSection('section-raw', 'RawMaterials_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                    Print / PDF
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="shareViaEmail('Raw Materials Price List')" class="no-print px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        Share (Email)
+                    </button>
+                    <button onclick="printTableSection('section-raw', 'RawMaterials_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        Print / PDF
+                    </button>
+                </div>
             </div>
             <div class="overflow-x-auto table-container bg-white">
                 <table class="w-full text-left border-collapse unified-table">
@@ -359,6 +369,10 @@
                     <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Main Quotation Generator <span class="text-sm text-gray-500 font-light tracking-normal lowercase ml-2">(Cosmetics & Medical)</span></h2>
                     <div class="space-x-2 flex">
                         <button onclick="addQuoteItem()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium transition-colors">+ Add Item</button>
+                        <button id="btn-share" onclick="shareViaEmail('Main Quotation')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Share (Email)
+                        </button>
                         <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
                     </div>
                 </div>
@@ -525,6 +539,10 @@ Beneficiary : MediFab Co., LTD</div>
                     <h2 class="text-2xl text-blue-900 font-montserrat uppercase tracking-wider font-semibold">Proprietary Raw Materials <br> Quotation Generator</h2>
                     <div class="space-x-2 flex">
                         <button onclick="addRawQuoteItem()" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-900 text-sm font-medium transition-colors border border-blue-200">+ Add Raw Item</button>
+                        <button id="btn-share-raw" onclick="shareViaEmail('Raw Material Quotation')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Share (Email)
+                        </button>
                         <button id="btn-print-raw" onclick="printRawQuotation()" class="px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
                     </div>
                 </div>
@@ -1215,6 +1233,7 @@ Beneficiary : MediFab Co., LTD</div>
             const warningEl = document.getElementById('foc-warning');
             const warningTextEl = document.getElementById('foc-warning-text');
             const btnPrint = document.getElementById('btn-print');
+            const btnShare = document.getElementById('btn-share');
             const curLabel = currency === 'USD' ? '$' : '₩';
             
             if (focTotal > 0 && subTotal === 0) {
@@ -1224,7 +1243,8 @@ Beneficiary : MediFab Co., LTD</div>
             } else {
                 warningEl.classList.add('hidden'); window.isFocLimitExceeded = false;
             }
-            btnPrint.disabled = window.isFocLimitExceeded;
+            if (btnPrint) btnPrint.disabled = window.isFocLimitExceeded;
+            if (btnShare) btnShare.disabled = window.isFocLimitExceeded;
         }
 
         function renderQuoteTable() {
@@ -1340,6 +1360,8 @@ Beneficiary : MediFab Co., LTD</div>
             
             const originalTitle = document.title;
             document.title = `${quoteDate}_${quoteNo}_Quotation`;
+            
+            applyPrintStyle('portrait');
             window.print();
             setTimeout(() => { document.title = originalTitle; }, 1000);
         }
@@ -1420,6 +1442,8 @@ Beneficiary : MediFab Co., LTD</div>
             
             const originalTitle = document.title;
             document.title = `RawMaterials_Quotation`;
+            
+            applyPrintStyle('portrait');
             window.print();
             setTimeout(() => { document.title = originalTitle; }, 1000);
         }
@@ -1427,11 +1451,7 @@ Beneficiary : MediFab Co., LTD</div>
         function printTableSection(sectionId, titleName) {
             document.body.classList.add('print-table-mode');
             
-            // Inject style to enforce Landscape mode specifically for tables
-            const style = document.createElement('style');
-            style.id = 'print-landscape-style';
-            style.innerHTML = '@media print { @page { size: landscape; margin: 10mm; } #main-content { padding: 0 !important; gap: 0 !important; max-width: 100% !important; } }';
-            document.head.appendChild(style);
+            applyPrintStyle('landscape');
 
             // Hide all other sections
             const allDirectChildren = document.querySelectorAll('#main-content > div');
@@ -1454,8 +1474,67 @@ Beneficiary : MediFab Co., LTD</div>
                 document.body.classList.remove('print-table-mode');
                 allDirectChildren.forEach(child => child.classList.remove('no-print'));
                 targetSection.classList.remove('print-active-section');
-                const styleEl = document.getElementById('print-landscape-style');
+                const styleEl = document.getElementById('dynamic-print-style');
                 if (styleEl) styleEl.remove();
+            }, 1000);
+        }
+
+        function applyPrintStyle(type) {
+            const oldStyle = document.getElementById('dynamic-print-style');
+            if (oldStyle) oldStyle.remove();
+            
+            const style = document.createElement('style');
+            style.id = 'dynamic-print-style';
+            if (type === 'landscape') {
+                style.innerHTML = `
+                    @media print { 
+                        @page { size: A4 landscape; margin: 5mm; } 
+                        body { zoom: 0.65; }
+                        #main-content { padding: 0 !important; max-width: 100% !important; width: 100% !important; }
+                        .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
+                        .unified-table { min-width: 0 !important; width: 100% !important; table-layout: auto !important; }
+                        .unified-table th, .unified-table td { padding: 6px 4px !important; font-size: 8pt !important; line-height: 1.2 !important; white-space: normal !important; word-break: break-word !important; }
+                        .unified-table tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+                        .unified-table thead { display: table-header-group !important; }
+                        h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
+                    }
+                `;
+            } else {
+                style.innerHTML = `
+                    @media print { 
+                        @page { size: A4 portrait; margin: 10mm; }
+                        body { zoom: 0.85; }
+                        #main-content { padding: 0 !important; margin: 0 !important; }
+                        .print-area-wrapper { width: 100% !important; max-width: 210mm !important; margin: 0 auto !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
+                    }
+                `;
+            }
+            document.head.appendChild(style);
+        }
+
+        function shareViaEmail(type) {
+            const dateStr = document.getElementById('current-date').textContent.replace('Today: ', '');
+            let subject = `[MEDIFAB] Product Information & Quotation`;
+            let body = `Hello,\n\nPlease find the attached Medifab document for your review.\n\nDocument Type: ${type}\nDate: ${dateStr}\n\nBest regards,\nMEDIFAB GLOBAL`;
+
+            if (type === 'Main Quotation') {
+                const comp = document.getElementById('cust-company').value.trim() || 'Customer';
+                subject = `[MEDIFAB] Official Quotation for ${comp}`;
+                const total = document.getElementById('quote-grandtotal').textContent;
+                const curr = document.getElementById('quote-currency-display').textContent;
+                body = `Hello ${comp},\n\nPlease find your official Medifab quotation attached as a PDF.\n\nTotal Amount: ${curr} ${total}\n\nBest regards,\nMEDIFAB GLOBAL`;
+            } else if (type === 'Raw Material Quotation') {
+                const comp = document.getElementById('raw-cust-company').value.trim() || 'Customer';
+                subject = `[MEDIFAB] Raw Material Quotation for ${comp}`;
+                const total = document.getElementById('raw-quote-grandtotal').textContent;
+                const curr = document.getElementById('unit-display').textContent.replace('[Unit: ', '').replace(']', '');
+                body = `Hello ${comp},\n\nPlease find your Medifab raw material quotation attached as a PDF.\n\nTotal Amount: ${curr} ${total}\n\nBest regards,\nMEDIFAB GLOBAL`;
+            }
+            
+            showToast('PDF로 먼저 저장한 후 이메일에 첨부해주세요.', 'success');
+            
+            setTimeout(() => {
+                window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             }, 1000);
         }
 
