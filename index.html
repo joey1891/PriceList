@@ -78,6 +78,14 @@
         .med-product-img { width: 44px; height: 44px; object-fit: contain; }
         .placeholder-img { width: 36px; height: 36px; border-radius: 4px; background-color: #f3f4f6; border: 1px dashed #d1d5db; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px; font-weight: bold; }
 
+        /* Table Print Enhancements */
+        body.print-table-mode .unified-table { min-width: 0 !important; width: 100% !important; }
+        body.print-table-mode .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
+        body.print-table-mode .unified-table th, body.print-table-mode .unified-table td { padding: 6px 4px !important; font-size: 9px !important; line-height: 1.2 !important; }
+        body.print-table-mode .unified-table tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+        body.print-table-mode .unified-table thead { display: table-header-group !important; }
+        body.print-table-mode h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
+
         /* Print and Quotation Styles */
         .print-only, .print-only-cell, .print-only-inline { display: none; }
         
@@ -138,6 +146,7 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- Image Modal -->
     <div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeImageModal(event)">
         <div class="relative max-w-4xl max-h-[90vh] p-4 flex flex-col items-center">
             <button class="absolute -top-10 right-0 text-white hover:text-gray-300 text-3xl" onclick="closeImageModal(event)">&times;</button>
@@ -548,16 +557,29 @@ Beneficiary : MediFab Co., LTD</div>
                 </div>
              </div>
              
+             <!-- Unified Customer Information for Raw Materials -->
              <div class="mb-8 bg-blue-50 p-6 border border-blue-200 no-print">
                 <p class="font-bold text-blue-900 mb-4 border-l-4 border-blue-900 pl-2">CUSTOMER INFORMATION (RAW MATERIALS)</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-blue-900 mb-1">Company Name</label>
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Company Name <span class="text-red-500">*</span></label>
                         <input type="text" id="raw-cust-company" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. Medifab Partners Inc.">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-blue-900 mb-1">Contact Name</label>
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Nationality <span class="text-red-500">*</span></label>
+                        <input type="text" id="raw-cust-nationality" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. South Korea, USA">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Contact Name <span class="text-red-500">*</span></label>
                         <input type="text" id="raw-cust-name" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. John Doe">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Email Address <span class="text-red-500">*</span></label>
+                        <input type="email" id="raw-cust-email" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. contact@company.com">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-blue-900 mb-1">Company Address <span class="text-red-500">*</span></label>
+                        <input type="text" id="raw-cust-address" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. 123 Business Rd, Seoul, Korea">
                     </div>
                 </div>
             </div>
@@ -1435,9 +1457,19 @@ Beneficiary : MediFab Co., LTD</div>
             document.getElementById('raw-quotation-section').classList.add('print-active-section');
             document.getElementById('quotation-section').classList.remove('print-active-section');
 
-            const comp = document.getElementById('raw-cust-company').value.trim(); const name = document.getElementById('raw-cust-name').value.trim();
+            const comp = document.getElementById('raw-cust-company').value.trim(); 
+            const nationality = document.getElementById('raw-cust-nationality').value.trim(); 
+            const name = document.getElementById('raw-cust-name').value.trim(); 
+            const addr = document.getElementById('raw-cust-address').value.trim(); 
+            const email = document.getElementById('raw-cust-email').value.trim();
+
             let toHtml = '';
-            if (comp) toHtml += `<span class="font-bold text-base block mb-1">${escapeHtml(comp)}</span>`; if (name) toHtml += `<span class="block">ATTN: ${escapeHtml(name)}</span>`;
+            if (comp) toHtml += `<span class="font-bold text-base block mb-1">${escapeHtml(comp)}</span>`; 
+            if (nationality) toHtml += `<span class="block text-sm">Nationality: ${escapeHtml(nationality)}</span>`; 
+            if (name) toHtml += `<span class="block">ATTN: ${escapeHtml(name)}</span>`; 
+            if (addr) toHtml += `<span class="block">${escapeHtml(addr)}</span>`; 
+            if (email) toHtml += `<span class="block">Email: ${escapeHtml(email)}</span>`;
+
             document.getElementById('raw-quote-to-print').innerHTML = toHtml || '<span class="text-gray-400 italic">No customer info provided.</span>';
             
             const originalTitle = document.title;
