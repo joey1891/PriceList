@@ -146,7 +146,6 @@
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Image Modal -->
     <div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeImageModal(event)">
         <div class="relative max-w-4xl max-h-[90vh] p-4 flex flex-col items-center">
             <button class="absolute -top-10 right-0 text-white hover:text-gray-300 text-3xl" onclick="closeImageModal(event)">&times;</button>
@@ -224,7 +223,7 @@
                     <thead>
                         <tr>
                             <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
-                            <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-left bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Item</th>
+                            <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Item</th>
                             <th rowspan="3" class="py-3 px-4 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Vol.</th>
                             <th rowspan="3" class="py-3 px-4 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Qty</th>
                             <th rowspan="3" class="py-3 px-4 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">CT</th>
@@ -369,8 +368,6 @@
                         <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
                     </div>
                 </div>
-                
-                <p class="text-xs text-red-600 font-medium tracking-wide mb-4">*Head of Division's Discretion: Max. 5% FOC</p>
                 
                 <div class="bg-gray-50 p-4 border border-gray-200 flex flex-wrap gap-6 items-center">
                     <div class="flex items-center gap-2 border-r border-gray-300 pr-6">
@@ -532,57 +529,56 @@ Beneficiary : MediFab Co., LTD</div>
                         <button id="btn-print-raw" onclick="printRawQuotation()" class="px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
                     </div>
                 </div>
+
+                <div class="bg-blue-50 p-4 border border-blue-200 flex flex-wrap gap-6 items-center mb-8">
+                    <div class="flex items-center gap-2 border-r border-blue-300 pr-6">
+                        <label class="text-sm font-bold text-blue-900">Region:</label>
+                        <select id="raw-quote-region" class="border border-blue-300 p-1.5 text-sm bg-white" onchange="changeRawRegion()">
+                            <option value="overseas">Overseas (해외)</option>
+                            <option value="domestic">Domestic (국내)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 border-r border-blue-300 pr-6">
+                        <label class="text-sm font-bold text-blue-900">Incoterms:</label>
+                        <select id="raw-quote-incoterms" class="border border-blue-300 p-1.5 text-sm bg-white" onchange="renderRawQuoteTable()">
+                            <option value="FOB">FOB</option>
+                            <option value="EXW">EXW</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-bold text-blue-900">Special Discount (%):</label>
+                        <input type="number" id="raw-quote-discount" min="0" max="100" class="border border-blue-300 p-1.5 text-sm bg-white w-16 text-right" value="0" onchange="renderRawQuoteTable()">
+                    </div>
+                </div>
              </div>
              
-             <!-- Add Region & Incoterms Controls for Raw Materials -->
-             <div class="bg-blue-50 p-4 border border-blue-200 flex flex-wrap gap-6 items-center mb-6 no-print">
-                <div class="flex items-center gap-2 border-r border-blue-300 pr-6">
-                    <label class="text-sm font-bold text-blue-900">Region:</label>
-                    <select id="raw-quote-region" class="border border-blue-300 p-1.5 text-sm bg-white" onchange="changeRawRegion()">
-                        <option value="overseas">Overseas (해외)</option>
-                        <option value="domestic">Domestic (국내)</option>
-                    </select>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                    <label class="text-sm font-bold text-blue-900">Incoterms:</label>
-                    <select id="raw-quote-incoterms" class="border border-blue-300 p-1.5 text-sm bg-white" onchange="renderRawQuoteTable()">
-                        <option value="FOB">FOB</option>
-                        <option value="EXW">EXW</option>
-                    </select>
-                </div>
-                
-                <div class="flex items-center gap-2 border-l border-blue-300 pl-6 ml-auto">
-                    <label class="text-sm font-bold text-blue-900">Special Discount (%):</label>
-                    <input type="number" id="raw-quote-discount" min="0" max="100" class="border border-blue-300 p-1.5 text-sm bg-white w-16 text-right" value="0" onchange="renderRawQuoteTable()">
-                </div>
-             </div>
-
              <div class="mb-8 bg-blue-50 p-6 border border-blue-200 no-print">
-                <p class="font-bold text-blue-900 mb-4 border-l-4 border-blue-900 pl-2">CUSTOMER INFORMATION (RAW MATERIALS)</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-blue-900 mb-1">Company Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="raw-cust-company" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. Medifab Partners Inc.">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-blue-900 mb-1">Nationality <span class="text-red-500">*</span></label>
-                        <input type="text" id="raw-cust-nationality" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. South Korea, USA">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-blue-900 mb-1">Contact Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="raw-cust-name" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. John Doe">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-blue-900 mb-1">Email Address <span class="text-red-500">*</span></label>
-                        <input type="email" id="raw-cust-email" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. contact@company.com">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-blue-900 mb-1">Company Address <span class="text-red-500">*</span></label>
-                        <input type="text" id="raw-cust-address" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. 123 Business Rd, Seoul, Korea">
-                    </div>
-                </div>
-            </div>
+                 <p class="font-bold text-blue-900 mb-4 border-l-4 border-blue-900 pl-2">CUSTOMER INFORMATION (RAW MATERIALS)</p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div>
+                         <label class="block text-xs font-bold text-blue-900 mb-1">Company Name <span class="text-red-500">*</span></label>
+                         <input type="text" id="raw-cust-company" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. Medifab Partners Inc.">
+                     </div>
+                     <div>
+                         <label class="block text-xs font-bold text-blue-900 mb-1">Nationality <span class="text-red-500">*</span></label>
+                         <input type="text" id="raw-cust-nationality" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. South Korea, USA">
+                     </div>
+                     <div>
+                         <label class="block text-xs font-bold text-blue-900 mb-1">Contact Name <span class="text-red-500">*</span></label>
+                         <input type="text" id="raw-cust-name" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. John Doe">
+                     </div>
+                     <div>
+                         <label class="block text-xs font-bold text-blue-900 mb-1">Email Address <span class="text-red-500">*</span></label>
+                         <input type="email" id="raw-cust-email" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. contact@company.com">
+                     </div>
+                     <div class="md:col-span-2">
+                         <label class="block text-xs font-bold text-blue-900 mb-1">Company Address <span class="text-red-500">*</span></label>
+                         <input type="text" id="raw-cust-address" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. 123 Business Rd, Seoul, Korea">
+                     </div>
+                 </div>
+             </div>
 
             <div id="raw-print-area" class="print-area-wrapper bg-white p-12 mx-auto shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100" style="max-w: 210mm; min-height: 297mm;">
                 <!-- Header: Title -->
@@ -601,7 +597,7 @@ Beneficiary : MediFab Co., LTD</div>
                             <tr>
                                 <td class="font-bold text-gray-700 py-1 align-top pt-2">To:</td>
                                 <td class="py-1 pt-2">
-                                    <div id="raw-quote-to-print" class="whitespace-pre-wrap text-sm border border-transparent min-h-[3rem] print-only"></div>
+                                    <div id="raw-quote-to-print" class="whitespace-pre-wrap text-sm border border-transparent min-h-[4rem] print-only"></div>
                                     <div class="no-print text-gray-400 italic text-xs">(Customer Info will be rendered here upon print)</div>
                                 </td>
                             </tr>
@@ -629,12 +625,12 @@ Beneficiary : MediFab Co., LTD</div>
                         <!-- Raw Items will be injected here -->
                     </tbody>
                 </table>
-
-                <!-- Totals and Bank Info for Raw Materials -->
-                <div class="flex justify-between items-start mt-6 pt-4 border-t border-gray-300 relative">
+                
+                <!-- Totals & Bank Info for Raw -->
+                <div class="flex justify-between items-start mt-6 pt-4 border-t border-blue-300 relative">
                     <div class="w-1/2 pr-4">
                         <p class="font-bold text-blue-900 mb-2 border-l-4 border-blue-900 pl-2">BANK INFORMATION</p>
-                        <div contenteditable="true" class="border border-dashed border-gray-300 p-3 text-xs bg-gray-50 focus:bg-white outline-none min-h-[80px] no-print" id="raw-bank-info-edit">Bank name : NongHyup Bank / Yeoksam branch
+                        <div contenteditable="true" class="border border-dashed border-blue-300 p-3 text-xs bg-blue-50 focus:bg-white outline-none min-h-[80px] no-print" id="raw-bank-info-edit">Bank name : NongHyup Bank / Yeoksam branch
 Bank address: 351 Gangnamdaero, Seocho-dong, Seocho-gu, Seoul, Korea
 SWIFT CODE: NACFKRSE
 Account number: 452-0022-0212-11
@@ -655,12 +651,13 @@ Beneficiary : MediFab Co., LTD</div>
                             <span>Discount (<span id="raw-quote-discount-display">0</span>%):</span>
                             <span>-<span id="raw-quote-currency-label2" class="text-xs mr-1"></span><span id="raw-quote-discount-amount" class="font-medium">0</span></span>
                         </div>
-                        <div class="flex justify-between items-center py-3 border-t-2 border-gray-900 mt-1">
-                            <span class="font-bold text-gray-900">GRAND TOTAL:</span>
-                            <span class="font-bold text-lg text-gray-900"><span id="raw-quote-currency-label" class="text-sm mr-1"></span><span id="raw-quote-grandtotal">0</span></span>
+                        <div class="flex justify-between items-center py-3 border-t-2 border-blue-900 mt-1">
+                            <span class="font-bold text-blue-900">GRAND TOTAL:</span>
+                            <span class="font-bold text-lg text-blue-900"><span id="raw-quote-currency-label" class="text-sm mr-1"></span><span id="raw-quote-grandtotal">0</span></span>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -831,7 +828,6 @@ Beneficiary : MediFab Co., LTD</div>
                         let displayName = product.name_en || '';
                         let cleanName = (product.clean_name || '').trim();
 
-                        // clean_name 문자열 포함 여부로 확인하여 확실하게 색상 옵션을 그룹화
                         if (cleanName.toLowerCase().includes('core impact')) {
                             displayName = "Core impact (PK/BK/WH/DW/BG)";
                         } else if (cleanName.toLowerCase().includes('hyper shot')) {
@@ -842,7 +838,6 @@ Beneficiary : MediFab Co., LTD</div>
                         
                         product.display_name = displayName;
                         
-                        // 디바이스의 경우 displayName 자체를 고유 키로 사용하여 컬러별 중복 아이템을 하나로 묶음
                         const uniqueKey = displayName;
                         
                         if (uniqueKey && !uniqueProductsMap.has(uniqueKey)) {
@@ -1443,46 +1438,42 @@ Beneficiary : MediFab Co., LTD</div>
         function renderRawQuoteTable() {
             try {
                 const tbody = document.getElementById('raw-quote-tbody'); tbody.innerHTML = '';
-                let subTotal = 0; const targetCurrency = currentCurrency; 
-                const incoterms = document.getElementById('raw-quote-incoterms')?.value || 'FOB';
+                let grandTotal = 0; let subTotal = 0;
+                const targetCurrency = currentCurrency; 
                 const discountRate = parseFloat(document.getElementById('raw-quote-discount')?.value) || 0;
-                
+                const incoterms = document.getElementById('raw-quote-incoterms')?.value || 'FOB';
+
                 document.getElementById('raw-quote-th-currency1').textContent = targetCurrency; document.getElementById('raw-quote-th-currency2').textContent = targetCurrency;
-                
-                const curLabel = targetCurrency === 'USD' ? '$' : '₩';
-                document.getElementById('raw-quote-currency-label').textContent = curLabel;
-                if(document.getElementById('raw-quote-currency-label1')) document.getElementById('raw-quote-currency-label1').textContent = curLabel;
-                if(document.getElementById('raw-quote-currency-label2')) document.getElementById('raw-quote-currency-label2').textContent = curLabel;
-                
-                document.getElementById('raw-quote-incoterms-print').textContent = incoterms;
-                const exwNotice = document.getElementById('raw-exw-notice');
-                if (incoterms === 'EXW') exwNotice.classList.remove('hidden');
-                else exwNotice.classList.add('hidden');
+                document.getElementById('raw-quote-currency-label').textContent = targetCurrency === 'USD' ? '$' : '₩';
+                document.getElementById('raw-quote-currency-label1').textContent = targetCurrency === 'USD' ? '$' : '₩';
+                document.getElementById('raw-quote-currency-label2').textContent = targetCurrency === 'USD' ? '$' : '₩';
 
                 if(rawQuoteItems.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-gray-400 italic text-sm no-print">Click "+ Add Raw Item" to generate.</td></tr>`;
-                    updateRawTotals(0, discountRate);
+                    document.getElementById('raw-quote-subtotal').textContent = '0';
+                    document.getElementById('raw-quote-grandtotal').textContent = '0'; 
+                    document.getElementById('raw-quote-discount-row').classList.add('hidden');
                     return;
                 }
 
                 rawQuoteItems.forEach((item) => {
                     const rawObj = globalRawMaterials.find(p => p.id === item.rawId);
                     if (!item.manualPrice && rawObj) {
-                        let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1; item.unitPrice = Math.round((Number(rawObj.unit_price_usd) || 0) * rate);
+                        let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1; 
+                        item.unitPrice = Math.round((Number(rawObj.unit_price_usd) || 0) * rate);
                     }
                     
                     let appliedUnitPrice = Number(item.unitPrice) || 0;
-                    if (incoterms === 'EXW' && !item.manualPrice) appliedUnitPrice *= 0.97;
-                    if (item.manualPrice) appliedUnitPrice = Number(item.unitPrice);
+                    if (incoterms === 'EXW') appliedUnitPrice *= 0.97;
+                    
+                    const amount = appliedUnitPrice * (item.qty || 0); 
+                    subTotal += amount;
 
-                    const amount = appliedUnitPrice * (item.qty || 0); subTotal += amount;
                     const tr = document.createElement('tr'); tr.className = "border-b border-gray-200 text-sm";
                     
                     let prodOptions = `<option value="">Select Raw Material...</option>`;
                     globalRawMaterials.forEach(p => { prodOptions += `<option value="${p.id}" ${p.id === item.rawId ? 'selected' : ''}>${escapeHtml(p.product_name)} - ${escapeHtml(p.grade)}</option>`; });
                     
-                    const formattedUnitPrice = Math.round(appliedUnitPrice).toString();
-
                     tr.innerHTML = `
                         <td class="py-2 px-2 text-center no-print"><button onclick="removeRawQuoteItem('${item.id}')" class="text-red-500 hover:text-red-700 font-bold px-2">&times;</button></td>
                         <td class="py-2 px-2">
@@ -1497,32 +1488,30 @@ Beneficiary : MediFab Co., LTD</div>
                             <div class="print-only hidden text-center font-bold">${item.qty}</div>
                         </td>
                         <td class="py-2 px-2 text-right">
-                            <input type="number" class="w-full border p-1 text-xs text-right outline-none bg-gray-50 no-print" value="${formattedUnitPrice}" onchange="updateRawQuoteItem('${item.id}', 'unitPrice', this.value)">
+                            <input type="number" class="w-full border p-1 text-xs text-right outline-none bg-gray-50 no-print" value="${Math.round(appliedUnitPrice)}" onchange="updateRawQuoteItem('${item.id}', 'unitPrice', this.value)">
                             <span class="print-only hidden">${formatQuoteNumber(appliedUnitPrice)}</span>
                         </td>
                         <td class="py-2 px-2 text-right font-medium text-gray-900">${formatQuoteNumber(amount)}</td>
                     `;
                     tbody.appendChild(tr);
                 });
-                
-                updateRawTotals(subTotal, discountRate);
-                
-            } catch (err) {}
-        }
 
-        function updateRawTotals(subTotal, discountRate) {
-            const discountAmount = subTotal * (discountRate / 100);
-            const grandTotal = subTotal - discountAmount;
-            
-            if(document.getElementById('raw-quote-subtotal')) document.getElementById('raw-quote-subtotal').textContent = formatQuoteNumber(subTotal);
-            if(document.getElementById('raw-quote-discount-display')) document.getElementById('raw-quote-discount-display').textContent = discountRate;
-            if(document.getElementById('raw-quote-discount-amount')) document.getElementById('raw-quote-discount-amount').textContent = formatQuoteNumber(discountAmount);
-            if(document.getElementById('raw-quote-grandtotal')) document.getElementById('raw-quote-grandtotal').textContent = formatQuoteNumber(grandTotal);
-            
-            const discountRow = document.getElementById('raw-quote-discount-row');
-            if(discountRow) {
+                const discountAmount = subTotal * (discountRate / 100);
+                grandTotal = subTotal - discountAmount;
+
+                document.getElementById('raw-quote-subtotal').textContent = formatQuoteNumber(subTotal);
+                document.getElementById('raw-quote-discount-display').textContent = discountRate;
+                document.getElementById('raw-quote-discount-amount').textContent = formatQuoteNumber(discountAmount);
+                document.getElementById('raw-quote-grandtotal').textContent = formatQuoteNumber(grandTotal);
+                
+                const discountRow = document.getElementById('raw-quote-discount-row');
                 if (discountRate > 0) discountRow.classList.remove('hidden'); else discountRow.classList.add('hidden');
-            }
+
+                document.getElementById('raw-quote-incoterms-print').textContent = incoterms;
+                const exwNotice = document.getElementById('raw-exw-notice'); 
+                if (incoterms === 'EXW') exwNotice.classList.remove('hidden'); else exwNotice.classList.add('hidden');
+
+            } catch (err) {}
         }
 
         function printRawQuotation() {
@@ -1530,11 +1519,8 @@ Beneficiary : MediFab Co., LTD</div>
             document.getElementById('raw-quotation-section').classList.add('print-active-section');
             document.getElementById('quotation-section').classList.remove('print-active-section');
 
-            const comp = document.getElementById('raw-cust-company').value.trim(); 
-            const name = document.getElementById('raw-cust-name').value.trim();
-            const nationality = document.getElementById('raw-cust-nationality')?.value.trim(); 
-            const addr = document.getElementById('raw-cust-address')?.value.trim(); 
-            const email = document.getElementById('raw-cust-email')?.value.trim();
+            const comp = document.getElementById('raw-cust-company').value.trim(); const name = document.getElementById('raw-cust-name').value.trim();
+            const nationality = document.getElementById('raw-cust-nationality').value.trim(); const addr = document.getElementById('raw-cust-address').value.trim(); const email = document.getElementById('raw-cust-email').value.trim();
             
             let toHtml = '';
             if (comp) toHtml += `<span class="font-bold text-base block mb-1">${escapeHtml(comp)}</span>`; 
@@ -1542,7 +1528,7 @@ Beneficiary : MediFab Co., LTD</div>
             if (name) toHtml += `<span class="block">ATTN: ${escapeHtml(name)}</span>`; 
             if (addr) toHtml += `<span class="block">${escapeHtml(addr)}</span>`; 
             if (email) toHtml += `<span class="block">Email: ${escapeHtml(email)}</span>`;
-            
+
             document.getElementById('raw-quote-to-print').innerHTML = toHtml || '<span class="text-gray-400 italic">No customer info provided.</span>';
             document.getElementById('raw-bank-info-print').innerHTML = document.getElementById('raw-bank-info-edit').innerHTML;
             
