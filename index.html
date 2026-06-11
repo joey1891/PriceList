@@ -375,7 +375,7 @@
             <!-- Controls (Not printed) -->
             <div class="no-print mb-8">
                 <div class="flex justify-between items-end mb-4">
-                    <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Main Quotation Generator <span class="text-sm text-gray-500 font-light tracking-normal lowercase ml-2">(Cosmetics & Medical)</span></h2>
+                    <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Cosmetics & Medical Quotation</h2>
                     <div class="space-x-2 flex">
                         <button onclick="addQuoteItem()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium transition-colors">+ Add Item</button>
                         <button id="btn-share" onclick="shareViaEmail('Main Quotation')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]">
@@ -540,7 +540,7 @@ Beneficiary : MediFab Co., LTD</div>
         <div id="raw-quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
              <div class="no-print mb-8">
                 <div class="flex justify-between items-end mb-4">
-                    <h2 class="text-2xl text-blue-900 font-montserrat uppercase tracking-wider font-semibold">Proprietary Raw Materials <br> Quotation Generator</h2>
+                    <h2 class="text-2xl text-blue-900 font-montserrat uppercase tracking-wider font-semibold">Raw Materials Quotation</h2>
                     <div class="space-x-2 flex">
                         <button onclick="addRawQuoteItem()" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-900 text-sm font-medium transition-colors border border-blue-200">+ Add Raw Item</button>
                         <button id="btn-print-raw" onclick="printRawQuotation()" class="px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
@@ -1148,9 +1148,6 @@ Beneficiary : MediFab Co., LTD</div>
                 tr.innerHTML = html;
                 tbody.appendChild(tr);
             });
-            const noteTr = document.createElement('tr');
-            noteTr.innerHTML = `<td colspan="17" class="py-3 px-4 text-[11px] text-black text-left bg-transparent border-t border-gray-100 uppercase tracking-wider">*Head of Division's Discretion: Max. 5% FOC</td>`;
-            tbody.appendChild(noteTr);
         }
 
         function renderRawMaterialsTableData() {
