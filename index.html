@@ -369,25 +369,24 @@
         </div>
 
         <!-- ========================================================= -->
-        <!-- 4. MAIN QUOTATION GENERATOR (Cosmetics & Medical)         -->
+        <!-- 4. MAIN QUOTATION GENERATOR (Cosmetic & Medical)          -->
         <!-- ========================================================= -->
         <div id="quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
             <!-- Controls (Not printed) -->
             <div class="no-print mb-8">
                 <div class="flex justify-between items-end mb-4">
-                    <div>
-                        <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Cosmetics & Medical Quotation</h2>
-                        <p class="text-xs text-red-600 mt-1.5 font-medium tracking-wide">*Head of Division's Discretion: Max. 5% FOC</p>
-                    </div>
+                    <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Cosmetics & Medical Quotation</h2>
                     <div class="space-x-2 flex">
                         <button onclick="addQuoteItem()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium transition-colors">+ Add Item</button>
-                        <button id="btn-share" onclick="shareViaEmail('Main Quotation')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]">
+                        <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
+                        <button id="btn-share" onclick="shareViaEmail('Cosmetics & Medical Quotation')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                             Share (Email)
                         </button>
-                        <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
                     </div>
                 </div>
+                
+                <p class="text-xs text-red-600 font-medium tracking-wide mb-4">*Head of Division's Discretion: Max. 5% FOC</p>
                 
                 <div class="bg-gray-50 p-4 border border-gray-200 flex flex-wrap gap-6 items-center">
                     <div class="flex items-center gap-2 border-r border-gray-300 pr-6">
@@ -546,8 +545,16 @@ Beneficiary : MediFab Co., LTD</div>
                     <h2 class="text-2xl text-blue-900 font-montserrat uppercase tracking-wider font-semibold">Raw Materials Quotation</h2>
                     <div class="space-x-2 flex">
                         <button onclick="addRawQuoteItem()" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-900 text-sm font-medium transition-colors border border-blue-200">+ Add Raw Item</button>
+                        <button id="btn-share-raw" onclick="shareViaEmail('Raw Material Quotation')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            Share (Email)
+                        </button>
                         <button id="btn-print-raw" onclick="printRawQuotation()" class="px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
                     </div>
+                </div>
+                
+                <p class="text-xs text-red-600 font-medium tracking-wide mb-4">*Head of Division's Discretion: Max. 5% FOC</p>
+             </div>
                 </div>
              </div>
              
@@ -1640,23 +1647,23 @@ Beneficiary : MediFab Co., LTD</div>
         function shareViaEmail(type) {
             const dateStr = document.getElementById('current-date').textContent.replace('Today: ', '');
             let subject = `[MEDIFAB] Product Information & Quotation`;
-            let body = `Hello,\n\nPlease find the attached Medifab document for your review.\n\nDocument Type: ${type}\nDate: ${dateStr}\n\nBest regards,\nMEDIFAB GLOBAL`;
+            let body = `안녕하세요,\n\n메디팹 기준 가격표를 송부드립니다.\n확인 부탁드립니다.\n\n문서 종류: ${type}\n기준 일자: ${dateStr}\n\n감사합니다.\nMEDIFAB GLOBAL`;
 
-            if (type === 'Main Quotation') {
+            if (type === 'Cosmetics & Medical Quotation') {
                 const comp = document.getElementById('cust-company').value.trim() || 'Customer';
                 subject = `[MEDIFAB] Official Quotation for ${comp}`;
                 const total = document.getElementById('quote-grandtotal').textContent;
                 const curr = document.getElementById('quote-currency-display').textContent;
-                body = `Hello ${comp},\n\nPlease find your official Medifab quotation attached as a PDF.\n\nTotal Amount: ${curr} ${total}\n\nBest regards,\nMEDIFAB GLOBAL`;
+                body = `안녕하세요 ${comp} 담당자님,\n\n요청하신 메디팹 제품 공식 견적서를 송부드립니다.\n\n총 결제 금액: ${curr} ${total}\n\n감사합니다.\nMEDIFAB GLOBAL`;
             } else if (type === 'Raw Material Quotation') {
                 const comp = document.getElementById('raw-cust-company').value.trim() || 'Customer';
                 subject = `[MEDIFAB] Raw Material Quotation for ${comp}`;
                 const total = document.getElementById('raw-quote-grandtotal').textContent;
                 const curr = document.getElementById('unit-display').textContent.replace('[Unit: ', '').replace(']', '');
-                body = `Hello ${comp},\n\nPlease find your Medifab raw material quotation attached as a PDF.\n\nTotal Amount: ${curr} ${total}\n\nBest regards,\nMEDIFAB GLOBAL`;
+                body = `안녕하세요 ${comp} 담당자님,\n\n요청하신 메디팹 원료(Raw Materials) 공식 견적서를 송부드립니다.\n\n총 결제 금액: ${curr} ${total}\n\n감사합니다.\nMEDIFAB GLOBAL`;
             }
             
-            showToast('PDF로 먼저 저장한 후 이메일에 첨부해주세요.', 'success');
+            showToast('보안상 자동 첨부가 불가능합니다. Print/PDF로 먼저 저장한 후 이메일에 수동으로 첨부해주세요.', 'success');
             
             setTimeout(() => {
                 window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
