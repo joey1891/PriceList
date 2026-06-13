@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confidential - MEDIFAB Product Live Price List & Quotation</title>
+    <title>Confidential - MEDIFAB Product Live Price List</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,17 +11,6 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #111827; }
         .font-montserrat { font-family: 'Montserrat', sans-serif; }
-        
-        /* Lock Screen Styles */
-        #lock-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #f8fafc;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 50; transition: opacity 0.3s ease;
-        }
-        
-        /* Main Content hidden initially */
-        #main-content { display: none; opacity: 0; transition: opacity 0.5s ease; }
 
         .table-container { 
             border: 1px solid #e5e7eb;
@@ -86,19 +75,15 @@
         body.print-table-mode .unified-table thead { display: table-header-group !important; }
         body.print-table-mode h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
 
-        /* Print and Quotation Styles */
-        .print-only, .print-only-cell, .print-only-inline { display: none; }
-        
+        /* Print Styles */
         @media print {
             body { background-color: #ffffff; margin: 0; padding: 0; }
-            #lock-screen, #toast-container, .no-print { display: none !important; }
+            #toast-container, .no-print { display: none !important; }
             
             #main-content { padding: 0 !important; margin: 0 !important; display: block !important; }
             
-            /* Hide all direct children of main-content by default in print */
             #main-content > div { display: none !important; }
             
-            /* Show ONLY the section that has the print-active-section class */
             #main-content > div.print-active-section { 
                 display: block !important; 
                 margin-top: 0 !important; 
@@ -106,44 +91,12 @@
                 border: none !important; 
             }
             
-            .print-area-wrapper {
-                box-shadow: none !important;
-                padding: 0 !important;
-                margin: 0 auto !important;
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-            .print-only { display: block !important; }
-            .print-only-cell { display: table-cell !important; }
-            .print-only-inline { display: inline !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            .page-break { page-break-before: always; }
         }
-
-        .pdf-text-section h3 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; margin-bottom: 6px; margin-top: 16px; color: #111827; }
-        .pdf-text-section p { font-size: 11px; color: #374151; margin-bottom: 6px; line-height: 1.4; }
-        .pdf-text-section strong { color: #111827; }
     </style>
 </head>
-<body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white relative">
+<body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white relative" onload="initDashboard()">
 
-    <div id="lock-screen" class="flex items-center justify-center">
-        <div class="bg-white p-10 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 max-w-sm w-full text-center">
-            <h2 class="text-2xl text-gray-900 mb-2 font-montserrat tracking-widest uppercase">MEDIFAB</h2>
-            <div class="w-8 h-0.5 bg-gray-900 mx-auto mb-6"></div>
-            <p class="text-sm text-gray-500 mb-8">Classified Document Access</p>
-            
-            <form id="login-form" onsubmit="event.preventDefault(); checkPassword();">
-                <input type="password" id="pwd-input" class="w-full px-4 py-3 border-b-2 border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-900 focus:outline-none transition-colors mb-4 text-center tracking-widest font-mono" placeholder="ENTER PASSWORD" required>
-                <p id="error-msg" class="text-xs text-red-500 mb-4 hidden">Authentication failed.</p>
-                <button type="submit" class="w-full bg-gray-900 hover:bg-black text-white tracking-widest text-sm py-3 px-4 uppercase transition duration-200 ease-in-out">
-                    Access System
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
 
     <div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeImageModal(event)">
@@ -210,7 +163,7 @@
                 <div class="flex gap-2">
                     <button onclick="printTableSection('section-cosmetic', 'Cosmetics_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        Print / PDF
+                        Print PDF
                     </button>
                 </div>
             </div>
@@ -259,7 +212,7 @@
                 <div class="flex gap-2">
                     <button onclick="printTableSection('section-medical', 'Medical_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        Print / PDF
+                        Print PDF
                     </button>
                 </div>
             </div>
@@ -322,7 +275,7 @@
                 <div class="flex gap-2">
                     <button onclick="printTableSection('section-raw', 'RawMaterials_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        Print / PDF
+                        Print PDF
                     </button>
                 </div>
             </div>
@@ -354,385 +307,12 @@
                 </table>
             </div>
         </div>
-
-        <!-- ========================================================= -->
-        <!-- 4. MAIN QUOTATION GENERATOR (Cosmetic & Medical)          -->
-        <!-- ========================================================= -->
-        <div id="quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
-            <!-- Controls (Not printed) -->
-            <div class="no-print mb-8">
-                <div class="flex justify-between items-end mb-4">
-                    <h2 class="text-2xl text-gray-900 font-montserrat uppercase tracking-wider">Cosmetics & Medical Quotation</h2>
-                    <div class="space-x-2 flex">
-                        <button onclick="addQuoteItem()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium transition-colors">+ Add Item</button>
-                        <button id="btn-print" onclick="printQuotation()" class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
-                    </div>
-                </div>
-                
-                <div class="bg-gray-50 p-4 border border-gray-200 flex flex-wrap gap-6 items-center">
-                    <div class="flex items-center gap-2 border-r border-gray-300 pr-6">
-                        <label class="text-sm font-bold text-gray-700">Region:</label>
-                        <select id="quote-region" class="border border-gray-300 p-1.5 text-sm bg-white" onchange="changeRegion()">
-                            <option value="overseas">Overseas (해외)</option>
-                            <option value="domestic">Domestic (국내)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-bold text-gray-700">Incoterms:</label>
-                        <select id="quote-incoterms" class="border border-gray-300 p-1.5 text-sm bg-white" onchange="renderQuoteTable()">
-                            <option value="FOB">FOB</option>
-                            <option value="EXW">EXW</option>
-                        </select>
-                    </div>
-                    
-                    <div class="flex items-center gap-2 border-l border-gray-300 pl-6 ml-auto">
-                        <label class="text-sm font-bold text-gray-700">Special Discount (%):</label>
-                        <input type="number" id="quote-discount" min="0" max="100" class="border border-gray-300 p-1.5 text-sm bg-white w-16 text-right" value="0" onchange="renderQuoteTable()">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Customer Details Input Container -->
-            <div class="mb-8 bg-gray-50 p-6 border border-gray-200 no-print">
-                <p class="font-bold text-gray-900 mb-4 border-l-4 border-gray-900 pl-2">CUSTOMER INFORMATION</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Company Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="cust-company" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. Medifab Partners Inc.">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Nationality <span class="text-red-500">*</span></label>
-                        <input type="text" id="cust-nationality" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. South Korea, USA">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Contact Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="cust-name" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. John Doe">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Email Address <span class="text-red-500">*</span></label>
-                        <input type="email" id="cust-email" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. contact@company.com">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Company Address <span class="text-red-500">*</span></label>
-                        <input type="text" id="cust-address" class="w-full border border-gray-300 p-2 text-sm bg-white focus:outline-none focus:border-gray-900" placeholder="e.g. 123 Business Rd, Seoul, Korea">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Print Area (Proforma Invoice) -->
-            <div id="print-area" class="print-area-wrapper bg-white p-12 mx-auto shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100" style="max-w: 210mm; min-height: 297mm;">
-                <!-- Header: Logo & Title -->
-                <div class="flex justify-between items-start mb-10 border-b-2 border-gray-900 pb-6">
-                    <div>
-                        <img src="https://metadqppbypzgiowkgzg.supabase.co/storage/v1/object/sign/SIN%20WONJONG/Medifab%20logo.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zYjU3MDQxZS04NjZlLTQxOTYtODJiMy0yZjMzODZhNjBkYTAiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJTSU4gV09OSk9ORy9NZWRpZmFiIGxvZ28ucG5nIiwiaWF0IjoxNzgwOTE5MDY1LCJleHAiOjIwOTYyNzkwNjV9.AOFB6QneYt7PLdENq_KWBkkAncl-xk5wkK3i1-cAH1E" alt="Medifab Logo" class="h-12 mb-4 object-contain">
-                        <p class="text-xs text-gray-600 mt-1">
-                            Room 417, Daeryung Techno Town 20th,<br>
-                            5, Gasan digital 1-ro, Geumcheon-gu,<br>
-                            Seoul, Republic of Korea
-                        </p>
-                    </div>
-                    <div class="text-right">
-                        <h1 class="text-3xl font-montserrat tracking-widest text-gray-900 uppercase">Proforma Invoice</h1>
-                        <table class="mt-4 text-sm ml-auto text-left">
-                            <tbody>
-                                <tr>
-                                    <td class="font-bold text-gray-700 pr-3 pb-1 text-right">DATE:</td>
-                                    <td class="pb-1"><span id="quote-date" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">YYYY-MM-DD</span><span id="quote-date-print" class="print-only-inline"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="font-bold text-gray-700 pr-3 pb-1 text-right">QUOTE NO:</td>
-                                    <td class="pb-1"><span id="quote-no" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">QT-2026-001</span><span id="quote-no-print" class="print-only-inline"></span></td>
-                                </tr>
-                                <tr>
-                                    <td class="font-bold text-gray-700 pr-3 text-right">CURRENCY:</td>
-                                    <td><span id="quote-currency-display" class="font-medium">USD</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Customer Info (Print Only View) -->
-                <div class="mb-8 print-only">
-                    <p class="font-bold text-gray-900 mb-2 border-l-4 border-gray-900 pl-2">TO (CUSTOMER)</p>
-                    <div id="quote-to-print" class="whitespace-pre-wrap text-sm border border-transparent min-h-[4rem]"></div>
-                </div>
-
-                <!-- Quote Table -->
-                <table class="w-full text-left border-collapse mb-6">
-                    <thead>
-                        <tr class="bg-gray-100 border-t-2 border-b-2 border-gray-900 text-xs uppercase tracking-wider text-gray-700">
-                            <th class="py-3 px-2 text-center w-[5%] print-only-cell hidden">No</th>
-                            <th class="py-3 px-2 text-center w-[5%] no-print">Del</th>
-                            <th class="py-3 px-2 w-[40%]">Item Description</th>
-                            <th class="py-3 px-2 text-center w-[15%]">Color/Opt</th>
-                            <th class="py-3 px-2 text-center w-[15%]">Qty</th>
-                            <th class="py-3 px-2 text-right w-[15%]">U.Price (<span id="quote-th-currency1">USD</span>)</th>
-                            <th class="py-3 px-2 text-right w-[15%]">Amount (<span id="quote-th-currency2">USD</span>)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="quote-tbody" class="text-sm">
-                        <!-- Items will be injected here -->
-                    </tbody>
-                </table>
-
-                <!-- Totals -->
-                <div class="flex justify-between items-start mt-6 pt-4 border-t border-gray-300 relative">
-                    <div class="w-1/2 pr-4">
-                        <p class="font-bold text-gray-900 mb-2 border-l-4 border-gray-900 pl-2">BANK INFORMATION</p>
-                        <div contenteditable="true" class="border border-dashed border-gray-300 p-3 text-xs bg-gray-50 focus:bg-white outline-none min-h-[80px] no-print" id="bank-info-edit">Bank name : NongHyup Bank / Yeoksam branch
-Bank address: 351 Gangnamdaero, Seocho-dong, Seocho-gu, Seoul, Korea
-SWIFT CODE: NACFKRSE
-Account number: 452-0022-0212-11
-Beneficiary : MediFab Co., LTD</div>
-                        <div class="print-only whitespace-pre-wrap text-xs p-3" id="bank-info-print"></div>
-                        <div class="mt-4 text-xs text-gray-600">
-                            <p><span class="font-bold text-gray-800">Payment Terms:</span> T/T (Telegraphic Transfer)</p>
-                            <p class="mt-1"><span class="font-bold text-gray-800">Incoterms:</span> <span id="quote-incoterms-print" class="uppercase">FOB</span></p>
-                            <p class="mt-1 hidden text-red-600 font-medium" id="exw-notice">* EXW condition applied (Unit Price reflects 3% discount)</p>
-                        </div>
-                    </div>
-                    
-                    <div class="w-1/2 max-w-[320px]">
-                        <!-- FOC Warning Box -->
-                        <div id="foc-warning" class="hidden mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2 shadow-sm no-print">
-                            <svg class="w-4 h-4 flex-shrink-0 mt-0.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                            <div id="foc-warning-text" class="leading-tight"></div>
-                        </div>
-
-                        <div class="flex justify-between items-center py-2 text-sm">
-                            <span class="text-gray-600">Subtotal:</span>
-                            <span><span id="quote-currency-label1" class="text-xs mr-1 text-gray-400"></span><span id="quote-subtotal" class="font-medium">0</span></span>
-                        </div>
-                        <div id="quote-discount-row" class="flex justify-between items-center py-2 text-sm text-red-600 hidden">
-                            <span>Discount (<span id="quote-discount-display">0</span>%):</span>
-                            <span>-<span id="quote-currency-label2" class="text-xs mr-1"></span><span id="quote-discount-amount" class="font-medium">0</span></span>
-                        </div>
-                        <div class="flex justify-between items-center py-3 border-t-2 border-gray-900 mt-1">
-                            <span class="font-bold text-gray-900">GRAND TOTAL:</span>
-                            <span class="font-bold text-lg text-gray-900"><span id="quote-currency-label" class="text-sm mr-1"></span><span id="quote-grandtotal">0</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Memo Section (Main Quotation) -->
-                <div class="mt-6 pt-4 border-t border-gray-300">
-                    <p class="font-bold text-gray-900 mb-2 border-l-4 border-gray-900 pl-2">REMARKS / SPECIAL CONDITIONS</p>
-                    <div contenteditable="true" class="border border-dashed border-gray-300 p-3 text-xs bg-gray-50 focus:bg-white outline-none min-h-[60px] no-print" id="quote-memo-edit"></div>
-                    <div class="print-only whitespace-pre-wrap text-xs p-3 text-gray-800" id="quote-memo-print"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ========================================================= -->
-        <!-- 5. RAW MATERIALS QUOTATION GENERATOR (Independent System) -->
-        <!-- ========================================================= -->
-        <div id="raw-quotation-section" class="mt-16 pt-8 border-t-2 border-gray-900">
-             <div class="no-print mb-8">
-                <div class="flex justify-between items-end mb-4">
-                    <h2 class="text-2xl text-blue-900 font-montserrat uppercase tracking-wider font-semibold">Raw Materials Quotation</h2>
-                    <div class="space-x-2 flex">
-                        <button onclick="addRawQuoteItem()" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-900 text-sm font-medium transition-colors border border-blue-200">+ Add Raw Item</button>
-                        <button id="btn-print-raw" onclick="printRawQuotation()" class="px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm tracking-widest uppercase transition-colors disabled:opacity-50 flex items-center justify-center min-w-[160px]">Print / Save PDF</button>
-                    </div>
-                </div>
-
-                <div class="bg-blue-50 p-4 border border-blue-200 flex flex-wrap gap-6 items-center mb-8">
-                    <div class="flex items-center gap-2 border-r border-blue-300 pr-6">
-                        <label class="text-sm font-bold text-blue-900">Region:</label>
-                        <select id="raw-quote-region" class="border border-blue-300 p-1.5 text-sm bg-white" onchange="changeRawRegion()">
-                            <option value="overseas">Overseas (해외)</option>
-                            <option value="domestic">Domestic (국내)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="flex items-center gap-2 border-r border-blue-300 pr-6">
-                        <label class="text-sm font-bold text-blue-900">Incoterms:</label>
-                        <select id="raw-quote-incoterms" class="border border-blue-300 p-1.5 text-sm bg-white" onchange="renderRawQuoteTable()">
-                            <option value="FOB">FOB</option>
-                            <option value="EXW">EXW</option>
-                        </select>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-bold text-blue-900">Special Discount (%):</label>
-                        <input type="number" id="raw-quote-discount" min="0" max="100" class="border border-blue-300 p-1.5 text-sm bg-white w-16 text-right" value="0" onchange="renderRawQuoteTable()">
-                    </div>
-                </div>
-             </div>
-             
-             <div class="mb-8 bg-blue-50 p-6 border border-blue-200 no-print">
-                 <p class="font-bold text-blue-900 mb-4 border-l-4 border-blue-900 pl-2">CUSTOMER INFORMATION (RAW MATERIALS)</p>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <div>
-                         <label class="block text-xs font-bold text-blue-900 mb-1">Company Name <span class="text-red-500">*</span></label>
-                         <input type="text" id="raw-cust-company" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. Medifab Partners Inc.">
-                     </div>
-                     <div>
-                         <label class="block text-xs font-bold text-blue-900 mb-1">Nationality <span class="text-red-500">*</span></label>
-                         <input type="text" id="raw-cust-nationality" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. South Korea, USA">
-                     </div>
-                     <div>
-                         <label class="block text-xs font-bold text-blue-900 mb-1">Contact Name <span class="text-red-500">*</span></label>
-                         <input type="text" id="raw-cust-name" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. John Doe">
-                     </div>
-                     <div>
-                         <label class="block text-xs font-bold text-blue-900 mb-1">Email Address <span class="text-red-500">*</span></label>
-                         <input type="email" id="raw-cust-email" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. contact@company.com">
-                     </div>
-                     <div class="md:col-span-2">
-                         <label class="block text-xs font-bold text-blue-900 mb-1">Company Address <span class="text-red-500">*</span></label>
-                         <input type="text" id="raw-cust-address" class="w-full border border-blue-300 p-2 text-sm bg-white focus:outline-none focus:border-blue-900" placeholder="e.g. 123 Business Rd, Seoul, Korea">
-                     </div>
-                 </div>
-             </div>
-
-            <div id="raw-print-area" class="print-area-wrapper bg-white p-12 mx-auto shadow-[0_4px_20px_rgb(0,0,0,0.05)] border border-gray-100" style="max-w: 210mm; min-height: 297mm;">
-                <!-- Header: Title -->
-                <div class="mb-8 border-b-2 border-gray-900 pb-6">
-                    <h1 class="text-2xl font-montserrat tracking-wide text-gray-900 uppercase font-bold text-center mb-6">OFFICIAL QUOTATION: PREMIUM BIO-MATERIAL SOLUTIONS</h1>
-                    <table class="w-full text-sm text-left">
-                        <tbody>
-                            <tr>
-                                <td class="font-bold text-gray-700 w-24 py-1">Date:</td>
-                                <td class="py-1"><span id="raw-quote-date" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">YYYY-MM-DD</span><span id="raw-quote-date-print" class="print-only-inline"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-bold text-gray-700 py-1">Quote No:</td>
-                                <td class="py-1"><span id="raw-quote-no" contenteditable="true" class="border-b border-dashed border-gray-300 px-1 outline-none focus:bg-gray-50 no-print">RM-QT-2026-001</span><span id="raw-quote-no-print" class="print-only-inline"></span></td>
-                            </tr>
-                            <tr>
-                                <td class="font-bold text-gray-700 py-1 align-top pt-2">To:</td>
-                                <td class="py-1 pt-2">
-                                    <div id="raw-quote-to-print" class="whitespace-pre-wrap text-sm border border-transparent min-h-[4rem] print-only"></div>
-                                    <div class="no-print text-gray-400 italic text-xs">(Customer Info will be rendered here upon print)</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <h3 class="font-montserrat font-bold text-gray-900 text-sm mb-3">1. Quotation Details</h3>
-                
-                <!-- Raw Quote Table -->
-                <table class="w-full text-left border-collapse mb-8">
-                    <thead>
-                        <tr class="bg-gray-100 border-t-2 border-b-2 border-gray-900 text-xs uppercase tracking-wider text-gray-700">
-                            <th class="py-2 px-2 text-center w-[5%] no-print">Del</th>
-                            <th class="py-2 px-2 w-[25%]">Product Name</th>
-                            <th class="py-2 px-2 text-center w-[15%]">Grade</th>
-                            <th class="py-2 px-2 text-center w-[12%]">Form</th>
-                            <th class="py-2 px-2 text-center w-[10%]">Unit</th>
-                            <th class="py-2 px-2 text-center w-[10%]">Qty</th>
-                            <th class="py-2 px-2 text-right w-[11%]">U.Price (<span id="raw-quote-th-currency1">USD</span>)</th>
-                            <th class="py-2 px-2 text-right w-[12%]">Amount (<span id="raw-quote-th-currency2">USD</span>)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="raw-quote-tbody" class="text-sm">
-                        <!-- Raw Items will be injected here -->
-                    </tbody>
-                </table>
-                
-                <!-- Totals & Bank Info for Raw -->
-                <div class="flex justify-between items-start mt-6 pt-4 border-t border-blue-300 relative">
-                    <div class="w-1/2 pr-4">
-                        <p class="font-bold text-blue-900 mb-2 border-l-4 border-blue-900 pl-2">BANK INFORMATION</p>
-                        <div contenteditable="true" class="border border-dashed border-blue-300 p-3 text-xs bg-blue-50 focus:bg-white outline-none min-h-[80px] no-print" id="raw-bank-info-edit">Bank name : NongHyup Bank / Yeoksam branch
-Bank address: 351 Gangnamdaero, Seocho-dong, Seocho-gu, Seoul, Korea
-SWIFT CODE: NACFKRSE
-Account number: 452-0022-0212-11
-Beneficiary : MediFab Co., LTD</div>
-                        <div class="print-only whitespace-pre-wrap text-xs p-3" id="raw-bank-info-print"></div>
-                        <div class="mt-4 text-xs text-gray-600">
-                            <p><span class="font-bold text-gray-800">Payment Terms:</span> T/T (Telegraphic Transfer)</p>
-                            <p class="mt-1"><span class="font-bold text-gray-800">Incoterms:</span> <span id="raw-quote-incoterms-print" class="uppercase">FOB</span></p>
-                            <p class="mt-1 hidden text-red-600 font-medium" id="raw-exw-notice">* EXW condition applied (Unit Price reflects 3% discount)</p>
-                        </div>
-                    </div>
-                    
-                    <div class="w-1/2 max-w-[320px]">
-                        <div class="flex justify-between items-center py-2 text-sm">
-                            <span class="text-gray-600">Subtotal:</span>
-                            <span><span id="raw-quote-currency-label1" class="text-xs mr-1 text-gray-400"></span><span id="raw-quote-subtotal" class="font-medium">0</span></span>
-                        </div>
-                        <div id="raw-quote-discount-row" class="flex justify-between items-center py-2 text-sm text-red-600 hidden">
-                            <span>Discount (<span id="raw-quote-discount-display">0</span>%):</span>
-                            <span>-<span id="raw-quote-currency-label2" class="text-xs mr-1"></span><span id="raw-quote-discount-amount" class="font-medium">0</span></span>
-                        </div>
-                        <div class="flex justify-between items-center py-3 border-t-2 border-blue-900 mt-1">
-                            <span class="font-bold text-blue-900">GRAND TOTAL:</span>
-                            <span class="font-bold text-lg text-blue-900"><span id="raw-quote-currency-label" class="text-sm mr-1"></span><span id="raw-quote-grandtotal">0</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Memo Section (Raw Materials) -->
-                <div class="mt-6 pt-4 border-t border-blue-300">
-                    <p class="font-bold text-blue-900 mb-2 border-l-4 border-blue-900 pl-2">REMARKS / SPECIAL CONDITIONS</p>
-                    <div contenteditable="true" class="border border-dashed border-blue-300 p-3 text-xs bg-blue-50 focus:bg-white outline-none min-h-[60px] no-print" id="raw-quote-memo-edit"></div>
-                    <div class="print-only whitespace-pre-wrap text-xs p-3 text-gray-800" id="raw-quote-memo-print"></div>
-                </div>
-
-            </div>
-        </div>
-
     </div>
 
     <script>
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const todayStr = new Date().toLocaleDateString('en-US', options);
         document.getElementById('current-date').textContent = `Today: ${todayStr}`;
-        
-        const isoDate = new Date().toISOString().split('T')[0];
-        document.getElementById('quote-date').textContent = isoDate;
-        document.getElementById('raw-quote-date').textContent = isoDate;
-
-        function checkPassword() {
-            const pwd = document.getElementById('pwd-input').value;
-            const errorMsg = document.getElementById('error-msg');
-            
-            if (pwd === "0905") {
-                document.getElementById('lock-screen').style.opacity = "0";
-                setTimeout(() => {
-                    document.getElementById('lock-screen').style.display = "none";
-                    const mainContent = document.getElementById('main-content');
-                    mainContent.style.display = "flex";
-                    setTimeout(() => { mainContent.style.opacity = "1"; }, 50);
-                    initDashboard();
-                }, 300);
-            } else {
-                errorMsg.classList.remove('hidden');
-                document.getElementById('pwd-input').value = "";
-                document.getElementById('pwd-input').focus();
-            }
-        }
-
-        const escapeHtml = (str) => {
-            if (str === null || str === undefined) return '';
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        };
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            const bgColor = type === 'success' ? 'bg-gray-900' : 'bg-red-600';
-            toast.className = `${bgColor} text-white px-6 py-3 shadow-lg flex items-center gap-3 transition-all duration-300 transform translate-y-full opacity-0 pointer-events-auto font-montserrat text-sm tracking-wide border border-transparent`;
-            
-            const icon = type === 'success' 
-                ? `<svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
-                : `<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-
-            toast.innerHTML = `${icon} <span>${message}</span>`;
-            container.appendChild(toast);
-
-            requestAnimationFrame(() => { toast.classList.remove('translate-y-full', 'opacity-0'); });
-            setTimeout(() => {
-                toast.classList.add('translate-y-full', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
 
         function openImageModal(imgSrc) {
             const modal = document.getElementById('image-modal');
@@ -756,7 +336,6 @@ Beneficiary : MediFab Co., LTD</div>
         let globalUniqueProducts = [];
         let globalMedicalProducts = [];
         let globalRawMaterials = [];
-        window.isFocLimitExceeded = false;
 
         const productImageMap = {
             "Cellular water ampoule booster 120ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoulbooster120.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxib29zdGVyMTIwLmpwZyIsImlhdCI6MTc4MDYyNzM4NCwiZXhwIjoyMDk1OTg3Mzg0fQ.YgYQumgSOVgFPo5h4rPdJgWEvU-DW-GBbrWWlGIGI2o",
@@ -782,41 +361,6 @@ Beneficiary : MediFab Co., LTD</div>
             "Echrever": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/echrever.avif?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9lY2hyZXZlci5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4MTAwNDkwNCwiZXhwIjoyMDk2MzY0OTA0fQ.gTqgle5g_hgh9Cp-oRP2OexYmpMUa47QaTYXorlJYyM"
         };
 
-        const bankInfoOverseas = `Bank name : NongHyup Bank / Yeoksam branch\nBank address: 351 Gangnamdaero, Seocho-dong, Seocho-gu, Seoul, Korea\nSWIFT CODE: NACFKRSE\nAccount number: 452-0022-0212-11\nBeneficiary : MediFab Co., LTD`;
-        const bankInfoDomestic = `은행명 : 우리은행 (독산동지점)\n계좌번호 : 1005-204-129976\n예금과목 : 우리CUBE 기업자유예금\n예금주 : 주식회사메디팹`;
-
-        function changeRegion() {
-            const region = document.getElementById('quote-region').value;
-            const bankInfoEdit = document.getElementById('bank-info-edit');
-            const incotermsSelect = document.getElementById('quote-incoterms');
-            
-            if (region === 'overseas') {
-                bankInfoEdit.innerText = bankInfoOverseas;
-                incotermsSelect.disabled = false;
-                incotermsSelect.value = 'FOB'; 
-            } else {
-                bankInfoEdit.innerText = bankInfoDomestic;
-                incotermsSelect.value = 'EXW'; 
-            }
-            renderQuoteTable(); 
-        }
-
-        function changeRawRegion() {
-            const region = document.getElementById('raw-quote-region').value;
-            const bankInfoEdit = document.getElementById('raw-bank-info-edit');
-            const incotermsSelect = document.getElementById('raw-quote-incoterms');
-            
-            if (region === 'overseas') {
-                bankInfoEdit.innerText = bankInfoOverseas;
-                incotermsSelect.disabled = false;
-                incotermsSelect.value = 'FOB'; 
-            } else {
-                bankInfoEdit.innerText = bankInfoDomestic;
-                incotermsSelect.value = 'EXW'; 
-            }
-            renderRawQuoteTable(); 
-        }
-
         async function initDashboard() {
             try {
                 const exRes = await fetch('https://open.er-api.com/v6/latest/USD');
@@ -833,28 +377,36 @@ Beneficiary : MediFab Co., LTD</div>
             }
 
             try {
+                // 수정 포인트 1: 데이터베이스 스키마 변경에 따라 'name' 제거 및 분리된 'volume', 'qty' 컬럼 직접 호출
                 const { data: dbProducts, error: prodErr } = await supabaseClient
                     .from('products')
-                    .select(`sub_category, name_en, clean_name, ct_quantity, product_prices (currency, b2c_msrp, b2c_promotion, b2b_tier1_1_to_10_ct, b2b_tier2_10_to_30_ct, b2b_tier3_30_to_70_ct)`)
+                    .select(`sub_category, clean_name, volume, qty, ct_quantity, product_prices (currency, b2c_msrp, b2c_promotion, b2b_tier1_1_to_10_ct, b2b_tier2_10_to_30_ct, b2b_tier3_30_to_70_ct)`)
                     .order('created_at', { ascending: true });
-                if (prodErr) throw prodErr;
+                    
+                if (prodErr) {
+                    console.error("Supabase Cosmetic Data Fetch Error:", prodErr);
+                    throw prodErr;
+                }
+
                 const uniqueProductsMap = new Map();
                 if (dbProducts && dbProducts.length > 0) {
                     dbProducts.forEach(product => {
-                        let displayName = product.name_en || '';
                         let cleanName = (product.clean_name || '').trim();
+                        let displayName = cleanName;
 
                         if (cleanName.toLowerCase().includes('core impact')) {
                             displayName = "Core impact (PK/BK/WH/DW/BG)";
                         } else if (cleanName.toLowerCase().includes('hyper shot')) {
                             displayName = "Hyper shot (PK/BG)";
-                        } else if (displayName.includes("Cellular water ampoule booster 50ml")) {
-                            displayName = displayName.replace("Cellular water ampoule booster 50ml", "Cellular water ampoule booster 60ml");
+                        } else if (cleanName.toLowerCase() === 'cellular water ampoule booster' && product.volume === '50ml') {
+                            // 기존 50ml -> 60ml 이름 치환을 volume 속성을 직접 수정하도록 변경
+                            product.volume = '60ml';
                         }
                         
                         product.display_name = displayName;
                         
-                        const uniqueKey = displayName;
+                        // 수정 포인트 2: 이름, 용량, 갯수를 함께 키로 묶어 중복 상품을 방지
+                        const uniqueKey = `${displayName}_${product.volume || ''}_${product.qty || ''}`;
                         
                         if (uniqueKey && !uniqueProductsMap.has(uniqueKey)) {
                             uniqueProductsMap.set(uniqueKey, product);
@@ -862,8 +414,11 @@ Beneficiary : MediFab Co., LTD</div>
                     });
                     globalUniqueProducts = Array.from(uniqueProductsMap.values());
                 }
-            } catch (err) {}
+            } catch (err) {
+                console.error("Failed to process Cosmetic products:", err);
+            }
 
+            // 의료 기기 (Medical) 호출
             try {
                 const { data: dbMedicals, error: medErr } = await supabaseClient
                     .from('medical_aesthetic_products')
@@ -880,6 +435,7 @@ Beneficiary : MediFab Co., LTD</div>
                 });
             }
 
+            // 원료 (Raw Materials) 호출
             try {
                 const { data: dbRaw, error: rawErr } = await supabaseClient
                     .from('raw_materials')
@@ -902,7 +458,6 @@ Beneficiary : MediFab Co., LTD</div>
             renderTableData();
             renderMedicalTableData();
             renderRawMaterialsTableData();
-            initQuotationSystem();
         }
 
         function changeExchangeRate(val) {
@@ -910,8 +465,6 @@ Beneficiary : MediFab Co., LTD</div>
             renderTableData();
             renderMedicalTableData();
             renderRawMaterialsTableData();
-            renderQuoteTable(); 
-            renderRawQuoteTable();
         }
 
         function setCurrency(currency) {
@@ -937,8 +490,6 @@ Beneficiary : MediFab Co., LTD</div>
             renderTableData();
             renderMedicalTableData();
             renderRawMaterialsTableData();
-            renderQuoteTable();
-            renderRawQuoteTable();
         }
 
         function formatCurrency(amount, roundKrwToThousands = false) {
@@ -953,33 +504,14 @@ Beneficiary : MediFab Co., LTD</div>
             if (amount === null || amount === undefined || amount === '-') return '<span class="text-black">-</span>';
             return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(amount));
         }
-        
-        function formatQuoteNumber(num) {
-            if (num === null || num === undefined || isNaN(num)) return '0';
-            return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(num));
-        }
-
-        function extractNameVolumeQty(fullName) {
-            if (!fullName) return { name: '-', volume: '-', qty: '-' };
-            let name = fullName.trim();
-            let volume = '-';
-            let qty = '-';
-            const formatQty = (q) => q.trim().toLowerCase();
-            const volQtyMatch = fullName.match(/(.*?)\s+(\d+\.?\d*\s*(?:ml|g|oz|kg|l|fl\.oz))\s*(?:x|\*|X)?\s*(\d+\s*(?:ea|pcs|p|sheets|pads|매|개))$/i);
-            if (volQtyMatch) return { name: volQtyMatch[1].trim(), volume: volQtyMatch[2].trim(), qty: formatQty(volQtyMatch[3]) };
-            const volMatch = fullName.match(/(.*?)\s+(\d+\.?\d*\s*(?:ml|g|oz|kg|l|fl\.oz))$/i);
-            if (volMatch) return { name: volMatch[1].trim(), volume: volMatch[2].trim(), qty: '-' };
-            const qtyMatch = fullName.match(/(.*?)\s+(\d+\s*(?:ea|pcs|p|sheets|pads|매|개))$/i);
-            if (qtyMatch) return { name: qtyMatch[1].trim(), volume: '-', qty: formatQty(qtyMatch[2]) };
-            const genericMatch = fullName.match(/(.*?)\s+(\d+\s*[a-zA-Z]+(?:\s*(?:x|\*|X)?\s*\d+\s*[a-zA-Z]+)?)$/);
-            if (genericMatch) return { name: genericMatch[1].trim(), volume: genericMatch[2].trim(), qty: '-' };
-            return { name, volume, qty };
-        }
 
         function renderTableData() {
             const tbody = document.getElementById('price-table-body');
             tbody.innerHTML = '';
-            if (!globalUniqueProducts || globalUniqueProducts.length === 0) return;
+            if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center py-10 text-red-500 font-light text-sm italic">Failed to load cosmetic data or no data available. Check console.</td></tr>';
+                return;
+            }
             
             const faceDevices = globalUniqueProducts.filter(p => {
                 const sub = (p.sub_category || '').toLowerCase();
@@ -1019,25 +551,41 @@ Beneficiary : MediFab Co., LTD</div>
             }
             function renderProducts(products) {
                 products.forEach(p => {
-                    const pricesArray = Array.isArray(p.product_prices) ? p.product_prices : [];
-                    const usdPrice = pricesArray.find(pr => pr.currency === 'USD') || {};
+                    let pricesArray = [];
+                    if (Array.isArray(p.product_prices)) {
+                        pricesArray = p.product_prices;
+                    } else if (p.product_prices && typeof p.product_prices === 'object') {
+                        pricesArray = [p.product_prices];
+                    }
+
+                    const usdPrice = pricesArray.find(pr => {
+                        const currencyCode = pr.currency ? pr.currency.trim().toUpperCase() : '';
+                        return currencyCode === 'USD';
+                    }) || {};
+
                     const tr = document.createElement('tr');
                     tr.className = "text-sm hover:bg-gray-50 transition-colors";
                     const rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
                     const isKrw = currentCurrency === 'KRW';
 
-                    const b2c_msrp = usdPrice.b2c_msrp ? usdPrice.b2c_msrp * rate : null;
-                    const b2c_promotion = usdPrice.b2c_promotion ? usdPrice.b2c_promotion * rate : null;
-                    const b2b1 = usdPrice.b2b_tier1_1_to_10_ct ? usdPrice.b2b_tier1_1_to_10_ct * rate : null;
-                    const b2b2 = usdPrice.b2b_tier2_10_to_30_ct ? usdPrice.b2b_tier2_10_to_30_ct * rate : null;
-                    const b2b3 = usdPrice.b2b_tier3_30_to_70_ct ? usdPrice.b2b_tier3_30_to_70_ct * rate : null;
+                    const getPrice = (val, rate) => (val !== undefined && val !== null) ? val * rate : null;
 
-                    let { name, volume, qty } = extractNameVolumeQty(p.display_name);
-                    if (qty === '-' || qty === '' || !qty) qty = '1ea';
+                    const b2c_msrp = getPrice(usdPrice.b2c_msrp, rate);
+                    const b2c_promotion = getPrice(usdPrice.b2c_promotion, rate);
+                    const b2b1 = getPrice(usdPrice.b2b_tier1_1_to_10_ct, rate);
+                    const b2b2 = getPrice(usdPrice.b2b_tier2_10_to_30_ct, rate);
+                    const b2b3 = getPrice(usdPrice.b2b_tier3_30_to_70_ct, rate);
+
+                    // 수정 포인트 3: 복잡한 문자열 처리 함수를 삭제하고 직관적으로 DB 컬럼 데이터를 가져옵니다.
+                    let name = p.display_name;
+                    let volume = (p.volume && p.volume.trim() !== '') ? p.volume : '-';
+                    let qty = (p.qty && p.qty.trim() !== '') ? p.qty : '1EA';
 
                     let mappedImg = "", longestMatch = "";
+                    // 수정 포인트 4: 이름과 용량을 결합해 상품 이미지 매핑 알고리즘이 올바르게 동작하게 합니다.
+                    const searchString = `${name} ${volume}`.toLowerCase();
                     for (const [key, url] of Object.entries(productImageMap)) {
-                        if (name.toLowerCase().includes(key.toLowerCase()) || p.display_name.toLowerCase().includes(key.toLowerCase())) {
+                        if (searchString.includes(key.toLowerCase()) || name.toLowerCase().includes(key.toLowerCase())) {
                             if (key.length > longestMatch.length) { longestMatch = key; mappedImg = url; }
                         }
                     }
@@ -1195,375 +743,11 @@ Beneficiary : MediFab Co., LTD</div>
             });
         }
 
-        // ==========================================
-        // QUOTATION LOGIC
-        // ==========================================
-        let allProductsList = [];
-        let quoteItems = [];
-        let quoteItemIdCounter = 0;
-
-        function initQuotationSystem() {
-            allProductsList = [];
-            const addedNames = new Set();
-            (globalUniqueProducts || []).forEach(p => {
-                if (!p || !p.display_name) return;
-                let prefix = '[Beauty]';
-                const cleanName = (p.clean_name || '').toLowerCase();
-                if (cleanName.includes('core impact') || cleanName.includes('hyper shot')) prefix = '[Device]';
-                const fullName = `${prefix} ${p.display_name}`;
-                if (!addedNames.has(fullName)) { allProductsList.push({ id: 'cos_' + p.display_name, name: fullName, type: 'cosmetic', raw: p }); addedNames.add(fullName); }
-            });
-            (globalMedicalProducts || []).forEach(p => {
-                if (!p || !p.item) return;
-                const fullName = `[Medical] ${p.item}`;
-                if (!addedNames.has(fullName)) { allProductsList.push({ id: 'med_' + p.item, name: fullName, type: 'medical', raw: p }); addedNames.add(fullName); }
-            });
-            renderQuoteTable();
-            renderRawQuoteTable();
-        }
-
-        function getCtSize(productObj) {
-            if (!productObj || productObj.type === 'medical' || productObj.type === 'raw') return 1; 
-            if (!productObj.raw || !productObj.raw.ct_quantity) return 1;
-            const num = parseInt(String(productObj.raw.ct_quantity).replace(/[^0-9]/g, ''), 10);
-            return isNaN(num) || num === 0 ? 1 : num;
-        }
-
-        function addQuoteItem() {
-            quoteItemIdCounter++;
-            quoteItems.push({ id: 'qi_' + quoteItemIdCounter, productId: '', customName: '', color: '', ctQty: 0, eaQty: 0, unitPrice: 0, manualPrice: false, isFoc: false, priceTier: 'auto' });
-            renderQuoteTable();
-        }
-        function removeQuoteItem(id) { quoteItems = quoteItems.filter(item => item.id !== id); renderQuoteTable(); }
-
-        function updateQuoteItem(id, field, value) {
-            const item = quoteItems.find(i => i.id === id);
-            if (!item) return;
-            if (field === 'ctQty' || field === 'eaQty') item[field] = Math.max(0, parseInt(value, 10) || 0);
-            else if (field === 'isFoc') item.isFoc = !!value;
-            else if (field === 'unitPrice') { item.unitPrice = Math.max(0, parseFloat(value) || 0); item.manualPrice = true; }
-            else if (field === 'productId') {
-                item.productId = value; item.customName = ''; item.color = ''; item.priceTier = 'auto'; item.manualPrice = false;
-                const prodObj = allProductsList.find(p => p.id === value);
-                if (prodObj && (prodObj.type === 'medical' || prodObj.type === 'raw')) item.ctQty = 0;
-            } else if (field === 'priceTier') { item.priceTier = value; item.manualPrice = false; }
-            else item[field] = value;
-            renderQuoteTable();
-        }
-
-        function calculateUnitPrice(item, totalEa) {
-            if (item.manualPrice) return item.unitPrice;
-            if (!item.productId || item.productId === 'CUSTOM') return 0;
-            const prodObj = allProductsList.find(p => p.id === item.productId);
-            if (!prodObj) return 0;
-            const tier = item.priceTier || 'auto';
-            let finalPrice = 0;
-
-            if (prodObj.type === 'cosmetic') {
-                const pricesArray = Array.isArray(prodObj.raw.product_prices) ? prodObj.raw.product_prices : [];
-                const usdPrice = pricesArray.find(pr => pr.currency === 'USD') || {};
-                const rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
-                const msrp = (Number(usdPrice.b2c_msrp) || 0) * rate; const promo = (Number(usdPrice.b2c_promotion) || 0) * rate;
-                const b2b1 = (Number(usdPrice.b2b_tier1_1_to_10_ct) || 0) * rate; const b2b2 = (Number(usdPrice.b2b_tier2_10_to_30_ct) || 0) * rate; const b2b3 = (Number(usdPrice.b2b_tier3_30_to_70_ct) || 0) * rate;
-
-                if (tier === 'msrp') finalPrice = msrp; else if (tier === 'promo') finalPrice = promo; else if (tier === 'b2b1') finalPrice = b2b1; else if (tier === 'b2b2') finalPrice = b2b2; else if (tier === 'b2b3') finalPrice = b2b3;
-                else {
-                    const ctSize = getCtSize(prodObj); const totalCt = totalEa / ctSize;
-                    if (totalCt >= 30 && b2b3) finalPrice = b2b3; else if (totalCt >= 10 && b2b2) finalPrice = b2b2; else if (totalCt > 0 && b2b1) finalPrice = b2b1; else finalPrice = b2b1 || msrp;
-                }
-            } else if (prodObj.type === 'medical') {
-                const p = prodObj.raw; const nativeCurrency = p.currency || 'USD';
-                let rate = 1; if (nativeCurrency === 'USD' && currentCurrency === 'KRW') rate = appliedKrwRate; else if (nativeCurrency === 'KRW' && currentCurrency === 'USD') rate = 1 / appliedKrwRate;
-                const c_msrp = (Number(p.clinic_msrp) || 0) * rate; const c_promo = (Number(p.clinic_promotion) || 0) * rate;
-                const d_1k = (Number(p.dist_1000) || 0) * rate; const d_3k = (Number(p.dist_3000) || 0) * rate; const d_5k = (Number(p.dist_5000) || 0) * rate; const d_10k = (Number(p.dist_10000) || 0) * rate;
-                const o_10k = (Number(p.oem_10000) || 0) * rate; const o_30k = (Number(p.oem_30000) || 0) * rate; const o_50k = (Number(p.oem_50000) || 0) * rate;
-
-                if (tier === 'clinic_msrp') finalPrice = c_msrp; else if (tier === 'clinic_promo') finalPrice = c_promo; else if (tier === 'dist_1000') finalPrice = d_1k; else if (tier === 'dist_3000') finalPrice = d_3k; else if (tier === 'dist_5000') finalPrice = d_5k; else if (tier === 'dist_10000') finalPrice = d_10k; else if (tier === 'oem_10000') finalPrice = o_10k !== null ? o_10k : d_10k; else if (tier === 'oem_30000') finalPrice = o_30k !== null ? o_30k : d_10k; else if (tier === 'oem_50000') finalPrice = o_50k !== null ? o_50k : d_10k;
-                else {
-                    if (totalEa >= 50000 && o_50k) finalPrice = o_50k; else if (totalEa >= 30000 && o_30k) finalPrice = o_30k; else if (totalEa >= 10000) finalPrice = o_10k || d_10k; else if (totalEa >= 5000 && d_5k) finalPrice = d_5k; else if (totalEa >= 3000 && d_3k) finalPrice = d_3k; else if (totalEa > 0 && d_1k) finalPrice = d_1k; else finalPrice = d_1k || c_msrp;
-                }
-            }
-            return Math.round(finalPrice);
-        }
-
-        function getTierOptionsHtml(item) {
-            if (!item.productId || item.productId === 'CUSTOM') return '';
-            const prodObj = allProductsList.find(p => p.id === item.productId);
-            if (!prodObj) return '';
-            const tier = item.priceTier || 'auto';
-            let options = `<option value="auto" ${tier==='auto'?'selected':''}>Auto</option>`;
-            if (prodObj.type === 'cosmetic') {
-                options += `<option value="msrp" ${tier==='msrp'?'selected':''}>MSRP</option><option value="promo" ${tier==='promo'?'selected':''}>Promo</option><option value="b2b1" ${tier==='b2b1'?'selected':''}>1-10CT</option><option value="b2b2" ${tier==='b2b2'?'selected':''}>10-30CT</option><option value="b2b3" ${tier==='b2b3'?'selected':''}>30+CT</option>`;
-            } else if (prodObj.type === 'medical') {
-                options += `<option value="clinic_msrp" ${tier==='clinic_msrp'?'selected':''}>MSRP</option><option value="clinic_promo" ${tier==='clinic_promo'?'selected':''}>Promo</option><option value="dist_1000" ${tier==='dist_1000'?'selected':''}>Dist(1k)</option><option value="dist_3000" ${tier==='dist_3000'?'selected':''}>Dist(3k)</option><option value="dist_5000" ${tier==='dist_5000'?'selected':''}>Dist(5k)</option><option value="dist_10000" ${tier==='dist_10000'?'selected':''}>Dist(10k)</option><option value="oem_10000" ${tier==='oem_10000'?'selected':''}>OEM(10k)</option><option value="oem_30000" ${tier==='oem_30000'?'selected':''}>OEM(30k)</option><option value="oem_50000" ${tier==='oem_50000'?'selected':''}>OEM(50k)</option>`;
-            }
-            return options;
-        }
-
-        function checkFocLimit(subTotal, focTotal, currency) {
-            const warningEl = document.getElementById('foc-warning');
-            const warningTextEl = document.getElementById('foc-warning-text');
-            const btnPrint = document.getElementById('btn-print');
-            const curLabel = currency === 'USD' ? '$' : '₩';
-            
-            if (focTotal > 0 && subTotal === 0) {
-                warningEl.classList.remove('hidden'); warningTextEl.innerHTML = `<strong>FOC Limit Error</strong><br>Cannot add FOC without paid items.`; window.isFocLimitExceeded = true;
-            } else if (focTotal > subTotal * 0.05) {
-                warningEl.classList.remove('hidden'); const limitAmt = subTotal * 0.05; warningTextEl.innerHTML = `<strong>FOC Limit Exceeded (Max 5%)</strong><br>Limit: ${curLabel}${formatQuoteNumber(limitAmt)}`; window.isFocLimitExceeded = true;
-            } else {
-                warningEl.classList.add('hidden'); window.isFocLimitExceeded = false;
-            }
-            if (btnPrint) btnPrint.disabled = window.isFocLimitExceeded;
-        }
-
-        function renderQuoteTable() {
-            try {
-                const tbody = document.getElementById('quote-tbody');
-                tbody.innerHTML = '';
-                let subTotal = 0, focTotalValue = 0; 
-                const targetCurrency = currentCurrency, incoterms = document.getElementById('quote-incoterms')?.value || 'FOB', discountRate = parseFloat(document.getElementById('quote-discount')?.value) || 0;
-
-                if(quoteItems.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 italic text-sm no-print">Click "+ Add Item" to generate quotation.</td></tr>`;
-                    updateTotals(0, discountRate, targetCurrency, incoterms); checkFocLimit(0, 0, targetCurrency); return;
-                }
-
-                quoteItems.forEach((item, index) => {
-                    const prodObj = allProductsList.find(p => p.id === item.productId);
-                    const isNonCtProduct = prodObj && (prodObj.type === 'medical' || prodObj.type === 'raw');
-                    const ctSize = prodObj ? getCtSize(prodObj) : 1; const totalEa = (item.ctQty * ctSize) + item.eaQty;
-                    
-                    if (!item.manualPrice) item.unitPrice = calculateUnitPrice(item, totalEa);
-                    
-                    let appliedUnitPrice = Number(item.unitPrice) || 0;
-                    if (incoterms === 'EXW') appliedUnitPrice *= 0.97;
-                    
-                    const originalAmount = appliedUnitPrice * totalEa;
-                    if (item.isFoc) { focTotalValue += originalAmount; appliedUnitPrice = 0; }
-                    const amount = appliedUnitPrice * totalEa; subTotal += amount;
-
-                    const tr = document.createElement('tr'); tr.className = "border-b border-gray-200 text-sm";
-                    
-                    let prodOptions = `<option value="">Select Product...</option><option value="CUSTOM" ${item.productId === 'CUSTOM' ? 'selected' : ''}>-- Custom Input --</option>`;
-                    allProductsList.forEach(p => { prodOptions += `<option value="${p.id}" ${p.id === item.productId ? 'selected' : ''}>${escapeHtml(p.name)}</option>`; });
-                    let displayItemName = item.productId === 'CUSTOM' ? (item.customName || 'Custom Item') : (prodObj ? prodObj.name : '');
-                    const formattedUnitPrice = Math.round(appliedUnitPrice || Number(item.unitPrice)).toString();
-
-                    let colorInputHtml = ''; const isCoreImpact = displayItemName.includes('Core impact'); const isHyperShot = displayItemName.includes('Hyper shot');
-                    if (isCoreImpact) {
-                        const options = ['', 'WH', 'PK', 'DW', 'BK', 'BG']; let optsHtml = options.map(opt => `<option value="${opt}" ${item.color === opt ? 'selected' : ''}>${opt || 'Select Color'}</option>`).join('');
-                        colorInputHtml = `<select class="w-full border p-1 text-xs text-center outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" onchange="updateQuoteItem('${item.id}', 'color', this.value)">${optsHtml}</select>`;
-                    } else if (isHyperShot) {
-                        const options = ['', 'PK', 'BG']; let optsHtml = options.map(opt => `<option value="${opt}" ${item.color === opt ? 'selected' : ''}>${opt || 'Select Color'}</option>`).join('');
-                        colorInputHtml = `<select class="w-full border p-1 text-xs text-center outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" onchange="updateQuoteItem('${item.id}', 'color', this.value)">${optsHtml}</select>`;
-                    } else {
-                        colorInputHtml = `<input type="text" class="w-full border p-1 text-xs text-center outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print" value="${escapeHtml(item.color)}" placeholder="None" onchange="updateQuoteItem('${item.id}', 'color', this.value)">`;
-                    }
-
-                    tr.innerHTML = `
-                        <td class="py-2 px-2 text-center print-only-cell hidden text-gray-700">${index + 1}</td>
-                        <td class="py-2 px-2 text-center no-print"><button onclick="removeQuoteItem('${item.id}')" class="text-red-500 hover:text-red-700 font-bold px-2">&times;</button></td>
-                        <td class="py-2 px-2 align-top">
-                            <select class="w-full border p-1 text-xs outline-none focus:border-gray-900 bg-gray-50 focus:bg-white no-print mb-1" onchange="updateQuoteItem('${item.id}', 'productId', this.value)">${prodOptions}</select>
-                            ${item.productId === 'CUSTOM' ? `<input type="text" class="w-full border p-1 text-xs outline-none focus:border-gray-900 bg-gray-50 no-print" placeholder="Enter custom item name..." value="${escapeHtml(item.customName)}" onchange="updateQuoteItem('${item.id}', 'customName', this.value)">` : ''}
-                            <div class="print-only hidden font-medium text-gray-900">${escapeHtml(displayItemName)}</div>
-                        </td>
-                        <td class="py-2 px-2 text-center align-top">${colorInputHtml}<span class="print-only hidden">${escapeHtml(item.color) || '-'}</span></td>
-                        <td class="py-2 px-2 text-center align-top">
-                            <div class="flex items-center justify-center gap-1 no-print">
-                                <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none ${isNonCtProduct ? 'bg-gray-200 text-gray-400' : 'bg-gray-50'}" value="${item.ctQty}" onchange="updateQuoteItem('${item.id}', 'ctQty', this.value)" ${isNonCtProduct ? 'disabled' : ''}> <span class="text-xs">CT</span>
-                                <input type="number" min="0" class="w-12 border p-1 text-xs text-center outline-none bg-gray-50" value="${item.eaQty}" onchange="updateQuoteItem('${item.id}', 'eaQty', this.value)"> <span class="text-xs">EA</span>
-                            </div>
-                            <div class="print-only hidden text-center"><span class="font-bold">${totalEa}</span> EA<br><span class="text-[10px]">(${item.ctQty}CT + ${item.eaQty}EA)</span></div>
-                        </td>
-                        <td class="py-2 px-2 text-right align-top">
-                            <div class="no-print float-right flex flex-col items-end gap-1 w-full max-w-[130px]">
-                                <label class="text-[10px] text-gray-500 cursor-pointer flex items-center gap-1 mb-1"><input type="checkbox" ${item.isFoc ? 'checked' : ''} onchange="updateQuoteItem('${item.id}', 'isFoc', this.checked)"> FOC</label>
-                                ${item.productId && item.productId !== 'CUSTOM' ? `<select class="w-full border p-1 text-[10px] outline-none bg-gray-50 text-right" onchange="updateQuoteItem('${item.id}', 'priceTier', this.value)">${getTierOptionsHtml(item)}</select>` : ''}
-                                <input type="number" step="any" class="w-full border p-1 text-xs text-right outline-none ${item.isFoc ? 'bg-gray-200 text-gray-400' : 'bg-gray-50'}" value="${formattedUnitPrice}" onchange="updateQuoteItem('${item.id}', 'unitPrice', this.value)" ${item.isFoc ? 'readonly' : ''}>
-                            </div>
-                            <span class="print-only hidden">${item.isFoc ? 'FOC' : formatQuoteNumber(appliedUnitPrice)}</span>
-                        </td>
-                        <td class="py-2 px-2 text-right font-medium text-gray-900 align-top">${item.isFoc ? '0' : formatQuoteNumber(amount)}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                updateTotals(subTotal, discountRate, targetCurrency, incoterms);
-                checkFocLimit(subTotal, focTotalValue, targetCurrency);
-            } catch (err) {}
-        }
-
-        function updateTotals(subTotal, discountRate, targetCurrency, incoterms) {
-            const discountAmount = subTotal * (discountRate / 100);
-            const grandTotal = subTotal - discountAmount;
-            document.getElementById('quote-subtotal').textContent = formatQuoteNumber(subTotal);
-            document.getElementById('quote-discount-display').textContent = discountRate;
-            document.getElementById('quote-discount-amount').textContent = formatQuoteNumber(discountAmount);
-            document.getElementById('quote-grandtotal').textContent = formatQuoteNumber(grandTotal);
-            const discountRow = document.getElementById('quote-discount-row');
-            if (discountRate > 0) discountRow.classList.remove('hidden'); else discountRow.classList.add('hidden');
-            const curLabel = targetCurrency === 'USD' ? '$' : '₩';
-            document.getElementById('quote-currency-label').textContent = curLabel; document.getElementById('quote-currency-label1').textContent = curLabel; document.getElementById('quote-currency-label2').textContent = curLabel;
-            document.getElementById('quote-currency-display').textContent = targetCurrency; document.getElementById('quote-th-currency1').textContent = targetCurrency; document.getElementById('quote-th-currency2').textContent = targetCurrency;
-            document.getElementById('quote-incoterms-print').textContent = incoterms;
-            const exwNotice = document.getElementById('exw-notice'); if (incoterms === 'EXW') exwNotice.classList.remove('hidden'); else exwNotice.classList.add('hidden');
-        }
-
-        async function printQuotation() {
-            if (window.isFocLimitExceeded) return;
-            if (quoteItems.length === 0) { showToast('Please add items to the quotation.', 'error'); return; }
-
-            document.getElementById('quotation-section').classList.add('print-active-section');
-            document.getElementById('raw-quotation-section').classList.remove('print-active-section');
-
-            const comp = document.getElementById('cust-company').value.trim(); const nationality = document.getElementById('cust-nationality').value.trim(); const name = document.getElementById('cust-name').value.trim(); const addr = document.getElementById('cust-address').value.trim(); const email = document.getElementById('cust-email').value.trim();
-            let toHtml = '';
-            if (comp) toHtml += `<span class="font-bold text-base block mb-1">${escapeHtml(comp)}</span>`; if (nationality) toHtml += `<span class="block text-sm">Nationality: ${escapeHtml(nationality)}</span>`; if (name) toHtml += `<span class="block">ATTN: ${escapeHtml(name)}</span>`; if (addr) toHtml += `<span class="block">${escapeHtml(addr)}</span>`; if (email) toHtml += `<span class="block">Email: ${escapeHtml(email)}</span>`;
-
-            document.getElementById('quote-to-print').innerHTML = toHtml || '<span class="text-gray-400 italic">No customer info provided.</span>';
-            document.getElementById('bank-info-print').innerHTML = document.getElementById('bank-info-edit').innerHTML;
-            document.getElementById('quote-memo-print').innerHTML = document.getElementById('quote-memo-edit').innerHTML;
-            
-            const quoteDate = document.getElementById('quote-date').textContent.trim(); const quoteNo = document.getElementById('quote-no').textContent.trim();
-            document.getElementById('quote-date-print').textContent = quoteDate; document.getElementById('quote-no-print').textContent = quoteNo;
-            
-            const originalTitle = document.title;
-            document.title = `${quoteDate}_${quoteNo}_Quotation`;
-            
-            applyPrintStyle('portrait');
-            window.print();
-            setTimeout(() => { document.title = originalTitle; }, 1000);
-        }
-
-        // ==========================================
-        // RAW MATERIAL QUOTATION (Independent)
-        // ==========================================
-        let rawQuoteItems = [];
-        let rawQuoteIdCounter = 0;
-
-        function addRawQuoteItem() { rawQuoteIdCounter++; rawQuoteItems.push({ id: 'rawqi_' + rawQuoteIdCounter, rawId: '', qty: 0, unitPrice: 0, manualPrice: false }); renderRawQuoteTable(); }
-        function removeRawQuoteItem(id) { rawQuoteItems = rawQuoteItems.filter(item => item.id !== id); renderRawQuoteTable(); }
-        function updateRawQuoteItem(id, field, value) {
-            const item = rawQuoteItems.find(i => i.id === id); if (!item) return;
-            if (field === 'qty') item.qty = Math.max(0, parseInt(value, 10) || 0);
-            else if (field === 'unitPrice') { item.unitPrice = Math.max(0, parseFloat(value) || 0); item.manualPrice = true; }
-            else if (field === 'rawId') { item.rawId = value; item.manualPrice = false; }
-            renderRawQuoteTable();
-        }
-
-        function renderRawQuoteTable() {
-            try {
-                const tbody = document.getElementById('raw-quote-tbody'); tbody.innerHTML = '';
-                let grandTotal = 0; let subTotal = 0;
-                const targetCurrency = currentCurrency; 
-                const discountRate = parseFloat(document.getElementById('raw-quote-discount')?.value) || 0;
-                const incoterms = document.getElementById('raw-quote-incoterms')?.value || 'FOB';
-
-                document.getElementById('raw-quote-th-currency1').textContent = targetCurrency; document.getElementById('raw-quote-th-currency2').textContent = targetCurrency;
-                document.getElementById('raw-quote-currency-label').textContent = targetCurrency === 'USD' ? '$' : '₩';
-                document.getElementById('raw-quote-currency-label1').textContent = targetCurrency === 'USD' ? '$' : '₩';
-                document.getElementById('raw-quote-currency-label2').textContent = targetCurrency === 'USD' ? '$' : '₩';
-
-                if(rawQuoteItems.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-gray-400 italic text-sm no-print">Click "+ Add Raw Item" to generate.</td></tr>`;
-                    document.getElementById('raw-quote-subtotal').textContent = '0';
-                    document.getElementById('raw-quote-grandtotal').textContent = '0'; 
-                    document.getElementById('raw-quote-discount-row').classList.add('hidden');
-                    return;
-                }
-
-                rawQuoteItems.forEach((item) => {
-                    const rawObj = globalRawMaterials.find(p => p.id === item.rawId);
-                    if (!item.manualPrice && rawObj) {
-                        let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1; 
-                        item.unitPrice = Math.round((Number(rawObj.unit_price_usd) || 0) * rate);
-                    }
-                    
-                    let appliedUnitPrice = Number(item.unitPrice) || 0;
-                    if (incoterms === 'EXW') appliedUnitPrice *= 0.97;
-                    
-                    const amount = appliedUnitPrice * (item.qty || 0); 
-                    subTotal += amount;
-
-                    const tr = document.createElement('tr'); tr.className = "border-b border-gray-200 text-sm";
-                    
-                    let prodOptions = `<option value="">Select Raw Material...</option>`;
-                    globalRawMaterials.forEach(p => { prodOptions += `<option value="${p.id}" ${p.id === item.rawId ? 'selected' : ''}>${escapeHtml(p.product_name)} - ${escapeHtml(p.grade)}</option>`; });
-                    
-                    tr.innerHTML = `
-                        <td class="py-2 px-2 text-center no-print"><button onclick="removeRawQuoteItem('${item.id}')" class="text-red-500 hover:text-red-700 font-bold px-2">&times;</button></td>
-                        <td class="py-2 px-2">
-                            <select class="w-full border p-1 text-xs outline-none bg-gray-50 no-print" onchange="updateRawQuoteItem('${item.id}', 'rawId', this.value)">${prodOptions}</select>
-                            <div class="print-only hidden font-medium text-gray-900">${rawObj ? escapeHtml(rawObj.product_name) : '-'}</div>
-                        </td>
-                        <td class="py-2 px-2 text-center">${escapeHtml(rawObj ? rawObj.grade : '-')}</td>
-                        <td class="py-2 px-2 text-center">${escapeHtml(rawObj ? rawObj.form : '-')}</td>
-                        <td class="py-2 px-2 text-center">${escapeHtml(rawObj ? rawObj.unit : '-')}</td>
-                        <td class="py-2 px-2 text-center">
-                            <input type="number" class="w-16 border p-1 text-xs text-center outline-none bg-gray-50 no-print" value="${item.qty}" onchange="updateRawQuoteItem('${item.id}', 'qty', this.value)"> 
-                            <div class="print-only hidden text-center font-bold">${item.qty}</div>
-                        </td>
-                        <td class="py-2 px-2 text-right">
-                            <input type="number" class="w-full border p-1 text-xs text-right outline-none bg-gray-50 no-print" value="${Math.round(appliedUnitPrice)}" onchange="updateRawQuoteItem('${item.id}', 'unitPrice', this.value)">
-                            <span class="print-only hidden">${formatQuoteNumber(appliedUnitPrice)}</span>
-                        </td>
-                        <td class="py-2 px-2 text-right font-medium text-gray-900">${formatQuoteNumber(amount)}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                const discountAmount = subTotal * (discountRate / 100);
-                grandTotal = subTotal - discountAmount;
-
-                document.getElementById('raw-quote-subtotal').textContent = formatQuoteNumber(subTotal);
-                document.getElementById('raw-quote-discount-display').textContent = discountRate;
-                document.getElementById('raw-quote-discount-amount').textContent = formatQuoteNumber(discountAmount);
-                document.getElementById('raw-quote-grandtotal').textContent = formatQuoteNumber(grandTotal);
-                
-                const discountRow = document.getElementById('raw-quote-discount-row');
-                if (discountRate > 0) discountRow.classList.remove('hidden'); else discountRow.classList.add('hidden');
-
-                document.getElementById('raw-quote-incoterms-print').textContent = incoterms;
-                const exwNotice = document.getElementById('raw-exw-notice'); 
-                if (incoterms === 'EXW') exwNotice.classList.remove('hidden'); else exwNotice.classList.add('hidden');
-
-            } catch (err) {}
-        }
-
-        function printRawQuotation() {
-            if (rawQuoteItems.length === 0) { showToast('Please add items.', 'error'); return; }
-            document.getElementById('raw-quotation-section').classList.add('print-active-section');
-            document.getElementById('quotation-section').classList.remove('print-active-section');
-
-            const comp = document.getElementById('raw-cust-company').value.trim(); const name = document.getElementById('raw-cust-name').value.trim();
-            const nationality = document.getElementById('raw-cust-nationality').value.trim(); const addr = document.getElementById('raw-cust-address').value.trim(); const email = document.getElementById('raw-cust-email').value.trim();
-            
-            let toHtml = '';
-            if (comp) toHtml += `<span class="font-bold text-base block mb-1">${escapeHtml(comp)}</span>`; 
-            if (nationality) toHtml += `<span class="block text-sm">Nationality: ${escapeHtml(nationality)}</span>`; 
-            if (name) toHtml += `<span class="block">ATTN: ${escapeHtml(name)}</span>`; 
-            if (addr) toHtml += `<span class="block">${escapeHtml(addr)}</span>`; 
-            if (email) toHtml += `<span class="block">Email: ${escapeHtml(email)}</span>`;
-
-            document.getElementById('raw-quote-to-print').innerHTML = toHtml || '<span class="text-gray-400 italic">No customer info provided.</span>';
-            document.getElementById('raw-bank-info-print').innerHTML = document.getElementById('raw-bank-info-edit').innerHTML;
-            document.getElementById('raw-quote-memo-print').innerHTML = document.getElementById('raw-quote-memo-edit').innerHTML;
-            
-            const originalTitle = document.title;
-            document.title = `RawMaterials_Quotation`;
-            
-            applyPrintStyle('portrait');
-            window.print();
-            setTimeout(() => { document.title = originalTitle; }, 1000);
-        }
-
         function printTableSection(sectionId, titleName) {
             document.body.classList.add('print-table-mode');
             
             applyPrintStyle('landscape');
 
-            // Hide all other sections
             const allDirectChildren = document.querySelectorAll('#main-content > div');
             allDirectChildren.forEach(child => child.classList.add('no-print'));
             
@@ -1571,14 +755,12 @@ Beneficiary : MediFab Co., LTD</div>
             targetSection.classList.remove('no-print');
             targetSection.classList.add('print-active-section');
             
-            // Set Print Title
             const originalTitle = document.title;
-            const quoteDate = document.getElementById('quote-date').textContent.trim();
+            const quoteDate = new Date().toISOString().split('T')[0];
             document.title = `${titleName}_${quoteDate}`;
             
             window.print();
             
-            // Restore everything
             setTimeout(() => {
                 document.title = originalTitle;
                 document.body.classList.remove('print-table-mode');
@@ -1607,15 +789,6 @@ Beneficiary : MediFab Co., LTD</div>
                         .unified-table tr { page-break-inside: avoid !important; break-inside: avoid !important; }
                         .unified-table thead { display: table-header-group !important; }
                         h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
-                    }
-                `;
-            } else {
-                style.innerHTML = `
-                    @media print { 
-                        @page { size: A4 portrait; margin: 10mm; }
-                        body { zoom: 0.85; }
-                        #main-content { padding: 0 !important; margin: 0 !important; }
-                        .print-area-wrapper { width: 100% !important; max-width: 210mm !important; margin: 0 auto !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
                     }
                 `;
             }
