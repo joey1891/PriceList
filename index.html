@@ -337,17 +337,23 @@
         let globalMedicalProducts = [];
         let globalRawMaterials = [];
 
-        // 디버깅 정보를 저장할 전역 변수
         let debugProductsLength = 0;
         let debugProductsError = null;
 
+        /* 
+           수정사항:
+           Blue crystal hydrating ampoule의 서명된 URL 토큰이 만료되어 (2026-06-14) 
+           퍼블릭(Public) URL로 교체되었습니다. 버킷이 공개 상태면 영구적으로 보입니다.
+        */
         const productImageMap = {
             "Cellular water ampoule booster 120ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoulbooster120.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxib29zdGVyMTIwLmpwZyIsImlhdCI6MTc4MDYyNzM4NCwiZXhwIjoyMDk1OTg3Mzg0fQ.YgYQumgSOVgFPo5h4rPdJgWEvU-DW-GBbrWWlGIGI2o",
             "Cellular water ampoule booster": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoule%20booster%2060ml.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxlIGJvb3N0ZXIgNjBtbC5wbmciLCJpYXQiOjE3ODA2MjcyODIsImV4cCI6MjA5NTk4NzI4Mn0.LKa9sEPCp05ASOzS2tnq2ybIrdOorq8GyKwfwxKYSgM",
             "Plan tox lifting ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/plan30.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9wbGFuMzAuanBnIiwiaWF0IjoxNzY5MzU0OTY5LCJleHAiOjE5MjcwMzQ5Njl9.oRmRXZlQJbfQFbpAfX7oWyBYtXTZmVey4zexy4qVQhk",
             "Phyto protein volumizing ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Vol30.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9Wb2wzMC53ZWJwIiwiaWF0IjoxNzY5MzU0NzMzLCJleHAiOjE5MjcwMzQ3MzN9.hTuqZjGSJhn5mmX3yEo3abfi3HxwOmUusuV8rLlJVVM",
             "Melano cut brightening ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/br30.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9icjMwLmpwZyIsImlhdCI6MTc2OTk1ODExMywiZXhwIjoxOTI3NjM4MTEzfQ.NUmP-rd8lVUMEobfYGkFGk83Cr12RISejvuIAzFnBvA",
-            "Blue crystal hydrating ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Blue%20crystal%20hydrating%20ampoule.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9CbHVlIGNyeXN0YWwgaHlkcmF0aW5nIGFtcG91bGUuanBlZyIsImlhdCI6MTc4MDU2OTYxNCwiZXhwIjoxNzgxNDMzNjE0fQ.QtUr8cBjRaCgdrKfW6DnEZq9LNsi7EzqzQG47GxX45I",
+            
+            "Blue crystal hydrating ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Blue%20crystal%20hydrating%20ampoule.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9CbHVlIGNyeXN0YWwgaHlkcmF0aW5nIGFtcG91bGUuanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODE1MjQyNjAsImV4cCI6MjA5Njg4NDI2MH0.EeMsuvISsY3J8uGGy3-ReBLxBHvh7XbMAsvZpN_e5Tk",
+            
             "Lift-toning sun protector cream": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Lift-toning%20sun%20protector%20cream.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9MaWZ0LXRvbmluZyBzdW4gcHJvdGVjdG9yIGNyZWFtLmpwZyIsImlhdCI6MTc4MDU2OTY4NCwiZXhwIjoyMDk1OTI5Njg0fQ.dwCpXCEGw-SqLQsa0sVltHYlGtQtB12dD7gZOdwRYrY",
             "EV shot skin boosting mask": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/mask.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9tYXNrLnBuZyIsImlhdCI6MTc2OTk0MjcwMiwiZXhwIjoxOTI3NjIyNzAyfQ.YdfuzylFO-lrh8x6j2vjolAQRR2CIxrWTWttNQX2zDA",
             "Active barrier hydrating cream": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/250707000867784.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS8yNTA3MDcwMDA4Njc3ODQuanBnIiwiaWF0IjoxNzY5MzUxNjY4LCJleHAiOjE5MjcwMzE2Njh9.5scqWSehvPB0CM27ARsTIXsb96uIH6A_Cq7ic4PZv8E",
@@ -392,7 +398,7 @@
                 }
                 
                 if (rawProducts) {
-                    debugProductsLength = rawProducts.length; // 진단을 위해 조회된 데이터 건수 저장
+                    debugProductsLength = rawProducts.length;
                 }
 
                 const { data: rawPrices, error: priceErr } = await supabaseClient
@@ -434,7 +440,6 @@
                 debugProductsError = err.message;
             }
 
-            // 의료 기기 (Medical) 호출
             try {
                 const { data: dbMedicals, error: medErr } = await supabaseClient
                     .from('medical_aesthetic_products')
@@ -451,7 +456,6 @@
                 });
             }
 
-            // 원료 (Raw Materials) 호출
             try {
                 const { data: dbRaw, error: rawErr } = await supabaseClient
                     .from('raw_materials')
@@ -525,7 +529,6 @@
             const tbody = document.getElementById('price-table-body');
             tbody.innerHTML = '';
             
-            // 데이터가 0건일 때(RLS 접근 차단 의심) 진단 메시지 출력
             if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
                 tbody.innerHTML = `
                 <tr>
@@ -715,16 +718,14 @@
                 if (volMatch) { specVol = volMatch[0]; specPkg = rawSpecs.replace(volMatch[0], '').trim().replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); }
                 if (!specPkg) specPkg = '-';
 
-                // products 테이블 데이터(globalUniqueProducts)에서 매칭되는 아이템을 찾아 form(Pkg), volume(Vol), ct_quantity 가져오기
                 let ctQty = p.ct_quantity;
-                let pkgForm = specPkg; // 기본값은 기존 스펙 파싱값
-                let pkgVol = specVol;  // 기본값은 기존 스펙 파싱값
+                let pkgForm = specPkg; 
+                let pkgVol = specVol;  
 
                 const matchedProduct = globalUniqueProducts.find(prod => {
                     const medItemName = (p.item || '').toLowerCase().trim();
                     const prodName = (prod.clean_name || '').toLowerCase().trim();
                     const dispName = (prod.display_name || '').toLowerCase().trim();
-                    // 이름이 부분적으로 포함된 제품(예: Blue crystal...)과 오매칭되는 것을 방지하기 위해 정확히 일치(===)하는 경우만 찾음
                     return prodName === medItemName || dispName === medItemName;
                 });
 
