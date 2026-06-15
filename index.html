@@ -715,8 +715,23 @@
                 if (volMatch) { specVol = volMatch[0]; specPkg = rawSpecs.replace(volMatch[0], '').trim().replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); }
                 if (!specPkg) specPkg = '-';
 
+                // products 테이블 데이터(globalUniqueProducts)에서 매칭되는 아이템을 찾아 ct_quantity 가져오기
+                let ctQty = p.ct_quantity;
+                if (!ctQty) {
+                    const matchedProduct = globalUniqueProducts.find(prod => {
+                        const medItemName = (p.item || '').toLowerCase().trim();
+                        const prodName = (prod.clean_name || '').toLowerCase().trim();
+                        const dispName = (prod.display_name || '').toLowerCase().trim();
+                        return prodName === medItemName || dispName === medItemName || prodName.includes(medItemName);
+                    });
+                    if (matchedProduct && matchedProduct.ct_quantity) {
+                        ctQty = matchedProduct.ct_quantity;
+                    }
+                }
+                const finalCtQty = ctQty || '-';
+
                 html += `<td class="py-3 px-2 text-center font-light text-black">${specPkg}</td><td class="py-3 px-2 text-center font-light text-black">${specVol}</td>`;
-                html += `<td class="py-3 px-2 text-center font-light text-black">1ea</td><td class="py-3 px-2 text-center font-light text-black">-</td>`;
+                html += `<td class="py-3 px-2 text-center font-light text-black">1ea</td><td class="py-3 px-2 text-center font-light text-black">${finalCtQty}</td>`;
                 html += `<td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.clinic_msrp)}</td>
                          <td class="py-3 px-3 text-center text-black">${formatMedCurrency(p.clinic_promotion)}</td>
                          <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_1000)}</td>
