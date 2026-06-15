@@ -55,7 +55,7 @@
         
         .cosmetic-table tr.category-header td { border-left: none; border-right: none; border-top: none; border-bottom: 2px solid #111827 !important; }
         .cosmetic-table tr.sub-category-header td { border-left: none; border-right: none; border-top: 1px solid #e5e7eb !important; border-bottom: 1px solid #e5e7eb !important; }
-        .cosmetic-table tr.type-header td { border-left: none; border-right: none; border-top: none; border-bottom: 1px solid #f3f4f6 !important; }
+        .cosmetic-table tr.type-header td { border-left: none; border-right: none; border-bottom: 1px solid #f3f4f6 !important; }
         
         .unified-table tr.loading-row td { border: none; border-bottom: 1px solid #e5e7eb; }
         .unified-table tr.note-row td { border-left: none; border-right: none; border-bottom: none; border-top: 1px solid #e5e7eb; }
@@ -337,6 +337,10 @@
         let globalMedicalProducts = [];
         let globalRawMaterials = [];
 
+        // 디버깅 정보를 저장할 전역 변수
+        let debugProductsLength = 0;
+        let debugProductsError = null;
+
         const productImageMap = {
             "Cellular water ampoule booster 120ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoulbooster120.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxib29zdGVyMTIwLmpwZyIsImlhdCI6MTc4MDYyNzM4NCwiZXhwIjoyMDk1OTg3Mzg0fQ.YgYQumgSOVgFPo5h4rPdJgWEvU-DW-GBbrWWlGIGI2o",
             "Cellular water ampoule booster": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoule%20booster%2060ml.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxlIGJvb3N0ZXIgNjBtbC5wbmciLCJpYXQiOjE3ODA2MjcyODIsImV4cCI6MjA5NTk4NzI4Mn0.LKa9sEPCp05ASOzS2tnq2ybIrdOorq8GyKwfwxKYSgM",
@@ -377,20 +381,33 @@
             }
 
             try {
-                // 수정 포인트 1: 데이터베이스 스키마 변경에 따라 'name' 제거 및 분리된 'volume', 'qty' 컬럼 직접 호출
-                const { data: dbProducts, error: prodErr } = await supabaseClient
+                const { data: rawProducts, error: prodErr } = await supabaseClient
                     .from('products')
-                    .select(`sub_category, clean_name, volume, qty, ct_quantity, product_prices (currency, b2c_msrp, b2c_promotion, b2b_tier1_1_to_10_ct, b2b_tier2_10_to_30_ct, b2b_tier3_30_to_70_ct)`)
+                    .select('*')
                     .order('created_at', { ascending: true });
                     
                 if (prodErr) {
-                    console.error("Supabase Cosmetic Data Fetch Error:", prodErr);
-                    throw prodErr;
+                    console.error("Supabase Products Fetch Error:", prodErr);
+                    debugProductsError = prodErr.message;
+                }
+                
+                if (rawProducts) {
+                    debugProductsLength = rawProducts.length; // 진단을 위해 조회된 데이터 건수 저장
+                }
+
+                const { data: rawPrices, error: priceErr } = await supabaseClient
+                    .from('product_prices')
+                    .select('*');
+
+                if (priceErr) {
+                    console.error("Supabase Prices Fetch Error:", priceErr);
                 }
 
                 const uniqueProductsMap = new Map();
-                if (dbProducts && dbProducts.length > 0) {
-                    dbProducts.forEach(product => {
+                if (rawProducts && rawProducts.length > 0) {
+                    rawProducts.forEach(product => {
+                        product.product_prices = (rawPrices || []).filter(pr => pr.product_id === product.id);
+
                         let cleanName = (product.clean_name || '').trim();
                         let displayName = cleanName;
 
@@ -399,13 +416,11 @@
                         } else if (cleanName.toLowerCase().includes('hyper shot')) {
                             displayName = "Hyper shot (PK/BG)";
                         } else if (cleanName.toLowerCase() === 'cellular water ampoule booster' && product.volume === '50ml') {
-                            // 기존 50ml -> 60ml 이름 치환을 volume 속성을 직접 수정하도록 변경
                             product.volume = '60ml';
                         }
                         
                         product.display_name = displayName;
                         
-                        // 수정 포인트 2: 이름, 용량, 갯수를 함께 키로 묶어 중복 상품을 방지
                         const uniqueKey = `${displayName}_${product.volume || ''}_${product.qty || ''}`;
                         
                         if (uniqueKey && !uniqueProductsMap.has(uniqueKey)) {
@@ -416,6 +431,7 @@
                 }
             } catch (err) {
                 console.error("Failed to process Cosmetic products:", err);
+                debugProductsError = err.message;
             }
 
             // 의료 기기 (Medical) 호출
@@ -508,30 +524,52 @@
         function renderTableData() {
             const tbody = document.getElementById('price-table-body');
             tbody.innerHTML = '';
+            
+            // 데이터가 0건일 때(RLS 접근 차단 의심) 진단 메시지 출력
             if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="text-center py-10 text-red-500 font-light text-sm italic">Failed to load cosmetic data or no data available. Check console.</td></tr>';
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="10" class="text-center py-10 bg-red-50">
+                        <div class="text-red-600 font-semibold mb-2 text-sm tracking-wide">데이터를 불러오지 못했습니다 (조회된 제품 수: ${debugProductsLength}건)</div>
+                        <div class="text-gray-600 text-xs mb-4">내부 시스템 에러: ${debugProductsError || '없음 (Supabase RLS 보안 정책에 의해 읽기가 차단되었을 확률이 99%입니다)'}</div>
+                        <div class="bg-white p-4 inline-block text-left rounded shadow-sm border border-red-200 text-xs text-gray-800">
+                            <strong class="text-black block mb-2">※ 해결 방법 (Supabase RLS 권한 허용)</strong>
+                            Supabase SQL Editor에서 아래 코드를 복사 후 실행하여 익명 사용자의 읽기 권한을 열어주세요.<br><br>
+                            <code class="text-blue-700 font-mono block bg-gray-50 p-2 border border-gray-200 rounded">
+                                ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;<br>
+                                DROP POLICY IF EXISTS "Allow public read" ON public.products;<br>
+                                CREATE POLICY "Allow public read" ON public.products FOR SELECT USING (true);
+                            </code>
+                        </div>
+                    </td>
+                </tr>`;
                 return;
             }
             
-            const faceDevices = globalUniqueProducts.filter(p => {
-                const sub = (p.sub_category || '').toLowerCase();
-                const cleanName = (p.clean_name || '').toLowerCase();
-                return sub.includes('device-face') || cleanName.includes('core impact');
+            const cosmeticAndDeviceProducts = globalUniqueProducts.filter(p => {
+                const mainCat = (p.main_category || '').trim().toLowerCase();
+                return mainCat.includes('device') || mainCat.includes('skincare') || mainCat.includes('cosmetic');
             });
-            const faceCosmetics = globalUniqueProducts.filter(p => {
+
+            const faceDevices = cosmeticAndDeviceProducts.filter(p => {
                 const sub = (p.sub_category || '').toLowerCase();
                 const cleanName = (p.clean_name || '').toLowerCase();
-                return sub.includes('product-face') && !cleanName.includes('core impact') && !cleanName.includes('hyper shot');
+                return (sub.includes('device') && sub.includes('face')) || cleanName.includes('core impact');
             });
-            const hairDevices = globalUniqueProducts.filter(p => {
+            const faceCosmetics = cosmeticAndDeviceProducts.filter(p => {
                 const sub = (p.sub_category || '').toLowerCase();
                 const cleanName = (p.clean_name || '').toLowerCase();
-                return sub.includes('device-hair') || cleanName.includes('hyper shot');
+                return (sub.includes('product') && sub.includes('face')) && !cleanName.includes('core impact') && !cleanName.includes('hyper shot');
             });
-            const hairCosmetics = globalUniqueProducts.filter(p => {
+            const hairDevices = cosmeticAndDeviceProducts.filter(p => {
                 const sub = (p.sub_category || '').toLowerCase();
                 const cleanName = (p.clean_name || '').toLowerCase();
-                return sub.includes('product-hair') && !cleanName.includes('core impact') && !cleanName.includes('hyper shot');
+                return (sub.includes('device') && sub.includes('hair')) || cleanName.includes('hyper shot');
+            });
+            const hairCosmetics = cosmeticAndDeviceProducts.filter(p => {
+                const sub = (p.sub_category || '').toLowerCase();
+                const cleanName = (p.clean_name || '').toLowerCase();
+                return (sub.includes('product') && sub.includes('hair')) && !cleanName.includes('core impact') && !cleanName.includes('hyper shot');
             });
 
             function getCosmeticType(name) {
@@ -539,7 +577,7 @@
                 if ((lowerName.includes('ampoule') && lowerName.includes('booster')) || lowerName.includes('ampoule booster')) return 'AMPOULE BOOSTER';
                 if (lowerName.includes('ampoule')) return 'AMPOULE';
                 if (lowerName.includes('mask')) return 'MASK';
-                if (lowerName.includes('cream')) return 'CREAM';
+                if (lowerName.includes('cream') || lowerName.includes('protector')) return 'CREAM';
                 return 'SHAMPOO';
             }
             function renderHeader(title, level) {
@@ -551,38 +589,36 @@
             }
             function renderProducts(products) {
                 products.forEach(p => {
-                    let pricesArray = [];
-                    if (Array.isArray(p.product_prices)) {
-                        pricesArray = p.product_prices;
-                    } else if (p.product_prices && typeof p.product_prices === 'object') {
-                        pricesArray = [p.product_prices];
-                    }
+                    let pricesArray = p.product_prices || [];
+                    if (!Array.isArray(pricesArray)) pricesArray = [pricesArray];
 
-                    const usdPrice = pricesArray.find(pr => {
-                        const currencyCode = pr.currency ? pr.currency.trim().toUpperCase() : '';
-                        return currencyCode === 'USD';
-                    }) || {};
+                    const priceData = pricesArray[0] || {};
+                    const nativeCurrency = (priceData.currency || 'KRW').trim().toUpperCase();
 
                     const tr = document.createElement('tr');
                     tr.className = "text-sm hover:bg-gray-50 transition-colors";
-                    const rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
                     const isKrw = currentCurrency === 'KRW';
+                    
+                    let rate = 1;
+                    if (nativeCurrency === 'KRW' && currentCurrency === 'USD') {
+                        rate = 1 / appliedKrwRate;
+                    } else if (nativeCurrency === 'USD' && currentCurrency === 'KRW') {
+                        rate = appliedKrwRate;
+                    }
 
-                    const getPrice = (val, rate) => (val !== undefined && val !== null) ? val * rate : null;
+                    const getPrice = (val, rate) => (val !== undefined && val !== null && val !== '') ? Number(val) * rate : null;
 
-                    const b2c_msrp = getPrice(usdPrice.b2c_msrp, rate);
-                    const b2c_promotion = getPrice(usdPrice.b2c_promotion, rate);
-                    const b2b1 = getPrice(usdPrice.b2b_tier1_1_to_10_ct, rate);
-                    const b2b2 = getPrice(usdPrice.b2b_tier2_10_to_30_ct, rate);
-                    const b2b3 = getPrice(usdPrice.b2b_tier3_30_to_70_ct, rate);
+                    const b2c_msrp = getPrice(priceData.b2c_msrp, rate);
+                    const b2c_promotion = getPrice(priceData.b2c_promotion, rate);
+                    const b2b1 = getPrice(priceData.b2b_tier1_1_to_10_ct, rate);
+                    const b2b2 = getPrice(priceData.b2b_tier2_10_to_30_ct, rate);
+                    const b2b3 = getPrice(priceData.b2b_tier3_30_to_70_ct, rate);
 
-                    // 수정 포인트 3: 복잡한 문자열 처리 함수를 삭제하고 직관적으로 DB 컬럼 데이터를 가져옵니다.
                     let name = p.display_name;
                     let volume = (p.volume && p.volume.trim() !== '') ? p.volume : '-';
                     let qty = (p.qty && p.qty.trim() !== '') ? p.qty : '1EA';
 
                     let mappedImg = "", longestMatch = "";
-                    // 수정 포인트 4: 이름과 용량을 결합해 상품 이미지 매핑 알고리즘이 올바르게 동작하게 합니다.
                     const searchString = `${name} ${volume}`.toLowerCase();
                     for (const [key, url] of Object.entries(productImageMap)) {
                         if (searchString.includes(key.toLowerCase()) || name.toLowerCase().includes(key.toLowerCase())) {
