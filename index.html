@@ -1013,14 +1013,10 @@
                     return roundedKrw;
                 };
 
-                const prefix = currentCurrency === 'KRW' ? '₩' : '$';
+                // 통화 기호 표시 안 함
                 const fPrice = (val) => {
                     if (!val) return '-';
-                    if (currentCurrency === 'USD') {
-                        return `${prefix}${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val)}`;
-                    } else {
-                        return `${prefix}${new Intl.NumberFormat('ko-KR').format(val)}`;
-                    }
+                    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val);
                 };
 
                 const baseMsrp = priceData.b2c_msrp;
@@ -1152,14 +1148,10 @@
                     return roundedKrw;
                 };
 
-                const prefix = currentCurrency === 'KRW' ? '₩' : '$';
+                // 통화 기호 표시 안 함
                 const fPrice = (val) => {
                     if (!val) return '-';
-                    if (currentCurrency === 'USD') {
-                        return `${prefix}${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val)}`;
-                    } else {
-                        return `${prefix}${new Intl.NumberFormat('ko-KR').format(val)}`;
-                    }
+                    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val);
                 };
 
                 const clinicMsrp = getPrice(priceData.b2c_msrp);
