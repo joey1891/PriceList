@@ -492,6 +492,82 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- 6. Charmacist Exclusive Line -->
+                <div id="section-charmacist" class="mb-4">
+                    <div class="flex justify-between items-end mb-3 cursor-pointer group select-none" onclick="toggleSection('container-charmacist', 'icon-charmacist')">
+                        <div>
+                            <span class="inline-block bg-black text-white text-[10px] px-2 py-1 uppercase tracking-widest mb-2 shadow-sm rounded-sm">Exclusive Partner Line</span>
+                            <div class="flex items-center gap-2">
+                                <svg id="icon-charmacist" class="w-6 h-6 text-gray-400 group-hover:text-gray-900 transition-transform duration-300 -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <h3 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider group-hover:text-black transition-colors">Charmacist Exclusive Line</h3>
+                            </div>
+                        </div>
+                        <div class="flex gap-2" onclick="event.stopPropagation()">
+                            <button onclick="printTableSection('section-charmacist', 'Charmacist_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                Print PDF
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mb-2 pl-8 font-light hidden" id="legend-charmacist">
+                        <span class="font-medium">Legend:</span> MF (MEDIFAB) · TDL (Triderma Lab) · CMC (Charmacist) · CMC 체인 (Charmacist Chain)
+                    </div>
+                    <div id="container-charmacist" class="overflow-x-auto table-container bg-white shadow-sm hidden">
+                        <table class="w-full text-left border-collapse unified-table">
+                            <colgroup>
+                                <col style="width: 4%;">  <!-- Img -->
+                                <col style="width: 12%;"> <!-- Item -->
+                                <col style="width: 9%;">  <!-- Ingr. -->
+                                <col style="width: 7%;">  <!-- Cat. -->
+                                <col style="width: 6%;">  <!-- Type -->
+                                <col style="width: 3%;">  <!-- Pkg -->
+                                <col style="width: 3%;">  <!-- Vol -->
+                                <col style="width: 3%;">  <!-- Qty -->
+                                <col style="width: 3%;">  <!-- CT -->
+                                <col style="width: 5%;">  <!-- CT Size -->
+                                <col style="width: 9%;"> <!-- Clinic MSRP -->
+                                <col style="width: 9%;"> <!-- Clinic Promo -->
+                                <col style="width: 9%;"> <!-- Price 1 -->
+                                <col style="width: 9%;"> <!-- Price 2 -->
+                                <col style="width: 9%;"> <!-- Price 3 -->
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th rowspan="3" class="py-3 px-2 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
+                                    <th rowspan="3" class="py-3 px-2 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Item</th>
+                                    <th rowspan="3" class="py-3 px-2 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Ingr.</th>
+                                    <th rowspan="3" class="py-3 px-2 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Cat.</th>
+                                    <th rowspan="3" class="py-3 px-2 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Type</th>
+                                    <th rowspan="3" class="py-3 px-1 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Pkg.</th>
+                                    <th rowspan="3" class="py-3 px-1 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Vol.</th>
+                                    <th rowspan="3" class="py-3 px-1 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Qty</th>
+                                    <th rowspan="3" class="py-3 px-1 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">CT</th>
+                                    <th rowspan="3" class="py-3 px-1 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">CT<br>Size</th>
+                                    <th colspan="2" class="py-2 px-2 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Pharmacy</th>
+                                    <th colspan="3" class="py-2 px-2 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Supply Chain Pricing</th>
+                                </tr>
+                                <tr>
+                                    <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
+                                    <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700 font-light">Promo</th>
+                                    <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MF<br>↓<br>TDL</th>
+                                    <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">TDL<br>↓<br>CMC</th>
+                                    <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">CMC<br>↓<br>CMC 체인</th>
+                                </tr>
+                                <tr>
+                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
+                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">80%</th>
+                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">27%</th>
+                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">35%</th>
+                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
+                                </tr>
+                            </thead>
+                            <tbody id="charmacist-table-body" class="text-sm bg-transparent">
+                                <tr class="loading-row"><td colspan="17" class="text-center py-10 text-black font-light text-sm italic">Fetching Charmacist data from server...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             <!-- ============================================== -->
         </div>
@@ -711,6 +787,7 @@
             renderPharmacyTableData();
             renderRawMaterialsTableData();
             renderRAClinicTableData();
+            renderCharmacistTableData();
         }
 
         function changeExchangeRate(val) {
@@ -720,6 +797,7 @@
             renderPharmacyTableData();
             renderRawMaterialsTableData();
             renderRAClinicTableData();
+            renderCharmacistTableData();
         }
 
         function setCurrency(currency) {
@@ -749,6 +827,7 @@
             renderPharmacyTableData();
             renderRawMaterialsTableData();
             renderRAClinicTableData();
+            renderCharmacistTableData();
         }
 
         function formatCurrency(amount, roundKrwToThousands = false) {
@@ -761,7 +840,6 @@
         
         function formatMedCurrency(amount) {
             if (amount === null || amount === undefined || amount === '-') return '<span class="text-black">-</span>';
-            // 메디컬 화폐 포맷팅에서도 동일하게 처리 (메디컬 원화의 경우 여기서 처리하거나 calc 단계에서 처리)
             return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(amount));
         }
 
@@ -781,7 +859,7 @@
                 const subCat = (p.sub_category || '').trim().toLowerCase();
                 const cleanName = (p.clean_name || '').trim().toLowerCase();
                 
-                if (subCat.includes('ra clinic') || subCat.includes('pharmacy') || mainCat.includes('pharmacy') || mainCat.includes('exclusive')) return false;
+                if (subCat.includes('ra clinic') || subCat.includes('pharmacy') || subCat.includes('charmacist') || mainCat.includes('pharmacy') || mainCat.includes('exclusive')) return false;
                 
                 // 메디컬 제품인 Scalp MD가 코스메틱 헤어/샴푸 카테고리에 잘못 노출되는 것을 방지
                 if (cleanName.includes('scalp md')) return false;
@@ -1186,21 +1264,15 @@
                 const getPrice = (val) => {
                     if (val === undefined || val === null || val === '') return null;
                     
-                    // 1. 입력값을 무조건 원화(KRW)로 변환
                     let krwPrice = nativeCurrency === 'USD' ? Number(val) * appliedKrwRate : Number(val);
-                    
-                    // 2. 천원 단위 올림 처리 
                     let roundedKrw = Math.ceil(krwPrice / 1000) * 1000;
                     
-                    // 3. 현재 선택된 통화에 맞게 최종 반환
                     if (currentCurrency === 'USD') {
-                        // 달러 표기 시 소수점 첫째 자리에서 올림 (정수화)
                         return Math.ceil(roundedKrw / appliedKrwRate);
                     }
                     return roundedKrw;
                 };
 
-                // 통화 기호 표시 안 함
                 const fPrice = (val) => {
                     if (!val) return '-';
                     return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val);
@@ -1243,6 +1315,103 @@
                     <td class="py-3 px-2 text-center font-medium text-black">${fPrice(ra_d1)}</td>
                     <td class="py-3 px-2 text-center font-medium text-black">${fPrice(d1_d2)}</td>
                     <td class="py-3 px-2 text-center font-medium text-black">${fPrice(d2_shop)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderCharmacistTableData() {
+            const tbody = document.getElementById('charmacist-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            
+            // 파머시 라인 타겟 상품명
+            const pharmacyTargetNames = [
+                '셀슈틱스 리투디엔 더마플라스트 크림',
+                '셀슈틱스 리투지엔 더마플라스트 립밤'
+            ];
+
+            const engNames = {
+                '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Retudien Dermaplast Cream',
+                '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Retudien Dermaplast Lip Balm'
+            };
+
+            const engIngr = {
+                '돼지유래 ECM, PDRN': 'Porcine-derived ECM, PDRN',
+                '돼지유래 ECM, 보르피린': 'Porcine-derived ECM, Volufiline'
+            };
+            
+            // 파머시 타겟 상품명 또는 카테고리가 Charmacist Exclusive인 상품 필터링
+            const charmacistProducts = globalUniqueProducts.filter(p => {
+                const cName = (p.clean_name || '').trim();
+                return pharmacyTargetNames.includes(cName) || p.sub_category === 'Charmacist Exclusive';
+            });
+            
+            if (!charmacistProducts || charmacistProducts.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching Charmacist data...</td></tr>`;
+                return;
+            }
+
+            charmacistProducts.forEach(p => {
+                let pricesArray = p.product_prices || [];
+                if (!Array.isArray(pricesArray)) pricesArray = [pricesArray];
+                const priceData = pricesArray[0] || {};
+                const nativeCurrency = (priceData.currency || 'KRW').trim().toUpperCase();
+
+                const getCalculatedPrice = (msrpValue, ratio) => {
+                    if (msrpValue === undefined || msrpValue === null || msrpValue === '') return null;
+                    
+                    let krwMsrp = nativeCurrency === 'USD' ? Number(msrpValue) * appliedKrwRate : Number(msrpValue);
+                    let targetKrw = krwMsrp * ratio;
+
+                    let roundedKrw = Math.ceil(targetKrw / 1000) * 1000;
+                    
+                    if (currentCurrency === 'USD') {
+                        return Math.ceil(roundedKrw / appliedKrwRate);
+                    }
+                    return roundedKrw;
+                };
+
+                const fPrice = (val) => {
+                    if (!val) return '-';
+                    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val);
+                };
+
+                const baseMsrp = priceData.b2c_msrp;
+                
+                // Charmacist 테이블용 가격 동적 계산 (파머시 로직 기반 렌더링)
+                const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0);
+                const clinicPromo = getCalculatedPrice(baseMsrp, 0.80);
+                const mf_tdl = getCalculatedPrice(baseMsrp, 0.27);
+                const tdl_cmc = getCalculatedPrice(baseMsrp, 0.35); // 30% -> 35%로 변경
+                const cmc_chain = getCalculatedPrice(baseMsrp, 0.45); // 33% -> 45%로 변경
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors text-xs";
+
+                let cName = (p.clean_name || '').trim();
+                let dispName = engNames[cName] || p.display_name || '-';
+                let dispIngr = engIngr[p.active_ingredients] || p.active_ingredients || '-';
+
+                let mappedImg = raImageMap[cName] || raImageMap[p.display_name] || ""; 
+                const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
+
+                tr.innerHTML = `
+                    <td class="py-2 px-2 text-center align-middle">${imgHtml}</td>
+                    <td class="py-3 px-2 text-center text-black font-medium align-middle">${dispName}</td>
+                    <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
+                    <td class="py-3 px-2 text-center text-black align-middle font-medium">Cosmetic</td>
+                    <td class="py-3 px-2 text-center text-black align-middle font-light">${p.type || '-'}</td>
+                    <td class="py-3 px-1 text-center font-light text-black">${p.form || '-'}</td>
+                    <td class="py-3 px-1 text-center font-light text-black">${p.volume || '-'}</td>
+                    <td class="py-3 px-1 text-center font-light text-black">${p.qty || '-'}</td>
+                    <td class="py-3 px-1 text-center font-light text-black">${p.ct_quantity || '-'}</td>
+                    <td class="py-3 px-1 text-center font-light text-black text-[10px] tracking-tighter">-</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(clinicMsrp)}</td>
+                    <td class="py-3 px-2 text-center text-black">${fPrice(clinicPromo)}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(mf_tdl)}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(tdl_cmc)}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(cmc_chain)}</td>
                 `;
                 tbody.appendChild(tr);
             });
