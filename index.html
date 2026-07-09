@@ -552,7 +552,7 @@
                                     <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700 font-light">Promo</th>
                                     <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MF<br>↓<br>TDL</th>
                                     <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">TDL<br>↓<br>CMC</th>
-                                    <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">CMC<br>↓<br>CMC 체인</th>
+                                    <th class="py-2 px-1 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">CMC<br>↓<br>CMC Chain</th>
                                 </tr>
                                 <tr>
                                     <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
@@ -587,7 +587,6 @@
                     document.body.classList.remove('overflow-hidden');
                     appContent.classList.remove('hidden');
                     
-                    // Small delay to allow display block to apply before fading in
                     requestAnimationFrame(() => {
                         appContent.classList.remove('opacity-0');
                     });
@@ -685,7 +684,6 @@
         };
 
         async function initDashboard() {
-            // Document Date
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const todayStr = new Date().toLocaleDateString('en-US', options);
             const dateEl = document.getElementById('current-date');
@@ -727,7 +725,6 @@
                     rawProducts.forEach(product => {
                         product.product_prices = (rawPrices || []).filter(pr => pr.product_id === product.id);
                         
-                        // MSRP 덮어쓰기
                         if (rawMasterData && product.product_prices.length > 0) {
                             const masterMatch = rawMasterData.find(m => m.id === product.id || m.product_id === product.id || m.clean_name === product.clean_name);
                             if (masterMatch) {
@@ -784,7 +781,6 @@
                 ];
             }
 
-            // Tables render in background even if locked
             renderTableData();
             renderMedicalTableData();
             renderPharmacyTableData();
@@ -864,7 +860,6 @@
                 
                 if (subCat.includes('ra clinic') || subCat.includes('pharmacy') || subCat.includes('charmacist') || mainCat.includes('pharmacy') || mainCat.includes('exclusive')) return false;
                 
-                // 메디컬 제품인 Scalp MD가 코스메틱 헤어/샴푸 카테고리에 잘못 노출되는 것을 방지
                 if (cleanName.includes('scalp md')) return false;
                 
                 return mainCat.includes('device') || mainCat.includes('skincare') || mainCat.includes('cosmetic') || 
@@ -1101,9 +1096,11 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             
+            // 파머시 라인 노출을 위한 타겟 상품명 배열 (Spot Relief Patch 추가)
             const targetNames = [
                 '셀슈틱스 리투디엔 더마플라스트 크림',
-                '셀슈틱스 리투지엔 더마플라스트 립밤'
+                '셀슈틱스 리투지엔 더마플라스트 립밤',
+                'medinovae CHITOGENIX Spot Relief Patch'
             ];
 
             const engNames = {
@@ -1146,7 +1143,6 @@
                     return roundedKrw;
                 };
 
-                // 통화 기호 표시 안 함
                 const fPrice = (val) => {
                     if (!val) return '-';
                     return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val);
