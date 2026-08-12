@@ -154,6 +154,7 @@
             <form id="admin-product-form" onsubmit="submitNewProduct(event)" class="p-6 overflow-y-auto space-y-4">
                 <input type="hidden" id="form-target-section">
                 <input type="hidden" id="form-edit-id">
+                <input type="hidden" id="remove-existing-image" value="false">
                 
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Product Name *</label>
@@ -821,6 +822,7 @@
                 document.getElementById('admin-modal-title').textContent = "Add New Product";
                 document.getElementById('btn-submit-product').innerHTML = "<span>Save Product to Database</span>";
                 removeSelectedFile();
+                if(document.getElementById('remove-existing-image')) document.getElementById('remove-existing-image').value = 'false';
             }
             modal.classList.remove('hidden');
         }
@@ -833,6 +835,29 @@
         }
 
         /* 파일 드래그 앤 드롭 및 삭제 로직 */
+        function initDragAndDrop() {
+            const dropZone = document.getElementById('drag-drop-zone');
+            if(!dropZone) return;
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    processFile(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
         function removeSelectedFile(e) {
             if(e) e.stopPropagation();
             selectedFileForUpload = null;
@@ -840,6 +865,7 @@
             if(document.getElementById('drop-zone-prompt')) document.getElementById('drop-zone-prompt').classList.remove('hidden');
             if(document.getElementById('drop-zone-preview')) document.getElementById('drop-zone-preview').classList.add('hidden');
             if(document.getElementById('preview-img')) document.getElementById('preview-img').src = '';
+            if(document.getElementById('remove-existing-image')) document.getElementById('remove-existing-image').value = 'true';
         }
 
         function handleFileSelect(e) {
@@ -853,6 +879,7 @@
                 return;
             }
             selectedFileForUpload = file;
+            if(document.getElementById('remove-existing-image')) document.getElementById('remove-existing-image').value = 'false';
             const reader = new FileReader();
             reader.onload = (e) => {
                 document.getElementById('preview-img').src = e.target.result;
@@ -904,7 +931,13 @@
                         .upload(filePath, selectedFileForUpload);
 
                     if (uploadErr) {
-                        console.warn("Storage upload fail, using direct data url or fallback:", uploadErr);
+                        console.warn("Storage upload fail, using base64 fallback:", uploadErr);
+                        // Storage 업로드 권한이 없을 경우, DB에 텍스트 형태로 직접 저장하는 Base64 백업 로직
+                        imageUrl = await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.readAsDataURL(selectedFileForUpload);
+                        });
                     } else {
                         const { data: publicUrlData } = supabaseClient.storage.from('product_images').getPublicUrl(filePath);
                         imageUrl = publicUrlData ? publicUrlData.publicUrl : "";
@@ -950,7 +983,8 @@
                         if (error) throw error;
                     }
                 } else {
-                    let subCategory = '';
+                    let existingProduct = editId ? globalUniqueProducts.find(p => p.id == editId) : null;
+                    let subCategory = existingProduct ? (existingProduct.sub_category || '') : '';
                     if (section === 'raclinic') subCategory = 'RA Clinic Exclusive';
                     else if (section === 'charmacist') subCategory = 'Charmacist Exclusive';
 
@@ -968,6 +1002,8 @@
                     
                     if (imageUrl) {
                         payload.image_url = imageUrl;
+                    } else if (document.getElementById('remove-existing-image').value === 'true') {
+                        payload.image_url = null; // 사용자가 삭제버튼을 눌렀을 경우 DB에서도 이미지 URL 삭제
                     }
 
                     let prodId = editId;
@@ -1050,6 +1086,17 @@
             if(document.getElementById('form-edit-id')) document.getElementById('form-edit-id').value = id;
             document.getElementById('admin-modal-title').textContent = "Edit Product";
             document.getElementById('btn-submit-product').innerHTML = "<span>Update Product in Database</span>";
+            
+            if(document.getElementById('remove-existing-image')) document.getElementById('remove-existing-image').value = 'false';
+            if (product.image_url) {
+                document.getElementById('preview-img').src = product.image_url;
+                document.getElementById('preview-filename').textContent = "기존 등록된 이미지";
+                document.getElementById('drop-zone-prompt').classList.add('hidden');
+                document.getElementById('drop-zone-preview').classList.remove('hidden');
+            } else {
+                removeSelectedFile();
+                if(document.getElementById('remove-existing-image')) document.getElementById('remove-existing-image').value = 'false';
+            }
             
             if (tableName === 'raw_materials') {
                 document.getElementById('p-name').value = product.product_name || '';
@@ -1353,6 +1400,8 @@
             renderRAClinicTableData();
             renderCharmacistTableData();
             
+            initDragAndDrop();
+            
             if(isSuperAdmin) toggleAdminUI(true); // 리렌더링 후 어드민 UI 재생성
         }
 
@@ -1426,42 +1475,62 @@
                 const mainCat = (p.main_category || '').trim().toLowerCase();
                 const subCat = (p.sub_category || '').trim().toLowerCase();
                 const cleanName = (p.clean_name || '').trim().toLowerCase();
+                const noSpaceName = cleanName.replace(/\s/g, '');
                 
                 if (subCat.includes('ra clinic') || subCat.includes('pharmacy') || subCat.includes('charmacist') || mainCat.includes('pharmacy') || mainCat.includes('exclusive')) return false;
                 if (cleanName.includes('scalp md')) return false;
                 
                 return mainCat.includes('device') || mainCat.includes('skincare') || mainCat.includes('cosmetic') || 
                        mainCat.includes('hair') || subCat.includes('hair') || 
-                       cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot');
+                       cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot') ||
+                       noSpaceName.includes('hypershot') || noSpaceName.includes('coreimpact');
             });
 
             const faceDevices = cosmeticAndDeviceProducts.filter(p => {
+                const main = (p.main_category || '').toLowerCase();
                 const sub = (p.sub_category || '').toLowerCase();
-                const cleanName = (p.clean_name || '').toLowerCase();
-                const isHair = sub.includes('hair') || cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot');
-                return (sub.includes('device') || cleanName.includes('core impact')) && !isHair;
+                const name = (p.clean_name || '').toLowerCase();
+                const noSpaceName = name.replace(/\s/g, '');
+                
+                const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
+                const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
+                
+                return isDevice && !isHair;
             });
             
             const faceCosmetics = cosmeticAndDeviceProducts.filter(p => {
+                const main = (p.main_category || '').toLowerCase();
                 const sub = (p.sub_category || '').toLowerCase();
-                const cleanName = (p.clean_name || '').toLowerCase();
-                const isDevice = sub.includes('device') || cleanName.includes('core impact') || cleanName.includes('hyper shot');
-                const isHair = sub.includes('hair') || cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot');
+                const name = (p.clean_name || '').toLowerCase();
+                const noSpaceName = name.replace(/\s/g, '');
+                
+                const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
+                const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
+                
                 return !isDevice && !isHair;
             });
             
             const hairDevices = cosmeticAndDeviceProducts.filter(p => {
+                const main = (p.main_category || '').toLowerCase();
                 const sub = (p.sub_category || '').toLowerCase();
-                const cleanName = (p.clean_name || '').toLowerCase();
-                const isHair = sub.includes('hair') || cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot') || cleanName.includes('hyper shot');
-                return (sub.includes('device') || cleanName.includes('hyper shot')) && isHair;
+                const name = (p.clean_name || '').toLowerCase();
+                const noSpaceName = name.replace(/\s/g, '');
+                
+                const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
+                const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
+                
+                return isDevice && isHair;
             });
             
             const hairCosmetics = cosmeticAndDeviceProducts.filter(p => {
+                const main = (p.main_category || '').toLowerCase();
                 const sub = (p.sub_category || '').toLowerCase();
-                const cleanName = (p.clean_name || '').toLowerCase();
-                const isDevice = sub.includes('device') || cleanName.includes('core impact') || cleanName.includes('hyper shot');
-                const isHair = sub.includes('hair') || cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot');
+                const name = (p.clean_name || '').toLowerCase();
+                const noSpaceName = name.replace(/\s/g, '');
+                
+                const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
+                const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
+                
                 return !isDevice && isHair;
             });
 
@@ -1471,7 +1540,8 @@
                 if (lowerName.includes('ampoule')) return 'AMPOULE';
                 if (lowerName.includes('mask')) return 'MASK';
                 if (lowerName.includes('cream') || lowerName.includes('protector')) return 'CREAM';
-                return 'SHAMPOO';
+                if (lowerName.includes('shampoo')) return 'SHAMPOO';
+                return 'OTHER';
             }
             
             function renderHeader(title, level) {
@@ -1544,10 +1614,13 @@
             }
             
             function renderCategorizedCosmetics(cosmetics) {
-                const groups = { 'AMPOULE BOOSTER': [], 'AMPOULE': [], 'MASK': [], 'CREAM': [], 'SHAMPOO': [] };
-                cosmetics.forEach(p => { const type = getCosmeticType(p.display_name); if(groups[type]) groups[type].push(p); });
-                ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM', 'SHAMPOO'].forEach(type => {
-                    if (groups[type] && groups[type].length > 0) { renderHeader(type, 3); renderProducts(groups[type]); }
+                const groups = { 'AMPOULE BOOSTER': [], 'AMPOULE': [], 'MASK': [], 'CREAM': [], 'SHAMPOO': [], 'OTHER': [] };
+                cosmetics.forEach(p => { 
+                    const type = getCosmeticType(p.display_name); 
+                    if(groups[type]) groups[type].push(p); 
+                });
+                ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM', 'SHAMPOO', 'OTHER'].forEach(type => {
+                    if (groups[type] && groups[type].length > 0) { renderHeader(type === 'OTHER' ? 'ETC.' : type, 3); renderProducts(groups[type]); }
                 });
             }
 
