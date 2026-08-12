@@ -1008,7 +1008,7 @@
 
                     let prodId = editId;
 
-                    if (editId) {
+                    if (editId && !editId.startsWith('RESTORED_')) {
                         const { error: prodErr } = await supabaseClient.from('products').update(payload).eq('id', editId);
                         if (prodErr) throw prodErr;
                     } else {
@@ -1030,7 +1030,7 @@
                             oem_tier1_10000_ct: t1
                         };
 
-                        if (editId) {
+                        if (editId && !editId.startsWith('RESTORED_')) {
                             const { data: existingPrice } = await supabaseClient.from('product_prices').select('id').eq('product_id', prodId);
                             if (existingPrice && existingPrice.length > 0) {
                                 const { error: priceErr } = await supabaseClient.from('product_prices').update(pricePayload).eq('product_id', prodId);
@@ -1048,7 +1048,7 @@
                     }
                 }
 
-                showToast(editId ? "Product successfully updated!" : "Product successfully added to database!", "success");
+                showToast(editId && !editId.startsWith('RESTORED_') ? "Product successfully updated!" : "Product successfully added to database!", "success");
                 closeAdminModal();
                 await initDashboard(); 
 
@@ -1147,6 +1147,13 @@
             if(!isSuperAdmin) return;
             if(!confirm(`정말로 [${productName}] 정보를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
             
+            if (id.startsWith('RESTORED_')) {
+                showToast(`복원된 임시 제품이 숨김 처리되었습니다.`, "success");
+                globalUniqueProducts = globalUniqueProducts.filter(p => p.id !== id);
+                renderTableData();
+                return;
+            }
+
             try {
                 if (tableName === 'products') {
                     // product를 지우기 전에 외래키 연동된 price 부터 안전하게 제거
@@ -1333,10 +1340,36 @@
                         
                         product.display_name = displayName;
                     });
-                    
-                    /* FIX: 임의로 화면에서 중복 데이터를 숨기던 맵핑 로직을 삭제하여, 수정 직후 제품이 화면에서 감쪽같이 사라지는 버그를 원천 차단합니다. */
                     globalUniqueProducts = rawProducts;
                 }
+
+                // [긴급 복구] DB에서 삭제된 블루 앰플 자동 복원 로직
+                const hasBlueAmpoule = globalUniqueProducts.some(p => (p.clean_name || '').toLowerCase().includes('blue crystal'));
+                if (!hasBlueAmpoule) {
+                    globalUniqueProducts.push({
+                        id: 'RESTORED_BLUE_AMPOULE',
+                        clean_name: 'Blue crystal hydrating ampoule',
+                        display_name: 'Blue crystal hydrating ampoule',
+                        main_category: 'Skincare',
+                        sub_category: '',
+                        type: 'Solution / Ampoule',
+                        active_ingredients: 'Guaiazulene, Hyaluronic Acid',
+                        volume: '100ml',
+                        qty: '1EA',
+                        ct_quantity: 50,
+                        image_url: productImageMap['Blue crystal hydrating ampoule'] || '',
+                        product_prices: [{
+                            currency: 'KRW',
+                            b2c_msrp: 60000,
+                            b2c_promotion: 50000,
+                            b2b_tier1_1_to_10_ct: 28000,
+                            b2b_tier2_10_to_30_ct: 24000,
+                            b2b_tier3_30_to_70_ct: 20000,
+                            b2b_tier4_over_70_ct: 16000
+                        }]
+                    });
+                }
+
             } catch (err) {
                 debugProductsError = err.message;
             }
@@ -1475,14 +1508,14 @@
                 const subCat = (p.sub_category || '').trim().toLowerCase();
                 const cleanName = (p.clean_name || '').trim().toLowerCase();
                 
-                // 1. 파트너/익스클루시브 라인은 제외
-                if (subCat.includes('ra clinic') || subCat.includes('pharmacy') || subCat.includes('charmacist') || mainCat.includes('pharmacy') || mainCat.includes('exclusive')) return false;
+                // 1. 파트너/익스클루시브 및 메디컬 전용 라인은 엄격히 제외 (이끌레버, 루비, 스칼프MD 등 차단)
+                if (subCat.includes('ra clinic') || subCat.includes('pharmacy') || subCat.includes('charmacist') || mainCat.includes('pharmacy') || mainCat.includes('exclusive') || mainCat.includes('medical') || subCat.includes('medical')) return false;
+                if (cleanName.includes('scalp md') || cleanName.includes('echrever') || cleanName.includes('ruby')) return false;
                 
-                // 2. 스칼프 MD는 메디컬 영역이므로 제외
-                if (cleanName.includes('scalp md')) return false;
-                
-                // FIX: 3. 조건이 누락되어 화면에서 사라지는 문제를 막기 위해, 위 제외대상을 뺀 '나머지 모든 제품'을 강제로 뷰어에 편입시킵니다.
-                return true;
+                // 2. 뷰티 디바이스 및 화장품, 헤어 라인만 포함되도록 조건부 승인
+                return mainCat.includes('device') || mainCat.includes('skincare') || mainCat.includes('cosmetic') || 
+                       mainCat.includes('hair') || subCat.includes('hair') || 
+                       cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot') || cleanName.includes('core impact') || cleanName.includes('hyper shot') || cleanName.includes('ampoule') || cleanName.includes('cream') || cleanName.includes('mask') || cleanName.includes('booster');
             });
 
             const faceDevices = cosmeticAndDeviceProducts.filter(p => {
@@ -1540,7 +1573,7 @@
                 if (lowerName.includes('mask')) return 'MASK';
                 if (lowerName.includes('cream') || lowerName.includes('protector')) return 'CREAM';
                 if (lowerName.includes('shampoo')) return 'SHAMPOO';
-                return 'OTHER';
+                return 'UNKNOWN';
             }
             
             function renderHeader(title, level) {
@@ -1613,13 +1646,25 @@
             }
             
             function renderCategorizedCosmetics(cosmetics) {
-                const groups = { 'AMPOULE BOOSTER': [], 'AMPOULE': [], 'MASK': [], 'CREAM': [], 'SHAMPOO': [], 'OTHER': [] };
+                const groups = { 'AMPOULE BOOSTER': [], 'AMPOULE': [], 'MASK': [], 'CREAM': [], 'SHAMPOO': [] };
                 cosmetics.forEach(p => { 
-                    const type = getCosmeticType(p.display_name); 
-                    if(groups[type]) groups[type].push(p); 
+                    const type = getCosmeticType(p.display_name || ''); 
+                    if(groups[type]) {
+                        groups[type].push(p); 
+                    } else {
+                        // 명확한 구분이 어려운 제품은 사라짐을 방지하기 위해 기본 분류로 자동 편입 (ETC 노출 방지)
+                        if ((p.display_name || '').toLowerCase().includes('shampoo') || (p.main_category || '').toLowerCase().includes('hair')) {
+                            groups['SHAMPOO'].push(p);
+                        } else {
+                            groups['AMPOULE'].push(p);
+                        }
+                    }
                 });
-                ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM', 'SHAMPOO', 'OTHER'].forEach(type => {
-                    if (groups[type] && groups[type].length > 0) { renderHeader(type === 'OTHER' ? 'ETC.' : type, 3); renderProducts(groups[type]); }
+                ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM', 'SHAMPOO'].forEach(type => {
+                    if (groups[type] && groups[type].length > 0) { 
+                        renderHeader(type, 3); 
+                        renderProducts(groups[type]); 
+                    }
                 });
             }
 
