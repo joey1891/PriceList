@@ -153,21 +153,15 @@
             
             <form id="admin-product-form" onsubmit="submitNewProduct(event)" class="p-6 overflow-y-auto space-y-4">
                 <input type="hidden" id="form-target-section">
+                <input type="hidden" id="form-edit-id">
                 
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Target Section Line</label>
-                    <input type="text" id="form-section-display" readonly class="w-full bg-gray-100 border border-gray-300 rounded px-3 py-2 text-sm font-semibold text-gray-700 cursor-not-allowed">
+                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Product Name *</label>
+                    <input type="text" id="p-name" required placeholder="e.g. Cellular Water Ampoule" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none">
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Product Name *</label>
-                        <input type="text" id="p-name" required placeholder="e.g. Cellular Water Ampoule" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Active Ingredient(s)</label>
-                        <input type="text" id="p-ingredients" placeholder="e.g. Porcine-derived ECM, PDRN" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none">
-                    </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Active Ingredient(s)</label>
+                    <input type="text" id="p-ingredients" placeholder="e.g. Porcine-derived ECM, PDRN" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none">
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -823,19 +817,22 @@
             const adminBar = document.getElementById('admin-badge-bar');
             const loginBtn = document.getElementById('admin-login-btn');
             const adminBtns = document.querySelectorAll('.admin-only-btn');
+            const actionBtns = document.querySelectorAll('.admin-action-btn');
 
             if (active) {
                 if (adminBar) adminBar.classList.remove('hidden');
                 if (loginBtn) loginBtn.classList.add('hidden');
                 adminBtns.forEach(b => b.classList.remove('hidden'));
+                actionBtns.forEach(b => b.classList.remove('hidden'));
             } else {
                 if (adminBar) adminBar.classList.add('hidden');
                 if (loginBtn) loginBtn.classList.remove('hidden');
                 adminBtns.forEach(b => b.classList.add('hidden'));
+                actionBtns.forEach(b => b.classList.add('hidden'));
             }
         }
 
-        /* Admin Modal & Drag-Drop */
+        /* Admin Modal, Drag-Drop, Edit & Delete */
         const sectionTitles = {
             'cosmetic': 'Beauty Device / Cosmetic Line',
             'medical': 'Medical Aesthetic Line',
@@ -845,19 +842,112 @@
             'charmacist': 'Charmacist Exclusive Line'
         };
 
-        function openAdminModal(sectionKey) {
+        const getActionHtml = (id, section, table, name) => `
+            <div class="absolute right-1 top-1/2 -translate-y-1/2 flex gap-1 ${isSuperAdmin ? '' : 'hidden'} admin-action-btn bg-white/90 p-1 rounded shadow-sm border border-gray-200 no-print z-10">
+                <button type="button" onclick="editProduct('${id}', '${section}', '${table}'); event.stopPropagation();" class="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="Edit">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                </button>
+                <button type="button" onclick="deleteProduct('${id}', '${table}', '${name.replace(/'/g, "\\'")}'); event.stopPropagation();" class="p-1 text-red-600 hover:bg-red-100 rounded transition-colors" title="Delete">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </div>
+        `;
+
+        function openAdminModal(sectionKey, isEdit = false) {
             if (!isSuperAdmin) {
                 showToast("Super Admin privilege required", "error");
                 return;
             }
             const modal = document.getElementById('admin-add-modal');
             document.getElementById('form-target-section').value = sectionKey;
-            document.getElementById('form-section-display').value = sectionTitles[sectionKey] || sectionKey;
             
-            // Setup Drag and Drop listeners
+            if(!isEdit) {
+                document.getElementById('admin-product-form').reset();
+                document.getElementById('form-edit-id').value = '';
+                document.getElementById('admin-modal-title').textContent = "Add New Product";
+                document.getElementById('btn-submit-product').innerHTML = "<span>Save Product to Database</span>";
+                removeSelectedFile();
+            }
+            
             setupDragAndDrop();
-            
             modal.classList.remove('hidden');
+        }
+
+        function editProduct(id, section, tableName) {
+            if (!isSuperAdmin) return;
+            let product;
+            if (tableName === 'products') product = globalUniqueProducts.find(p => p.id == id);
+            else if (tableName === 'medical_aesthetic_products') product = globalMedicalProducts.find(p => p.id == id);
+            else if (tableName === 'raw_materials') product = globalRawMaterials.find(p => p.id == id);
+            
+            if (!product) return;
+            
+            openAdminModal(section, true);
+            document.getElementById('form-edit-id').value = id;
+            document.getElementById('admin-modal-title').textContent = "Edit Product";
+            document.getElementById('btn-submit-product').innerHTML = "<span>Update Product in Database</span>";
+            
+            if (tableName === 'raw_materials') {
+                document.getElementById('p-name').value = product.product_name || '';
+                document.getElementById('p-ingredients').value = product.active_ingredients || '';
+                document.getElementById('p-main-cat').value = product.grade || 'Exclusive';
+                document.getElementById('p-type').value = product.form || '';
+                document.getElementById('p-volume').value = product.unit || '';
+                document.getElementById('p-ct-qty').value = '';
+                document.getElementById('p-price-msrp').value = product.unit_price_usd || '';
+                document.getElementById('p-currency').value = 'USD';
+            } else if (tableName === 'medical_aesthetic_products') {
+                document.getElementById('p-name').value = product.item || '';
+                document.getElementById('p-ingredients').value = product.ingredients || '';
+                document.getElementById('p-type').value = product.type || '';
+                
+                let specs = product.specs || '';
+                const parts = specs.split(' ');
+                document.getElementById('p-volume').value = parts[0] || '';
+                document.getElementById('p-ct-qty').value = parts.slice(1).join(' ') || '';
+                
+                document.getElementById('p-price-msrp').value = product.clinic_msrp || '';
+                document.getElementById('p-price-promo').value = product.clinic_promotion || '';
+                document.getElementById('p-price-t1').value = product.dist_1000 || '';
+                document.getElementById('p-price-t2').value = product.dist_3000 || '';
+                document.getElementById('p-price-t3').value = product.dist_5000 || '';
+                document.getElementById('p-price-t4').value = product.dist_10000 || '';
+                document.getElementById('p-currency').value = product.currency || 'KRW';
+            } else {
+                document.getElementById('p-name').value = product.clean_name || '';
+                document.getElementById('p-ingredients').value = product.active_ingredients || '';
+                document.getElementById('p-main-cat').value = product.main_category || 'Skincare';
+                document.getElementById('p-type').value = product.type || '';
+                document.getElementById('p-volume').value = product.volume || '';
+                document.getElementById('p-ct-qty').value = product.ct_quantity || '';
+                
+                let priceData = (product.product_prices && product.product_prices.length > 0) ? product.product_prices[0] : {};
+                document.getElementById('p-price-msrp').value = priceData.b2c_msrp || '';
+                document.getElementById('p-price-promo').value = priceData.b2c_promotion || '';
+                document.getElementById('p-price-t1').value = priceData.b2b_tier1_1_to_10_ct || '';
+                document.getElementById('p-price-t2').value = priceData.b2b_tier2_10_to_30_ct || '';
+                document.getElementById('p-price-t3').value = priceData.b2b_tier3_30_to_70_ct || '';
+                document.getElementById('p-price-t4').value = priceData.b2b_tier4_over_70_ct || '';
+                document.getElementById('p-currency').value = priceData.currency || 'KRW';
+            }
+        }
+
+        async function deleteProduct(id, tableName, productName) {
+            if(!isSuperAdmin) return;
+            if(!confirm(`Are you sure you want to delete [${productName}]? This action cannot be undone.`)) return;
+            
+            try {
+                if (tableName === 'products') {
+                    await supabaseClient.from('product_prices').delete().eq('product_id', id);
+                }
+                const { error } = await supabaseClient.from(tableName).delete().eq('id', id);
+                if (error) throw error;
+                
+                showToast(`Product deleted successfully`, "success");
+                await initDashboard();
+            } catch (err) {
+                showToast(`Delete failed: ${err.message}`, "error");
+            }
         }
 
         function closeAdminModal(e) {
@@ -931,7 +1021,7 @@
             document.getElementById('preview-img').src = '';
         }
 
-        /* Submit New Product to Supabase */
+        /* Submit New/Updated Product to Supabase */
         async function submitNewProduct(e) {
             e.preventDefault();
             if (!isSuperAdmin) return;
@@ -941,6 +1031,7 @@
             submitBtn.innerHTML = `<span>Saving...</span>`;
 
             try {
+                const editId = document.getElementById('form-edit-id').value;
                 const section = document.getElementById('form-target-section').value;
                 const name = document.getElementById('p-name').value.trim();
                 const ingredients = document.getElementById('p-ingredients').value.trim();
@@ -979,23 +1070,27 @@
                 }
 
                 if (section === 'raw') {
-                    // Raw Materials Table
-                    const { error } = await supabaseClient.from('raw_materials').insert([{
+                    const payload = {
                         product_name: name,
                         active_ingredients: ingredients,
                         grade: mainCat,
                         form: type || 'Solution',
                         unit: volume || '1L',
                         unit_price_usd: msrp
-                    }]);
-                    if (error) throw error;
+                    };
+                    if (editId) {
+                        const { error } = await supabaseClient.from('raw_materials').update(payload).eq('id', editId);
+                        if (error) throw error;
+                    } else {
+                        const { error } = await supabaseClient.from('raw_materials').insert([payload]);
+                        if (error) throw error;
+                    }
                 } else if (section === 'medical') {
-                    // Medical Aesthetic Table
-                    const { error } = await supabaseClient.from('medical_aesthetic_products').insert([{
+                    const payload = {
                         item: name,
                         ingredients: ingredients,
                         type: type || 'Medical',
-                        specs: `${volume} ${ctQty}`,
+                        specs: `${volume} ${ctQty}`.trim(),
                         clinic_msrp: msrp,
                         clinic_promotion: promo,
                         dist_1000: t1,
@@ -1003,16 +1098,21 @@
                         dist_5000: t3,
                         dist_10000: t4,
                         currency: currency
-                    }]);
-                    if (error) throw error;
+                    };
+                    if (editId) {
+                        const { error } = await supabaseClient.from('medical_aesthetic_products').update(payload).eq('id', editId);
+                        if (error) throw error;
+                    } else {
+                        const { error } = await supabaseClient.from('medical_aesthetic_products').insert([payload]);
+                        if (error) throw error;
+                    }
                     if (imageUrl) medImageMap[name] = imageUrl;
                 } else {
-                    // Main Products Table
                     let subCategory = '';
                     if (section === 'raclinic') subCategory = 'RA Clinic Exclusive';
                     else if (section === 'charmacist') subCategory = 'Charmacist Exclusive';
 
-                    const { data: insertedProd, error: prodErr } = await supabaseClient.from('products').insert([{
+                    const payload = {
                         clean_name: name,
                         display_name: name,
                         main_category: mainCat,
@@ -1022,14 +1122,21 @@
                         volume: volume,
                         ct_quantity: ctQty,
                         qty: '1EA'
-                    }]).select();
+                    };
 
-                    if (prodErr) throw prodErr;
+                    let prodId = editId;
 
-                    if (insertedProd && insertedProd.length > 0) {
-                        const prodId = insertedProd[0].id;
-                        const { error: priceErr } = await supabaseClient.from('product_prices').insert([{
-                            product_id: prodId,
+                    if (editId) {
+                        const { error: prodErr } = await supabaseClient.from('products').update(payload).eq('id', editId);
+                        if (prodErr) throw prodErr;
+                    } else {
+                        const { data: insertedProd, error: prodErr } = await supabaseClient.from('products').insert([payload]).select();
+                        if (prodErr) throw prodErr;
+                        if (insertedProd && insertedProd.length > 0) prodId = insertedProd[0].id;
+                    }
+
+                    if (prodId) {
+                        const pricePayload = {
                             currency: currency,
                             b2c_msrp: msrp,
                             b2c_promotion: promo,
@@ -1038,22 +1145,31 @@
                             b2b_tier3_30_to_70_ct: t3,
                             b2b_tier4_over_70_ct: t4,
                             oem_tier1_10000_ct: t1
-                        }]);
-                        if (priceErr) throw priceErr;
+                        };
+
+                        if (editId) {
+                            const { error: priceErr } = await supabaseClient.from('product_prices').update(pricePayload).eq('product_id', prodId);
+                            if (priceErr) throw priceErr;
+                        } else {
+                            pricePayload.product_id = prodId;
+                            const { error: priceErr } = await supabaseClient.from('product_prices').insert([pricePayload]);
+                            if (priceErr) throw priceErr;
+                        }
                     }
+
                     if (imageUrl) {
                         productImageMap[name] = imageUrl;
                         raImageMap[name] = imageUrl;
                     }
                 }
 
-                showToast("Product successfully added to database!", "success");
+                showToast(editId ? "Product successfully updated!" : "Product successfully added to database!", "success");
                 closeAdminModal();
-                await initDashboard(); // Refresh Data Live
+                await initDashboard(); 
 
             } catch (err) {
                 console.error("Save error:", err);
-                showToast(`Failed to add product: ${err.message || 'Error occurred'}`, "error");
+                showToast(`Failed to save product: ${err.message || 'Error occurred'}`, "error");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<span>Save Product to Database</span>`;
@@ -1435,7 +1551,7 @@
                     const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img cursor-pointer hover:opacity-80 transition-opacity" alt="${name}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img">N/A</div>`;
                     tr.innerHTML = `
                         <td class="py-2 px-4 text-center align-middle"><div class="flex justify-center">${imgHtml}</div></td>
-                        <td class="py-3 pr-6 align-middle"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${name}</span></div></td>
+                        <td class="py-3 pr-6 align-middle relative group/item"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${name}</span></div>${getActionHtml(p.id, 'cosmetic', 'products', name)}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${volume}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${qty}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${p.ct_quantity || '-'}</td>
@@ -1523,7 +1639,7 @@
                     const imgHtml = mappedImg ? `<img src="${mappedImg}" class="med-product-img mx-auto cursor-pointer hover:opacity-80 transition-opacity" alt="${p.item}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8"></div>`;
                     html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle">${imgHtml}</td>`;
                 }
-                if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center text-black align-middle">${p.item || ''}</td>`;
+                if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center text-black align-middle relative group/item">${p.item || ''}${getActionHtml(p.id, 'medical', 'medical_aesthetic_products', p.item)}</td>`;
                 if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.ingredients || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.type || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 
@@ -1646,7 +1762,7 @@
 
                 tr.innerHTML = `
                     <td class="py-2 px-2 text-center align-middle">${imgHtml}</td>
-                    <td class="py-3 px-4 text-center text-black font-medium align-middle">${dispName}</td>
+                    <td class="py-3 px-4 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'pharmacy', 'products', dispName)}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light">Cosmetic</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.form || '-'}</td>
@@ -1702,7 +1818,7 @@
                 let html = '';
                 if (nameSpans[idx] > 0) {
                     html += `<td rowspan="${nameSpans[idx]}" class="py-2 px-2 text-center align-middle"><div class="placeholder-img mx-auto w-8 h-8 bg-gray-100">RM</div></td>`;
-                    html += `<td rowspan="${nameSpans[idx]}" class="py-3 px-4 text-center text-gray-900 font-medium align-middle">${p.product_name}</td>`;
+                    html += `<td rowspan="${nameSpans[idx]}" class="py-3 px-4 text-center text-gray-900 font-medium align-middle relative group/item">${p.product_name}${getActionHtml(p.id, 'raw', 'raw_materials', p.product_name)}</td>`;
                 }
                 if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center text-gray-700 font-light align-middle">${p.active_ingredients}</td>`;
                 
@@ -1773,7 +1889,7 @@
 
                 tr.innerHTML = `
                     <td class="py-2 px-2 text-center align-middle">${imgHtml}</td>
-                    <td class="py-3 px-2 text-center text-black font-medium align-middle">${dispName}</td>
+                    <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'raclinic', 'products', p.display_name || p.clean_name)}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${p.active_ingredients || '-'}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-medium">Cosmetic</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light">${p.type || '-'}</td>
@@ -1869,7 +1985,7 @@
 
                 tr.innerHTML = `
                     <td class="py-2 px-2 text-center align-middle">${imgHtml}</td>
-                    <td class="py-3 px-2 text-center text-black font-medium align-middle">${dispName}</td>
+                    <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'charmacist', 'products', p.display_name || p.clean_name)}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-medium">Cosmetic</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light">${p.type || '-'}</td>
