@@ -78,6 +78,13 @@
             background-color: #eff6ff;
         }
 
+        /* Drag & Drop Reordering Styles */
+        .draggable-row { cursor: grab; }
+        .draggable-row:active { cursor: grabbing; }
+        .drag-over { border-top: 2px solid #3b82f6 !important; background-color: #eff6ff !important; }
+        .drag-handle-icon { opacity: 0.3; transition: opacity 0.2s; }
+        .draggable-row:hover .drag-handle-icon { opacity: 1; }
+
         /* Table Print Enhancements */
         body.print-table-mode .unified-table { min-width: 0 !important; width: 100% !important; }
         body.print-table-mode .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
@@ -1231,7 +1238,106 @@
             }
         }
 
-        /* Supabase 초기 설정 및 데이터 로딩 로직 */
+        /* -------------------------------------------------------------
+           [새로운 기능] 테이블 행(Row) 드래그 앤 드롭 순서 변경 로직
+           ------------------------------------------------------------- */
+        let draggedRow = null;
+        let dragSourceTable = null;
+
+        function handleRowDragStart(e, tableName) {
+            if (!isSuperAdmin) return;
+            draggedRow = e.target.closest('tr');
+            dragSourceTable = tableName;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedRow.getAttribute('data-id'));
+            
+            // 시각적 피드백을 위해 약간의 딜레이 적용
+            setTimeout(() => { draggedRow.classList.add('opacity-50', 'bg-gray-100'); }, 0);
+        }
+
+        function handleRowDragOver(e) {
+            if (!isSuperAdmin || !draggedRow) return;
+            e.preventDefault();
+            const targetRow = e.target.closest('tr');
+            if (targetRow && targetRow !== draggedRow && targetRow.hasAttribute('data-id')) {
+                targetRow.classList.add('drag-over');
+            }
+        }
+
+        function handleRowDragLeave(e) {
+            const targetRow = e.target.closest('tr');
+            if (targetRow) {
+                targetRow.classList.remove('drag-over');
+            }
+        }
+
+        async function handleRowDrop(e, tableName) {
+            if (!isSuperAdmin || !draggedRow) return;
+            e.preventDefault();
+            
+            const targetRow = e.target.closest('tr');
+            if (targetRow) targetRow.classList.remove('drag-over');
+            draggedRow.classList.remove('opacity-50', 'bg-gray-100');
+            
+            // 유효한 드롭 위치인지 확인 (같은 테이블, 대상이 id를 가짐)
+            if (targetRow && draggedRow !== targetRow && targetRow.hasAttribute('data-id') && dragSourceTable === tableName) {
+                const tbody = targetRow.parentNode;
+                const allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
+                const draggedIdx = allRows.indexOf(draggedRow);
+                const targetIdx = allRows.indexOf(targetRow);
+                
+                // DOM 상에서 위치 변경
+                if (draggedIdx < targetIdx) targetRow.after(draggedRow);
+                else targetRow.before(draggedRow);
+                
+                // 새로운 순서 배열 추출
+                const newOrderIds = Array.from(tbody.querySelectorAll('tr[data-id]')).map(tr => tr.getAttribute('data-id'));
+                
+                // DB에 일괄 저장
+                await saveSortOrder(newOrderIds, tableName);
+            }
+            draggedRow = null;
+        }
+
+        async function saveSortOrder(ids, tableName) {
+            showToast("순서 저장 중...", "info");
+            try {
+                // Supabase 다중 업데이트 (Promise.all 활용)
+                const promises = ids.map((id, index) => {
+                    return supabaseClient.from(tableName).update({ sort_order: index }).eq('id', id);
+                });
+                await Promise.all(promises);
+                
+                // 로컬 전역 변수 메모리 순서 최신화 (리렌더링 시 원상복구 방지)
+                if (tableName === 'products') {
+                    ids.forEach((id, idx) => {
+                        let p = globalUniqueProducts.find(x => x.id === id);
+                        if(p) p.sort_order = idx;
+                    });
+                } else if (tableName === 'medical_aesthetic_products') {
+                    ids.forEach((id, idx) => {
+                        let p = globalMedicalProducts.find(x => x.id === id);
+                        if(p) p.sort_order = idx;
+                    });
+                } else if (tableName === 'raw_materials') {
+                    ids.forEach((id, idx) => {
+                        let p = globalRawMaterials.find(x => x.id === id);
+                        if(p) p.sort_order = idx;
+                    });
+                }
+                showToast("순서가 성공적으로 변경되었습니다.", "success");
+            } catch (err) {
+                showToast("순서 저장 실패: " + err.message, "error");
+            }
+        }
+
+        // 관리자용 드래그 핸들 아이콘 HTML 반환기
+        const getDragHandleHtml = () => `
+            <div class="absolute left-1 top-1/2 -translate-y-1/2 flex items-center justify-center ${isSuperAdmin ? '' : 'hidden'} admin-action-btn no-print z-10 w-4 h-full cursor-grab drag-handle-icon" title="Drag to reorder">
+                <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+            </div>
+        `;
+
         const SUPABASE_URL = 'https://rayhgqcpupwmwpymtkwg.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1289,27 +1395,11 @@
             if (dateEl) dateEl.textContent = `Today: ${todayStr}`;
 
             try {
-                const exRes = await fetch('https://open.er-api.com/v6/latest/USD');
-                const exData = await exRes.json();
-                liveKrwRate = exData.rates.KRW;
-                appliedKrwRate = liveKrwRate;
-                
-                const liveRateEl = document.getElementById('live-rate');
-                if (liveRateEl) liveRateEl.textContent = `1 USD = ₩ ` + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate);
-                
-                const liveOption = document.querySelector('#krw-rate-select option[value="live"]');
-                if (liveOption) liveOption.textContent = `Live (₩${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(liveKrwRate)})`;
-            } catch (e) {
-                const liveRateEl = document.getElementById('live-rate');
-                if (liveRateEl) liveRateEl.textContent = `Rate Load Failed (Default: ₩1,400)`;
-                liveKrwRate = 1400;
-                appliedKrwRate = 1400;
-            }
-
-            try {
+                // 데이터 Fetch 시 sort_order 기준 오름차순 정렬 추가
                 const { data: rawProducts, error: prodErr } = await supabaseClient
                     .from('products')
                     .select('*')
+                    .order('sort_order', { ascending: true, nullsFirst: false })
                     .order('created_at', { ascending: true });
                     
                 if (prodErr) debugProductsError = prodErr.message;
@@ -1330,46 +1420,41 @@
                                 else if (masterMatch.msrp !== undefined) product.product_prices[0].b2c_msrp = masterMatch.msrp;
                             }
                         }
-
+                        
                         let cleanName = (product.clean_name || '').trim();
                         let displayName = cleanName;
 
-                        if (cleanName.toLowerCase().includes('core impact')) displayName = "Core impact (PK/BK/WH/DW/BG)";
-                        else if (cleanName.toLowerCase().includes('hyper shot')) displayName = "Hyper shot (PK/BG)";
+                        if (cleanName.toLowerCase().includes('core impact')) displayName = "Core impact";
+                        else if (cleanName.toLowerCase().includes('hyper shot')) displayName = "Hyper shot";
                         else if (cleanName.toLowerCase() === 'cellular water ampoule booster' && product.volume === '50ml') product.volume = '60ml';
                         
                         product.display_name = displayName;
                     });
+                    
                     globalUniqueProducts = rawProducts;
+                    
+                    // 삭제된 블루 앰플 임시 자동 복구 로직
+                    if (!globalUniqueProducts.some(p => (p.clean_name || '').toLowerCase() === 'blue crystal hydrating ampoule')) {
+                         globalUniqueProducts.push({
+                             id: 'RESTORED_BLUE_AMPOULE',
+                             clean_name: 'Blue crystal hydrating ampoule',
+                             display_name: 'Blue crystal hydrating ampoule',
+                             main_category: 'Skincare',
+                             sub_category: 'Cosmetic',
+                             volume: '30ml',
+                             qty: '1EA',
+                             ct_quantity: 72,
+                             product_prices: [{
+                                 currency: 'KRW',
+                                 b2c_msrp: 35000,
+                                 b2c_promotion: 24500,
+                                 b2b_tier1_1_to_10_ct: 15750,
+                                 b2b_tier2_10_to_30_ct: 14000,
+                                 b2b_tier3_30_to_70_ct: 12250,
+                             }]
+                         });
+                    }
                 }
-
-                // [긴급 복구] DB에서 삭제된 블루 앰플 자동 복원 로직
-                const hasBlueAmpoule = globalUniqueProducts.some(p => (p.clean_name || '').toLowerCase().includes('blue crystal'));
-                if (!hasBlueAmpoule) {
-                    globalUniqueProducts.push({
-                        id: 'RESTORED_BLUE_AMPOULE',
-                        clean_name: 'Blue crystal hydrating ampoule',
-                        display_name: 'Blue crystal hydrating ampoule',
-                        main_category: 'Skincare',
-                        sub_category: '',
-                        type: 'Solution / Ampoule',
-                        active_ingredients: 'Guaiazulene, Hyaluronic Acid',
-                        volume: '100ml',
-                        qty: '1EA',
-                        ct_quantity: 50,
-                        image_url: productImageMap['Blue crystal hydrating ampoule'] || '',
-                        product_prices: [{
-                            currency: 'KRW',
-                            b2c_msrp: 60000,
-                            b2c_promotion: 50000,
-                            b2b_tier1_1_to_10_ct: 28000,
-                            b2b_tier2_10_to_30_ct: 24000,
-                            b2b_tier3_30_to_70_ct: 20000,
-                            b2b_tier4_over_70_ct: 16000
-                        }]
-                    });
-                }
-
             } catch (err) {
                 debugProductsError = err.message;
             }
@@ -1378,7 +1463,7 @@
                 const { data: dbMedicals, error: medErr } = await supabaseClient
                     .from('medical_aesthetic_products')
                     .select('*')
-                    .order('sort_order', { ascending: true });
+                    .order('sort_order', { ascending: true, nullsFirst: false });
                 if (!medErr && dbMedicals && dbMedicals.length > 0) globalMedicalProducts = dbMedicals;
             } catch (err) {}
 
@@ -1407,10 +1492,15 @@
                 if (lower.includes('echrever')) return 5;
                 return 999;
             }
-            globalMedicalProducts.sort((a, b) => getMedicalOrder(a.item) - getMedicalOrder(b.item));
+            // 이미 정렬된 상태를 깨지 않기 위해 기본값(초기화) 경우에만 정렬 실행
+            if(globalMedicalProducts.length <= 5) {
+                globalMedicalProducts.sort((a, b) => getMedicalOrder(a.item) - getMedicalOrder(b.item));
+            }
 
             try {
-                const { data: dbRaw, error: rawErr } = await supabaseClient.from('raw_materials').select('*').order('product_name', { ascending: true });
+                const { data: dbRaw, error: rawErr } = await supabaseClient.from('raw_materials').select('*')
+                    .order('sort_order', { ascending: true, nullsFirst: false })
+                    .order('product_name', { ascending: true });
                 if (!rawErr && dbRaw && dbRaw.length > 0) globalRawMaterials = dbRaw;
                 else throw new Error();
             } catch (err) {
@@ -1592,7 +1682,17 @@
                     const nativeCurrency = (priceData.currency || 'KRW').trim().toUpperCase();
 
                     const tr = document.createElement('tr');
-                    tr.className = "text-sm hover:bg-gray-50 transition-colors";
+                    // 관리자일 경우 드래그 이벤트 주입
+                    tr.className = `text-sm hover:bg-gray-50 transition-colors ${isSuperAdmin ? 'draggable-row' : ''}`;
+                    if (isSuperAdmin) {
+                        tr.setAttribute('draggable', 'true');
+                        tr.setAttribute('ondragstart', `handleRowDragStart(event, 'products')`);
+                        tr.setAttribute('ondragover', `handleRowDragOver(event)`);
+                        tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
+                        tr.setAttribute('ondrop', `handleRowDrop(event, 'products')`);
+                    }
+                    tr.setAttribute('data-id', p.id);
+
                     const isKrw = currentCurrency === 'KRW';
                     
                     let rate = 1;
@@ -1630,8 +1730,8 @@
 
                     const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img cursor-pointer hover:opacity-80 transition-opacity" alt="${name}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img">N/A</div>`;
                     tr.innerHTML = `
-                        <td class="py-2 px-4 text-center align-middle"><div class="flex justify-center">${imgHtml}</div></td>
-                        <td class="py-3 pr-6 align-middle relative group/item"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${name}</span></div>${getActionHtml(p.id, 'cosmetic', 'products', name)}</td>
+                        <td class="py-2 px-4 text-center align-middle relative">${getDragHandleHtml()}<div class="flex justify-center">${imgHtml}</div></td>
+                        <td class="py-3 pr-6 align-middle"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${name}</span></div>${getActionHtml(p.id, 'cosmetic', 'products', name)}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${volume}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${qty}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${p.ct_quantity || '-'}</td>
@@ -1725,12 +1825,21 @@
 
             filteredData.forEach((p, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition-colors text-xs";
+                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
+                if (isSuperAdmin) {
+                    tr.setAttribute('draggable', 'true');
+                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'medical_aesthetic_products')`);
+                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
+                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
+                    tr.setAttribute('ondrop', `handleRowDrop(event, 'medical_aesthetic_products')`);
+                }
+                tr.setAttribute('data-id', p.id);
+                
                 let html = '';
                 if (itemSpans[idx] > 0) {
-                    let mappedImg = medImageMap[p.item] || productImageMap[p.item] || "";
+                    let mappedImg = medImageMap[p.item] || productImageMap[p.item];
                     const imgHtml = mappedImg ? `<img src="${mappedImg}" class="med-product-img mx-auto cursor-pointer hover:opacity-80 transition-opacity" alt="${p.item}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8"></div>`;
-                    html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle">${imgHtml}</td>`;
+                    html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}${imgHtml}</td>`;
                 }
                 if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center text-black align-middle relative group/item">${p.item || ''}${getActionHtml(p.id, 'medical', 'medical_aesthetic_products', p.item)}</td>`;
                 if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.ingredients || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
@@ -1837,17 +1946,25 @@
                 const oem50000 = getCalculatedPrice(baseMsrp, 0.27);
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition-colors text-xs";
+                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
+                if (isSuperAdmin) {
+                    tr.setAttribute('draggable', 'true');
+                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'products')`);
+                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
+                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
+                    tr.setAttribute('ondrop', `handleRowDrop(event, 'products')`);
+                }
+                tr.setAttribute('data-id', p.id);
 
                 let cName = (p.clean_name || '').trim();
                 let dispName = engNames[cName] || p.display_name || '-';
                 let dispIngr = engIngr[p.active_ingredients] || p.active_ingredients || '-';
 
-                let mappedImg = p.image_url || raImageMap[cName] || raImageMap[p.display_name] || ""; 
+                let mappedImg = raImageMap[cName] || raImageMap[p.display_name] || ""; 
                 const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
 
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle">${imgHtml}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}${imgHtml}</td>
                     <td class="py-3 px-4 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'pharmacy', 'products', dispName)}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light">Cosmetic</td>
@@ -1896,14 +2013,22 @@
 
             globalRawMaterials.forEach((p, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition-colors text-xs";
+                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
+                if (isSuperAdmin) {
+                    tr.setAttribute('draggable', 'true');
+                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'raw_materials')`);
+                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
+                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
+                    tr.setAttribute('ondrop', `handleRowDrop(event, 'raw_materials')`);
+                }
+                tr.setAttribute('data-id', p.id);
                 
                 let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
                 let price = (Number(p.unit_price_usd) || 0) * rate;
 
                 let html = '';
                 if (nameSpans[idx] > 0) {
-                    html += `<td rowspan="${nameSpans[idx]}" class="py-2 px-2 text-center align-middle"><div class="placeholder-img mx-auto w-8 h-8 bg-gray-100">RM</div></td>`;
+                    html += `<td rowspan="${nameSpans[idx]}" class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100">RM</div></td>`;
                     html += `<td rowspan="${nameSpans[idx]}" class="py-3 px-4 text-center text-gray-900 font-medium align-middle relative group/item">${p.product_name}${getActionHtml(p.id, 'raw', 'raw_materials', p.product_name)}</td>`;
                 }
                 if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center text-gray-700 font-light align-middle">${p.active_ingredients}</td>`;
@@ -1927,7 +2052,7 @@
             const raProducts = globalUniqueProducts.filter(p => p.sub_category === 'RA Clinic Exclusive');
             
             if (!raProducts || raProducts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching data...</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching RA Clinic data from server...</td></tr>`;
                 return;
             }
 
@@ -1956,9 +2081,17 @@
                 const d2_shop = getPrice(priceData.oem_tier1_10000_ct);
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition-colors text-xs";
+                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
+                if (isSuperAdmin) {
+                    tr.setAttribute('draggable', 'true');
+                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'products')`);
+                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
+                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
+                    tr.setAttribute('ondrop', `handleRowDrop(event, 'products')`);
+                }
+                tr.setAttribute('data-id', p.id);
 
-                let mappedImg = p.image_url || raImageMap[p.clean_name] || raImageMap[p.display_name] || ""; 
+                let mappedImg = raImageMap[p.clean_name] || raImageMap[p.display_name] || ""; 
                 const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
 
                 let dispName = p.display_name || p.clean_name || '-';
@@ -1967,7 +2100,7 @@
                 }
 
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle">${imgHtml}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}${imgHtml}</td>
                     <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'raclinic', 'products', p.display_name || p.clean_name)}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${p.active_ingredients || '-'}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-medium">Cosmetic</td>
@@ -2044,17 +2177,25 @@
                 const cmc_chain = getCalculatedPrice(baseMsrp, 0.45); 
 
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition-colors text-xs";
+                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
+                if (isSuperAdmin) {
+                    tr.setAttribute('draggable', 'true');
+                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'products')`);
+                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
+                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
+                    tr.setAttribute('ondrop', `handleRowDrop(event, 'products')`);
+                }
+                tr.setAttribute('data-id', p.id);
 
                 let cName = (p.clean_name || '').trim();
                 let dispName = engNames[cName] || p.display_name || '-';
                 let dispIngr = engIngr[p.active_ingredients] || p.active_ingredients || '-';
 
-                let mappedImg = p.image_url || raImageMap[cName] || raImageMap[p.display_name] || ""; 
+                let mappedImg = raImageMap[cName] || raImageMap[p.display_name] || ""; 
                 const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
 
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle">${imgHtml}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}${imgHtml}</td>
                     <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'charmacist', 'products', p.display_name || p.clean_name)}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-medium">Cosmetic</td>
