@@ -67,6 +67,17 @@
         .med-product-img { width: 44px; height: 44px; object-fit: contain; }
         .placeholder-img { width: 36px; height: 36px; border-radius: 4px; background-color: #f3f4f6; border: 1px dashed #d1d5db; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px; font-weight: bold; }
 
+        /* Drag & Drop Zone Styling */
+        .drop-zone {
+            border: 2px dashed #9ca3af;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        .drop-zone.dragover {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
+
         /* Table Print Enhancements */
         body.print-table-mode .unified-table { min-width: 0 !important; width: 100% !important; }
         body.print-table-mode .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
@@ -79,7 +90,7 @@
         /* Print Styles */
         @media print {
             body { background-color: #ffffff; margin: 0; padding: 0; }
-            #toast-container, .no-print { display: none !important; }
+            #toast-container, .no-print, #admin-badge-bar { display: none !important; }
             
             #main-content { padding: 0 !important; margin: 0 !important; display: block !important; }
             
@@ -98,9 +109,13 @@
 </head>
 <body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white relative overflow-hidden" onload="initDashboard()">
 
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[10000] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Password Lock Screen -->
     <div id="lock-screen" class="fixed inset-0 z-[9999] bg-gray-900 flex flex-col items-center justify-center transition-opacity duration-500 no-print">
         <div class="bg-white p-10 rounded shadow-2xl max-w-sm w-full text-center mx-4">
-            <svg class="w-12 h-12 mx-auto text-gray-900 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg class="w-12 h-12 mx-auto text-gray-900 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7z"></path>
             </svg>
             <h2 class="text-2xl font-montserrat font-bold text-gray-900 tracking-widest mb-1">MEDIFAB</h2>
@@ -117,24 +132,165 @@
         </div>
     </div>
 
-    <div id="app-content" class="hidden opacity-0 transition-opacity duration-500">
-        <div id="toast-container" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+    <!-- Image Modal -->
+    <div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeImageModal(event)">
+        <div class="relative max-w-4xl max-h-[90vh] p-4 flex flex-col items-center">
+            <button class="absolute -top-10 right-0 text-white hover:text-gray-300 text-3xl" onclick="closeImageModal(event)">&times;</button>
+            <img id="modal-img" src="" class="max-w-full max-h-[85vh] object-contain rounded shadow-2xl bg-white" onclick="event.stopPropagation()">
+        </div>
+    </div>
 
-        <div id="image-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeImageModal(event)">
-            <div class="relative max-w-4xl max-h-[90vh] p-4 flex flex-col items-center">
-                <button class="absolute -top-10 right-0 text-white hover:text-gray-300 text-3xl" onclick="closeImageModal(event)">&times;</button>
-                <img id="modal-img" src="" class="max-w-full max-h-[85vh] object-contain rounded shadow-2xl bg-white" onclick="event.stopPropagation()">
+    <!-- Admin Super Modal (Add Product DB & Image Drag/Drop) -->
+    <div id="admin-add-modal" class="fixed inset-0 z-[101] hidden flex items-center justify-center bg-black/70 backdrop-blur-sm no-print" onclick="closeAdminModal(event)">
+        <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full mx-4 overflow-hidden flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+            <div class="bg-gray-900 px-6 py-4 flex justify-between items-center text-white">
+                <div class="flex items-center gap-2">
+                    <span class="bg-red-600 text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-widest">Super Admin</span>
+                    <h3 class="text-lg font-montserrat font-semibold" id="admin-modal-title">Add New Product</h3>
+                </div>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
             </div>
+            
+            <form id="admin-product-form" onsubmit="submitNewProduct(event)" class="p-6 overflow-y-auto space-y-4">
+                <input type="hidden" id="form-target-section">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Target Section Line</label>
+                    <input type="text" id="form-section-display" readonly class="w-full bg-gray-100 border border-gray-300 rounded px-3 py-2 text-sm font-semibold text-gray-700 cursor-not-allowed">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Product Name *</label>
+                        <input type="text" id="p-name" required placeholder="e.g. Cellular Water Ampoule" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Active Ingredient(s)</label>
+                        <input type="text" id="p-ingredients" placeholder="e.g. Porcine-derived ECM, PDRN" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 uppercase mb-1">Main Category</label>
+                        <select id="p-main-cat" class="w-full border border-gray-300 rounded px-2 py-2 text-xs focus:ring-2 focus:ring-gray-900">
+                            <option value="Skincare">Skincare</option>
+                            <option value="Device">Device</option>
+                            <option value="Hair">Hair</option>
+                            <option value="Medical">Medical</option>
+                            <option value="Exclusive">Exclusive</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 uppercase mb-1">Type / Form</label>
+                        <input type="text" id="p-type" placeholder="e.g. Solution / Cream" class="w-full border border-gray-300 rounded px-2 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 uppercase mb-1">Volume / Spec</label>
+                        <input type="text" id="p-volume" placeholder="e.g. 50ml" class="w-full border border-gray-300 rounded px-2 py-2 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-700 uppercase mb-1">CT Qty / Size</label>
+                        <input type="text" id="p-ct-qty" placeholder="e.g. 50ea" class="w-full border border-gray-300 rounded px-2 py-2 text-xs">
+                    </div>
+                </div>
+
+                <!-- Pricing Config Zone -->
+                <div class="bg-gray-50 p-4 border border-gray-200 rounded space-y-3">
+                    <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-800">Pricing Settings</span>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-gray-600">Currency:</label>
+                            <select id="p-currency" class="text-xs border rounded px-2 py-1 bg-white font-bold">
+                                <option value="KRW">KRW (₩)</option>
+                                <option value="USD">USD ($)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-600 mb-1">B2C / Clinic MSRP *</label>
+                            <input type="number" step="any" id="p-price-msrp" required placeholder="0" class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs font-semibold">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-600 mb-1">Promo Price</label>
+                            <input type="number" step="any" id="p-price-promo" placeholder="0" class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-600 mb-1">Tier 1 / Dist 1k</label>
+                            <input type="number" step="any" id="p-price-t1" placeholder="0" class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-600 mb-1">Tier 2 / Dist 3k</label>
+                            <input type="number" step="any" id="p-price-t2" placeholder="0" class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-600 mb-1">Tier 3 / Dist 5k</label>
+                            <input type="number" step="any" id="p-price-t3" placeholder="0" class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-gray-600 mb-1">Tier 4 / Dist 10k</label>
+                            <input type="number" step="any" id="p-price-t4" placeholder="0" class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drag & Drop Image Upload Zone -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Product Image (Drag & Drop)</label>
+                    <div id="drag-drop-zone" class="drop-zone p-4 text-center cursor-pointer bg-gray-50 hover:bg-gray-100" onclick="document.getElementById('file-input').click()">
+                        <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                        <div id="drop-zone-prompt" class="space-y-1">
+                            <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <p class="text-xs font-semibold text-gray-600">Drag & Drop product image here, or <span class="text-blue-600 underline">browse</span></p>
+                            <p class="text-[10px] text-gray-400">PNG, JPG, WEBP or AVIF up to 5MB</p>
+                        </div>
+                        <div id="drop-zone-preview" class="hidden flex items-center justify-center gap-3">
+                            <img id="preview-img" src="" class="w-12 h-12 object-contain border rounded bg-white">
+                            <div class="text-left">
+                                <p id="preview-filename" class="text-xs font-bold text-gray-800 truncate max-w-[200px]">filename.png</p>
+                                <button type="button" onclick="removeSelectedFile(event)" class="text-[10px] text-red-500 hover:underline">Remove image</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeAdminModal()" class="w-1/3 border border-gray-300 py-2.5 text-xs font-semibold text-gray-700 uppercase tracking-wider rounded hover:bg-gray-100 transition-colors">Cancel</button>
+                    <button type="submit" id="btn-submit-product" class="w-2/3 bg-gray-900 hover:bg-black text-white py-2.5 text-xs font-semibold uppercase tracking-wider rounded transition-colors shadow-md flex items-center justify-center gap-2">
+                        <span>Save Product to Database</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="app-content" class="hidden opacity-0 transition-opacity duration-500">
+
+        <!-- Top Super Admin Control Bar -->
+        <div id="admin-badge-bar" class="hidden bg-gray-900 text-white px-6 py-2 text-xs flex justify-between items-center shadow-md">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="font-bold tracking-widest uppercase text-[11px] text-emerald-400">Super Admin Mode Active</span>
+                <span class="text-gray-400 text-[10px] ml-2">| Direct DB Addition & Image Drag-Drop Enabled</span>
+            </div>
+            <button onclick="logoutSuperAdmin()" class="bg-gray-800 hover:bg-red-700 px-3 py-1 rounded text-[10px] uppercase tracking-wider transition-colors">Exit Admin Mode</button>
         </div>
 
         <div id="main-content" class="p-6 md:p-12 max-w-[100rem] mx-auto flex flex-col gap-10">
             
             <div class="flex flex-col md:flex-row justify-between items-end pb-6 border-b-2 border-gray-900 print-active-section">
                 <div>
-                    <span class="inline-flex items-center gap-1.5 py-1 px-2 mb-4 bg-red-600 text-[10px] tracking-widest text-white uppercase shadow-sm">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 012 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
-                        Confidential
-                    </span>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="inline-flex items-center gap-1.5 py-1 px-2 bg-red-600 text-[10px] tracking-widest text-white uppercase shadow-sm">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 012 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                            Confidential
+                        </span>
+                        <button id="admin-login-btn" onclick="promptSuperAdminLogin()" class="no-print text-[10px] bg-gray-100 border border-gray-300 text-gray-700 px-2.5 py-1 rounded hover:bg-gray-900 hover:text-white transition-colors tracking-wider uppercase font-semibold">
+                            Admin Mode Login
+                        </button>
+                    </div>
                     <h1 class="text-4xl text-gray-900 mb-2 font-montserrat tracking-tight">Global Export System</h1>
                     <h2 class="text-xl text-gray-500 font-montserrat tracking-wide mb-4">Product Live Price List <span class="text-sm ml-2 text-gray-400 tracking-normal">(VAT Excluded)</span></h2>
                     <div class="text-xs text-gray-400 uppercase tracking-widest space-y-1">
@@ -187,6 +343,10 @@
                             <h3 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider group-hover:text-black transition-colors">Beauty Device / Cosmetic Product Line</h3>
                         </div>
                         <div class="flex gap-2" onclick="event.stopPropagation()">
+                            <button onclick="openAdminModal('cosmetic')" class="admin-only-btn hidden no-print px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-1.5 rounded shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Add Product
+                            </button>
                             <button onclick="printTableSection('section-cosmetic', 'Cosmetics_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                 Print PDF
@@ -239,6 +399,10 @@
                             <h3 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider group-hover:text-black transition-colors">Medical Aesthetic Product Line</h3>
                         </div>
                         <div class="flex gap-2" onclick="event.stopPropagation()">
+                            <button onclick="openAdminModal('medical')" class="admin-only-btn hidden no-print px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-1.5 rounded shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Add Product
+                            </button>
                             <button onclick="printTableSection('section-medical', 'Medical_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                 Print PDF
@@ -305,6 +469,10 @@
                             <h3 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider group-hover:text-black transition-colors">Pharmacy Product Line</h3>
                         </div>
                         <div class="flex gap-2" onclick="event.stopPropagation()">
+                            <button onclick="openAdminModal('pharmacy')" class="admin-only-btn hidden no-print px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-1.5 rounded shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Add Product
+                            </button>
                             <button onclick="printTableSection('section-pharmacy', 'Pharmacy_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                 Print PDF
@@ -371,6 +539,10 @@
                             <h3 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider group-hover:text-black transition-colors">Proprietary Raw Materials</h3>
                         </div>
                         <div class="flex gap-2" onclick="event.stopPropagation()">
+                            <button onclick="openAdminModal('raw')" class="admin-only-btn hidden no-print px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-1.5 rounded shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Add Raw Material
+                            </button>
                             <button onclick="printTableSection('section-raw', 'RawMaterials_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                 Print PDF
@@ -421,6 +593,10 @@
                             </div>
                         </div>
                         <div class="flex gap-2" onclick="event.stopPropagation()">
+                            <button onclick="openAdminModal('raclinic')" class="admin-only-btn hidden no-print px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-1.5 rounded shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Add Product
+                            </button>
                             <button onclick="printTableSection('section-raclinic', 'RA_Clinic_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                 Print PDF
@@ -503,6 +679,10 @@
                             </div>
                         </div>
                         <div class="flex gap-2" onclick="event.stopPropagation()">
+                            <button onclick="openAdminModal('charmacist')" class="admin-only-btn hidden no-print px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-1.5 rounded shadow-sm">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                Add Product
+                            </button>
                             <button onclick="printTableSection('section-charmacist', 'Charmacist_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                                 Print PDF
@@ -572,6 +752,23 @@
     </div>
 
     <script>
+        let isSuperAdmin = false;
+        let selectedFileForUpload = null;
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-800' : type === 'error' ? 'bg-red-800' : 'bg-gray-800';
+            toast.className = `${bgClass} text-white px-4 py-3 rounded shadow-lg text-xs font-semibold uppercase tracking-wider transition-all duration-300 pointer-events-auto flex items-center gap-2`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
         function unlockScreen() {
             const pwd = document.getElementById('password-input').value;
             const errorEl = document.getElementById('lock-error');
@@ -597,8 +794,269 @@
         }
 
         function handleLockKeyPress(e) {
-            if (e.key === 'Enter') {
-                unlockScreen();
+            if (e.key === 'Enter') unlockScreen();
+        }
+
+        /* Super Admin Logic */
+        function promptSuperAdminLogin() {
+            if (isSuperAdmin) {
+                showToast("Already logged in as Super Admin", "info");
+                return;
+            }
+            const pwd = prompt("Enter Super Admin Security Password:");
+            if (pwd === "admin2026!") {
+                isSuperAdmin = true;
+                toggleAdminUI(true);
+                showToast("Super Admin Mode Authenticated", "success");
+            } else if (pwd !== null) {
+                showToast("Invalid Admin Password", "error");
+            }
+        }
+
+        function logoutSuperAdmin() {
+            isSuperAdmin = false;
+            toggleAdminUI(false);
+            showToast("Logged out from Super Admin Mode", "info");
+        }
+
+        function toggleAdminUI(active) {
+            const adminBar = document.getElementById('admin-badge-bar');
+            const loginBtn = document.getElementById('admin-login-btn');
+            const adminBtns = document.querySelectorAll('.admin-only-btn');
+
+            if (active) {
+                if (adminBar) adminBar.classList.remove('hidden');
+                if (loginBtn) loginBtn.classList.add('hidden');
+                adminBtns.forEach(b => b.classList.remove('hidden'));
+            } else {
+                if (adminBar) adminBar.classList.add('hidden');
+                if (loginBtn) loginBtn.classList.remove('hidden');
+                adminBtns.forEach(b => b.classList.add('hidden'));
+            }
+        }
+
+        /* Admin Modal & Drag-Drop */
+        const sectionTitles = {
+            'cosmetic': 'Beauty Device / Cosmetic Line',
+            'medical': 'Medical Aesthetic Line',
+            'pharmacy': 'Pharmacy Product Line',
+            'raw': 'Proprietary Raw Materials Line',
+            'raclinic': 'RA Clinic Exclusive Line',
+            'charmacist': 'Charmacist Exclusive Line'
+        };
+
+        function openAdminModal(sectionKey) {
+            if (!isSuperAdmin) {
+                showToast("Super Admin privilege required", "error");
+                return;
+            }
+            const modal = document.getElementById('admin-add-modal');
+            document.getElementById('form-target-section').value = sectionKey;
+            document.getElementById('form-section-display').value = sectionTitles[sectionKey] || sectionKey;
+            
+            // Setup Drag and Drop listeners
+            setupDragAndDrop();
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeAdminModal(e) {
+            const modal = document.getElementById('admin-add-modal');
+            if (modal) modal.classList.add('hidden');
+            document.getElementById('admin-product-form').reset();
+            removeSelectedFile();
+        }
+
+        function setupDragAndDrop() {
+            const dropZone = document.getElementById('drag-drop-zone');
+            if (!dropZone) return;
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+            });
+
+            dropZone.addEventListener('drop', handleDrop, false);
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function processFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showToast("Only image files are allowed", "error");
+                return;
+            }
+            selectedFileForUpload = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('preview-img').src = e.target.result;
+                document.getElementById('preview-filename').textContent = file.name;
+                document.getElementById('drop-zone-prompt').classList.add('hidden');
+                document.getElementById('drop-zone-preview').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeSelectedFile(e) {
+            if(e) e.stopPropagation();
+            selectedFileForUpload = null;
+            document.getElementById('file-input').value = '';
+            document.getElementById('drop-zone-prompt').classList.remove('hidden');
+            document.getElementById('drop-zone-preview').classList.add('hidden');
+            document.getElementById('preview-img').src = '';
+        }
+
+        /* Submit New Product to Supabase */
+        async function submitNewProduct(e) {
+            e.preventDefault();
+            if (!isSuperAdmin) return;
+
+            const submitBtn = document.getElementById('btn-submit-product');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>Saving...</span>`;
+
+            try {
+                const section = document.getElementById('form-target-section').value;
+                const name = document.getElementById('p-name').value.trim();
+                const ingredients = document.getElementById('p-ingredients').value.trim();
+                const mainCat = document.getElementById('p-main-cat').value;
+                const type = document.getElementById('p-type').value.trim();
+                const volume = document.getElementById('p-volume').value.trim();
+                const ctQty = document.getElementById('p-ct-qty').value.trim();
+                
+                const currency = document.getElementById('p-currency').value;
+                const msrp = parseFloat(document.getElementById('p-price-msrp').value) || 0;
+                const promo = parseFloat(document.getElementById('p-price-promo').value) || null;
+                const t1 = parseFloat(document.getElementById('p-price-t1').value) || null;
+                const t2 = parseFloat(document.getElementById('p-price-t2').value) || null;
+                const t3 = parseFloat(document.getElementById('p-price-t3').value) || null;
+                const t4 = parseFloat(document.getElementById('p-price-t4').value) || null;
+
+                let imageUrl = "";
+
+                // Upload Image to Supabase Storage if file selected
+                if (selectedFileForUpload) {
+                    const fileExt = selectedFileForUpload.name.split('.').pop();
+                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                    const filePath = `images/${fileName}`;
+
+                    const { data: uploadData, error: uploadErr } = await supabaseClient
+                        .storage
+                        .from('product_images')
+                        .upload(filePath, selectedFileForUpload);
+
+                    if (uploadErr) {
+                        console.warn("Storage upload fail, using direct data url or fallback:", uploadErr);
+                    } else {
+                        const { data: publicUrlData } = supabaseClient.storage.from('product_images').getPublicUrl(filePath);
+                        imageUrl = publicUrlData ? publicUrlData.publicUrl : "";
+                    }
+                }
+
+                if (section === 'raw') {
+                    // Raw Materials Table
+                    const { error } = await supabaseClient.from('raw_materials').insert([{
+                        product_name: name,
+                        active_ingredients: ingredients,
+                        grade: mainCat,
+                        form: type || 'Solution',
+                        unit: volume || '1L',
+                        unit_price_usd: msrp
+                    }]);
+                    if (error) throw error;
+                } else if (section === 'medical') {
+                    // Medical Aesthetic Table
+                    const { error } = await supabaseClient.from('medical_aesthetic_products').insert([{
+                        item: name,
+                        ingredients: ingredients,
+                        type: type || 'Medical',
+                        specs: `${volume} ${ctQty}`,
+                        clinic_msrp: msrp,
+                        clinic_promotion: promo,
+                        dist_1000: t1,
+                        dist_3000: t2,
+                        dist_5000: t3,
+                        dist_10000: t4,
+                        currency: currency
+                    }]);
+                    if (error) throw error;
+                    if (imageUrl) medImageMap[name] = imageUrl;
+                } else {
+                    // Main Products Table
+                    let subCategory = '';
+                    if (section === 'raclinic') subCategory = 'RA Clinic Exclusive';
+                    else if (section === 'charmacist') subCategory = 'Charmacist Exclusive';
+
+                    const { data: insertedProd, error: prodErr } = await supabaseClient.from('products').insert([{
+                        clean_name: name,
+                        display_name: name,
+                        main_category: mainCat,
+                        sub_category: subCategory,
+                        active_ingredients: ingredients,
+                        type: type,
+                        volume: volume,
+                        ct_quantity: ctQty,
+                        qty: '1EA'
+                    }]).select();
+
+                    if (prodErr) throw prodErr;
+
+                    if (insertedProd && insertedProd.length > 0) {
+                        const prodId = insertedProd[0].id;
+                        const { error: priceErr } = await supabaseClient.from('product_prices').insert([{
+                            product_id: prodId,
+                            currency: currency,
+                            b2c_msrp: msrp,
+                            b2c_promotion: promo,
+                            b2b_tier1_1_to_10_ct: t1,
+                            b2b_tier2_10_to_30_ct: t2,
+                            b2b_tier3_30_to_70_ct: t3,
+                            b2b_tier4_over_70_ct: t4,
+                            oem_tier1_10000_ct: t1
+                        }]);
+                        if (priceErr) throw priceErr;
+                    }
+                    if (imageUrl) {
+                        productImageMap[name] = imageUrl;
+                        raImageMap[name] = imageUrl;
+                    }
+                }
+
+                showToast("Product successfully added to database!", "success");
+                closeAdminModal();
+                await initDashboard(); // Refresh Data Live
+
+            } catch (err) {
+                console.error("Save error:", err);
+                showToast(`Failed to add product: ${err.message || 'Error occurred'}`, "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>Save Product to Database</span>`;
             }
         }
 
@@ -653,15 +1111,15 @@
             "Plan tox lifting ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/plan30.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9wbGFuMzAuanBnIiwiaWF0IjoxNzY5MzU0OTY5LCJleHAiOjE5MjcwMzQ5Njl9.oRmRXZlQJbfQFbpAfX7oWyBYtXTZmVey4zexy4qVQhk",
             "Phyto protein volumizing ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Vol30.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9Wb2wzMC53ZWJwIiwiaWF0IjoxNzY5MzU0NzMzLCJleHAiOjE5MjcwMzQ3MzN9.hTuqZjGSJhn5mmX3yEo3abfi3HxwOmUusuV8rLlJVVM",
             "Melano cut brightening ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/br30.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9icjMwLmpwZyIsImlhdCI6MTc6OTk1ODExMywiZXhwIjoxOTI3NjM4MTEzfQ.NUmP-rd8lVUMEobfYGkFGk83Cr12RISejvuIAzFnBvA",
-            "Blue crystal hydrating ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Blue%20crystal%20hydrating%20ampoule.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9CbHVlIGNyeXN0YWwgaHlkcmF0aW5nIGFtcG91bGUuanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODE1MjQyNjAsImV4cCI6MjA5Njg4NDI2MH0.EeMsuvISsY3J8uGGy3-ReBLxBHvh7XbMAsvZpN_e5Tk",
+            "Blue crystal hydrating ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Blue%20crystal%20hydrating%20ampoule.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9CbHVlIGNyeXN0YWwgaHlkcmF0aW5nIGFtcG91bGUuanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODE1MjQyNjAsImV4cCI6MjA9Njg4NDI2MH0.EeMsuvISsY3J8uGGy3-ReBLxBHvh7XbMAsvZpN_e5Tk",
             "Lift-toning sun protector cream": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Lift-toning%20sun%20protector%20cream.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9MaWZ0LXRvbmluZyBzdW4gcHJvdGVjdG9yIGNyZWFtLmpwZyIsImlhdCI6MTc4MDU2OTY4NCwiZXhwIjoyMDk1OTI5Njg0fQ.dwCpXCEGw-SqLQsa0sVltHYlGtQtB12dD7gZOdwRYrY",
-            "EV shot skin boosting mask": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/mask.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9tYXNrLnBuZyIsImlhdCI6MTc2OTk0MjcwMiwiZXhwIjoxOTI3NjIyNzAyfQ.YdfuzylFO-lrh8x6j2vjolAQRR2CIxrWTWttNQX2zDA",
+            "EV shot skin boosting mask": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/mask.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9tYXNrLnBuZyIsImlhdCI6MTc6OTk0MjcwMiwiZXhwIjoxOTI3NjIyNzAyfQ.YdfuzylFO-lrh8x6j2vjolAQRR2CIxrWTWttNQX2zDA",
             "Active barrier hydrating cream": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/250707000867784.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS8yNTA3MDcwMDA4Njc3ODQuanBnIiwiaWF0IjoxNzY5MzUxNjY4LCJleHAiOjE5MjcwMzE2Njh9.5scqWSehvPB0CM27ARsTIXsb96uIH6A_Cq7ic4PZv8E",
             "Core impact": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/coreimpact.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9jb3JlaW1wYWN0LmpwZyIsImlhdCI6MTc2OTM0NTc0NSwiZXhwIjoxOTI3MDI1NzQ1fQ.ZgtQSrx1wFcoBUOOl4NvEaEwY19WSaPkX__XZaZc23o",
-            "Hyper shot": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/hypershot.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9oeXBlcnNob3Qud2VicCIsImlhdCI6MTc2OTM0NTc4OSwiZXhwIjoxOTI3MDI1Nzg5fQ.4pu-qOCjRdknUBqlMYqCT3Sm1XZ2U-hupV2YymXeUcI",
+            "Hyper shot": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/hypershot.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9oeXBlcnNob3Qud2VicCIsImlhdCI6MTc6OTM0NTc4OSwiZXhwIjoxOTI3MDI1Nzg5fQ.4pu-qOCjRdknUBqlMYqCT3Sm1XZ2U-hupV2YymXeUcI",
             "Expert shot scalp ampoule 45ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/expert3.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9leHBlcnQzLmpwZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODIwNDc3NjUsImV4cCI6MjA5NzQwNzc2NX0.7Bj4sdGoflsPOkf19gp7twGibj2V8gox2-bz4630nNI",
             "Expert shot scalp ampoule 15ml 3ea": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/scalp3ea.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zY2FscDNlYS5qcGciLCJpYXQiOjE3Njk4NzY3ODUsImV4cCI6MTkyNzU1Njc4NX0.0TH3Qhjgx3wmBAhJ7SUoNwwuDXnvNDMTWDC0SmEto5Y",
-            "Expert shot scalp ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/fe99474f1d21bb4e898bb349b2e5c76a.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mZTk9NDc0ZjFkMjFiYjRlODk4YmIzNDliMmU1Yzc2YS5qcGciLCJpYXQiOjE3NjkzNDk4MDUsImV4cCI6MTkyNzAyOTgwNX0.XUaHM29eBlSzZe1HvBsDXv5e1nhuUg7fKyAHlbVsOjk",
+            "Expert shot scalp ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/fe99474f1d21bb4e898bb349b2e5c76a.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mZTk9NDc0ZjFkMjFiYjRlODk4YmIzNDliMmU1Yzc2YS5qcGciLCJpYXQiOjE3Njk3NDk4MDUsImV4cCI6MTkyNzAyOTgwNX0.XUaHM29eBlSzZe1HvBsDXv5e1nhuUg7fKyAHlbVsOjk",
             "Root vitality volume shampoo 300ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampoo300ml.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcG9vMzAwbWwuanBnIiwiaWF0IjoxNzY5ODc0MDY0LCJleHAiOjE5Mjc1NTQwNjR9.Q_kA-8HIr6_asLAxPIMVs_i_06Aix0ItovUPyJDZzHM",
             "Root vitality volume shampoo 100ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampu.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcHUuanBnIiwiaWF0IjoxNzY5ODczMTU2LCJleHAiOjE5Ijc1NTMxNTZ9.rpyILNhH4uQFS67Q9sKgiUDzhX7a_sWLknZvDHbzMog"
         };
@@ -717,7 +1175,6 @@
                 if (rawProducts) debugProductsLength = rawProducts.length;
 
                 const { data: rawPrices, error: priceErr } = await supabaseClient.from('product_prices').select('*');
-
                 const { data: rawMasterData, error: masterErr } = await supabaseClient.from('form_catalog_master').select('*');
 
                 const uniqueProductsMap = new Map();
@@ -772,7 +1229,6 @@
                 });
             }
 
-            // 요청된 순서 정렬: 1. 크리스탈 -> 2. 크리스탈 플러스 -> 3. 루비 MTS -> 4. 스칼프 MD -> 5. 이끌레버
             function getMedicalOrder(itemName) {
                 if (!itemName) return 999;
                 const lower = itemName.toLowerCase().trim();
