@@ -1082,6 +1082,7 @@
                         const { error } = await supabaseClient.from('raw_materials').update(payload).eq('id', editId);
                         if (error) throw error;
                     } else {
+                        payload.id = 'RM_' + Date.now(); // Varchar 기본키를 위한 고유 ID 자동 생성 로직
                         const { error } = await supabaseClient.from('raw_materials').insert([payload]);
                         if (error) throw error;
                     }
@@ -1114,7 +1115,6 @@
 
                     const payload = {
                         clean_name: name,
-                        display_name: name,
                         main_category: mainCat,
                         sub_category: subCategory,
                         active_ingredients: ingredients,
