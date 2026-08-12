@@ -132,7 +132,7 @@
             <div class="flex flex-col md:flex-row justify-between items-end pb-6 border-b-2 border-gray-900 print-active-section">
                 <div>
                     <span class="inline-flex items-center gap-1.5 py-1 px-2 mb-4 bg-red-600 text-[10px] tracking-widest text-white uppercase shadow-sm">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 012 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
                         Confidential
                     </span>
                     <h1 class="text-4xl text-gray-900 mb-2 font-montserrat tracking-tight">Global Export System</h1>
@@ -406,7 +406,6 @@
                     </div>
                 </div>
             </div>
-            <!-- ============================================== -->
 
             <div class="border-l-4 border-blue-800 pl-6 mb-12 mt-4 no-print-border print-active-section" id="group-exclusive-lines">
                 <h2 class="text-2xl font-montserrat font-bold text-gray-900 mb-8 tracking-wider">PARTNER EXCLUSIVE LINES</h2>
@@ -569,9 +568,8 @@
                     </div>
                 </div>
             </div>
-            <!-- ============================================== -->
         </div>
-    </div> <!-- End app-content -->
+    </div>
 
     <script>
         function unlockScreen() {
@@ -651,10 +649,10 @@
 
         const productImageMap = {
             "Cellular water ampoule booster 120ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoulbooster120.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxib29zdGVyMTIwLmpwZyIsImlhdCI6MTc4MDYyNzM4NCwiZXhwIjoyMDk1OTg3Mzg0fQ.YgYQumgSOVgFPo5h4rPdJgWEvU-DW-GBbrWWlGIGI2o",
-            "Cellular water ampoule booster": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoule%20booster%2060ml.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxlIGJvb3N0ZXIgNjBtbC5wbmciLCJpYXQiOjE3ODA2MjcyODIsImV4cCI6MjA5NTk4NzI4Mn0.LKa9sEPCp05ASOzS2tnq2ybIrdOorq8GyKwfwxKYSgM",
+            "Cellular water ampoule booster": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ampoule%20booster%2060ml.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9hbXBvdWxlIGJvb3N0ZXIgNjBtbC5wbmciLCJpYXQiOjE3ODA2MjcyODIsImV4cCI6MjA9NTk4NzI4Mn0.LKa9sEPCp05ASOzS2tnq2ybIrdOorq8GyKwfwxKYSgM",
             "Plan tox lifting ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/plan30.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9wbGFuMzAuanBnIiwiaWF0IjoxNzY5MzU0OTY5LCJleHAiOjE5MjcwMzQ5Njl9.oRmRXZlQJbfQFbpAfX7oWyBYtXTZmVey4zexy4qVQhk",
             "Phyto protein volumizing ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Vol30.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9Wb2wzMC53ZWJwIiwiaWF0IjoxNzY5MzU0NzMzLCJleHAiOjE5MjcwMzQ3MzN9.hTuqZjGSJhn5mmX3yEo3abfi3HxwOmUusuV8rLlJVVM",
-            "Melano cut brightening ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/br30.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9icjMwLmpwZyIsImlhdCI6MTc2OTk1ODExMywiZXhwIjoxOTI3NjM4MTEzfQ.NUmP-rd8lVUMEobfYGkFGk83Cr12RISejvuIAzFnBvA",
+            "Melano cut brightening ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/br30.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9icjMwLmpwZyIsImlhdCI6MTc6OTk1ODExMywiZXhwIjoxOTI3NjM4MTEzfQ.NUmP-rd8lVUMEobfYGkFGk83Cr12RISejvuIAzFnBvA",
             "Blue crystal hydrating ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Blue%20crystal%20hydrating%20ampoule.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9CbHVlIGNyeXN0YWwgaHlkcmF0aW5nIGFtcG91bGUuanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODE1MjQyNjAsImV4cCI6MjA5Njg4NDI2MH0.EeMsuvISsY3J8uGGy3-ReBLxBHvh7XbMAsvZpN_e5Tk",
             "Lift-toning sun protector cream": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/Lift-toning%20sun%20protector%20cream.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9MaWZ0LXRvbmluZyBzdW4gcHJvdGVjdG9yIGNyZWFtLmpwZyIsImlhdCI6MTc4MDU2OTY4NCwiZXhwIjoyMDk1OTI5Njg0fQ.dwCpXCEGw-SqLQsa0sVltHYlGtQtB12dD7gZOdwRYrY",
             "EV shot skin boosting mask": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/mask.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9tYXNrLnBuZyIsImlhdCI6MTc2OTk0MjcwMiwiZXhwIjoxOTI3NjIyNzAyfQ.YdfuzylFO-lrh8x6j2vjolAQRR2CIxrWTWttNQX2zDA",
@@ -663,16 +661,18 @@
             "Hyper shot": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/hypershot.webp?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9oeXBlcnNob3Qud2VicCIsImlhdCI6MTc2OTM0NTc4OSwiZXhwIjoxOTI3MDI1Nzg5fQ.4pu-qOCjRdknUBqlMYqCT3Sm1XZ2U-hupV2YymXeUcI",
             "Expert shot scalp ampoule 45ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/expert3.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9leHBlcnQzLmpwZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODIwNDc3NjUsImV4cCI6MjA5NzQwNzc2NX0.7Bj4sdGoflsPOkf19gp7twGibj2V8gox2-bz4630nNI",
             "Expert shot scalp ampoule 15ml 3ea": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/scalp3ea.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zY2FscDNlYS5qcGciLCJpYXQiOjE3Njk4NzY3ODUsImV4cCI6MTkyNzU1Njc4NX0.0TH3Qhjgx3wmBAhJ7SUoNwwuDXnvNDMTWDC0SmEto5Y",
-            "Expert shot scalp ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/fe99474f1d21bb4e898bb349b2e5c76a.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mZTk5NDc0ZjFkMjFiYjRlODk4YmIzNDliMmU1Yzc2YS5qcGciLCJpYXQiOjE3NjkzNDk4MDUsImV4cCI6MTkyNzAyOTgwNX0.XUaHM29eBlSzZe1HvBsDXv5e1nhuUg7fKyAHlbVsOjk",
+            "Expert shot scalp ampoule": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/fe99474f1d21bb4e898bb349b2e5c76a.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mZTk9NDc0ZjFkMjFiYjRlODk4YmIzNDliMmU1Yzc2YS5qcGciLCJpYXQiOjE3NjkzNDk4MDUsImV4cCI6MTkyNzAyOTgwNX0.XUaHM29eBlSzZe1HvBsDXv5e1nhuUg7fKyAHlbVsOjk",
             "Root vitality volume shampoo 300ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampoo300ml.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcG9vMzAwbWwuanBnIiwiaWF0IjoxNzY5ODc0MDY0LCJleHAiOjE5Mjc1NTQwNjR9.Q_kA-8HIr6_asLAxPIMVs_i_06Aix0ItovUPyJDZzHM",
-            "Root vitality volume shampoo 100ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampu.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcHUuanBnIiwiaWF0IjoxNzY5ODczMTU2LCJleHAiOjE5Mjc1NTMxNTZ9.rpyILNhH4uQFS67Q9sKgiUDzhX7a_sWLknZvDHbzMog"
+            "Root vitality volume shampoo 100ml": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/shampu.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9zaGFtcHUuanBnIiwiaWF0IjoxNzY5ODczMTU2LCJleHAiOjE5Ijc1NTMxNTZ9.rpyILNhH4uQFS67Q9sKgiUDzhX7a_sWLknZvDHbzMog"
         };
 
         const medImageMap = {
-            "Crystal": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/cc492d238d1dc-removebg-preview.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9jYzQ5MmQyMzhkMWRjLXJlbW92ZWJnLXByZXZpZXcucG5nIiwiaWF0IjoxNzY5MzE5OTgxLCJleHAiOjE5MjY5OTk5ODF9.p-96RHgIhc21DB_WAthHvodJ_w3yxT3dryd4kJno3yo",
-            "Crystal Plus": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/f8ead94e5360b.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mOGVhZDk0ZTUzNjBiLnBuZyIsImlhdCI6MTc2OTMxOTIyMiwiZXhwIjoxOTI2OTk5MjIyfQ.oHhH2kK_UUgbuKUufp9igjYZS6XdGd5DMJQXB9gSsdw",
+            "Crystal": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/cc492d238d1dc-removebg-preview.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9jYzQ5MmQyMzhkMWRjLXJlbW92ZWJnLXByZXZpZXcucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4NjUwOTgxMSwiZXhwIjoyMTAxODY5ODExfQ.3gscEmby6G_Ynav4l65VI4wSrjKaMXc0eY-v2EAoXoU",
+            "Crystal Plus": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/f8ead94e5360b.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mOGVhZDk0ZTUzNjBiLnBuZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODY1MDk3NjAsImV4cCI6MTc4NzM3Mzc2MH0.wGfYtTG-UTobOACcffzZAi1lCdvPRk7ATPBu9kLZI4k",
             "Scalp MD": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ScalpMD%20(1).png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9TY2FscE1EICgxKS5wbmciLCJpYXQiOjE3ODA2MjYxMjAsImV4cCI6MjA5NTk4NjEyMH0.9U_nU_gxKrs0mhXBgNlmKwi81fywoK57EF9670E-Va8",
-            "Echrever": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/echrever.avif?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9lY2hyZXZlci5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4MTAwNDkwNCwiZXhwIjoyMDk2MzY0OTA0fQ.gTqgle5g_hgh9Cp-oRP2OexYmpMUa47QaTYXorlJYyM"
+            "Echrever": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/echrever.avif?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9lY2hyZXZlci5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4MTAwNDkwNCwiZXhwIjoyMDk2MzY0OTA0fQ.gTqgle5g_hgh9Cp-oRP2OexYmpMUa47QaTYXorlJYyM",
+            "RUBY M T S": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/public/product_images/images/KakaoTalk_20260812_095727781.png",
+            "RUBY MTS": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/public/product_images/images/KakaoTalk_20260812_095727781.png"
         };
 
         const raImageMap = {
@@ -758,12 +758,32 @@
                 if (!medErr && dbMedicals && dbMedicals.length > 0) globalMedicalProducts = dbMedicals;
             } catch (err) {}
 
+            if (!globalMedicalProducts.some(p => p.item && p.item.toLowerCase().includes('ruby'))) {
+                globalMedicalProducts.push({
+                    item: 'RUBY M T S', ingredients: 'Hyaluronic Acid, PDRN, Growth Factors (EGF)', type: 'Microneedle Therapy System & Ampoule', specs: '5ml * 5vials', 
+                    clinic_msrp: 150000, clinic_promotion: 120000, dist_1000: 80000, dist_3000: 70000, dist_5000: 60000, dist_10000: 50000, oem_10000: 45000, oem_30000: 40000, oem_50000: 35000, currency: 'KRW'
+                });
+            }
+
             if (!globalMedicalProducts.some(p => p.item && p.item.toLowerCase().includes('echrever'))) {
                 globalMedicalProducts.push({
                     item: 'Echrever', ingredients: 'DVS Filler', type: 'Collagen Stimulator', specs: '200mg * 1ea', 
                     clinic_msrp: 150, clinic_promotion: 130, dist_1000: 75, dist_3000: 70, dist_5000: 65, dist_10000: 60, oem_10000: null, oem_30000: null, oem_50000: null, currency: 'USD'
                 });
             }
+
+            // 요청된 순서 정렬: 1. 크리스탈 -> 2. 크리스탈 플러스 -> 3. 루비 MTS -> 4. 스칼프 MD -> 5. 이끌레버
+            function getMedicalOrder(itemName) {
+                if (!itemName) return 999;
+                const lower = itemName.toLowerCase().trim();
+                if (lower === 'crystal') return 1;
+                if (lower === 'crystal plus') return 2;
+                if (lower.includes('ruby')) return 3;
+                if (lower.includes('scalp')) return 4;
+                if (lower.includes('echrever')) return 5;
+                return 999;
+            }
+            globalMedicalProducts.sort((a, b) => getMedicalOrder(a.item) - getMedicalOrder(b.item));
 
             try {
                 const { data: dbRaw, error: rawErr } = await supabaseClient.from('raw_materials').select('*').order('product_name', { ascending: true });
@@ -1043,7 +1063,7 @@
                 tr.className = "hover:bg-gray-50 transition-colors text-xs";
                 let html = '';
                 if (itemSpans[idx] > 0) {
-                    let mappedImg = medImageMap[p.item];
+                    let mappedImg = medImageMap[p.item] || productImageMap[p.item];
                     const imgHtml = mappedImg ? `<img src="${mappedImg}" class="med-product-img mx-auto cursor-pointer hover:opacity-80 transition-opacity" alt="${p.item}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8"></div>`;
                     html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle">${imgHtml}</td>`;
                 }
@@ -1096,7 +1116,6 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             
-            // 파머시 라인 노출을 위한 타겟 상품명 배열 (Spot Relief Patch 추가)
             const targetNames = [
                 '셀슈틱스 리투디엔 더마플라스트 크림',
                 '셀슈틱스 리투지엔 더마플라스트 립밤',
@@ -1324,7 +1343,6 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             
-            // 파머시 라인 타겟 상품명
             const pharmacyTargetNames = [
                 '셀슈틱스 리투디엔 더마플라스트 크림',
                 '셀슈틱스 리투지엔 더마플라스트 립밤'
@@ -1340,7 +1358,6 @@
                 '돼지유래 ECM, 보르피린': 'Porcine-derived ECM, Volufiline'
             };
             
-            // 파머시 타겟 상품명 또는 카테고리가 Charmacist Exclusive인 상품 필터링
             const charmacistProducts = globalUniqueProducts.filter(p => {
                 const cName = (p.clean_name || '').trim();
                 return pharmacyTargetNames.includes(cName) || p.sub_category === 'Charmacist Exclusive';
@@ -1378,12 +1395,11 @@
 
                 const baseMsrp = priceData.b2c_msrp;
                 
-                // Charmacist 테이블용 가격 동적 계산 (파머시 로직 기반 렌더링)
                 const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0);
                 const clinicPromo = getCalculatedPrice(baseMsrp, 0.80);
                 const mf_tdl = getCalculatedPrice(baseMsrp, 0.27);
-                const tdl_cmc = getCalculatedPrice(baseMsrp, 0.36); // 35% -> 36%로 변경
-                const cmc_chain = getCalculatedPrice(baseMsrp, 0.45); // 33% -> 45%로 변경
+                const tdl_cmc = getCalculatedPrice(baseMsrp, 0.36); 
+                const cmc_chain = getCalculatedPrice(baseMsrp, 0.45); 
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50 transition-colors text-xs";
@@ -1420,7 +1436,6 @@
             const targetSection = document.getElementById(sectionId);
             if (!targetSection) return;
             
-            // Expand table before printing if it is collapsed
             const tableContainer = targetSection.querySelector('.table-container');
             const icon = targetSection.querySelector('svg[id^="icon-"]');
             if (tableContainer && tableContainer.classList.contains('hidden')) {
