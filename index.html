@@ -1312,7 +1312,6 @@
 
                 const { data: rawMasterData, error: masterErr } = await supabaseClient.from('form_catalog_master').select('*');
 
-                const uniqueProductsMap = new Map();
                 if (rawProducts && rawProducts.length > 0) {
                     rawProducts.forEach(product => {
                         product.product_prices = (rawPrices || []).filter(pr => pr.product_id === product.id);
@@ -1333,10 +1332,10 @@
                         else if (cleanName.toLowerCase() === 'cellular water ampoule booster' && product.volume === '50ml') product.volume = '60ml';
                         
                         product.display_name = displayName;
-                        const uniqueKey = `${displayName}_${product.volume || ''}_${product.qty || ''}`;
-                        if (uniqueKey && !uniqueProductsMap.has(uniqueKey)) uniqueProductsMap.set(uniqueKey, product);
                     });
-                    globalUniqueProducts = Array.from(uniqueProductsMap.values());
+                    
+                    /* FIX: 임의로 화면에서 중복 데이터를 숨기던 맵핑 로직을 삭제하여, 수정 직후 제품이 화면에서 감쪽같이 사라지는 버그를 원천 차단합니다. */
+                    globalUniqueProducts = rawProducts;
                 }
             } catch (err) {
                 debugProductsError = err.message;
@@ -1475,15 +1474,15 @@
                 const mainCat = (p.main_category || '').trim().toLowerCase();
                 const subCat = (p.sub_category || '').trim().toLowerCase();
                 const cleanName = (p.clean_name || '').trim().toLowerCase();
-                const noSpaceName = cleanName.replace(/\s/g, '');
                 
+                // 1. 파트너/익스클루시브 라인은 제외
                 if (subCat.includes('ra clinic') || subCat.includes('pharmacy') || subCat.includes('charmacist') || mainCat.includes('pharmacy') || mainCat.includes('exclusive')) return false;
+                
+                // 2. 스칼프 MD는 메디컬 영역이므로 제외
                 if (cleanName.includes('scalp md')) return false;
                 
-                return mainCat.includes('device') || mainCat.includes('skincare') || mainCat.includes('cosmetic') || 
-                       mainCat.includes('hair') || subCat.includes('hair') || 
-                       cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot') ||
-                       noSpaceName.includes('hypershot') || noSpaceName.includes('coreimpact');
+                // FIX: 3. 조건이 누락되어 화면에서 사라지는 문제를 막기 위해, 위 제외대상을 뺀 '나머지 모든 제품'을 강제로 뷰어에 편입시킵니다.
+                return true;
             });
 
             const faceDevices = cosmeticAndDeviceProducts.filter(p => {
