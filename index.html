@@ -1264,11 +1264,47 @@
             "medinovae CHITOGENIX Spot Relief Patch": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Pharma/Patch.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJQaGFybWEvUGF0Y2gucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4MzU2NTA5MCwiZXhwIjoyMDk4OTI1MDkwfQ.vkLQLUrbiShUOr0IrRbxI22D7Rn7PxYHBsJLiu5SwoQ"
         };
 
+        /* -------------------------------------------------------------
+           [새로 추가됨] 외부 환율 API를 통해 실시간 데이터를 가져오는 함수
+           ------------------------------------------------------------- */
+        async function fetchLiveExchangeRate() {
+            try {
+                // Open Exchange Rates API는 별도의 API KEY가 필요하므로 무료 공개 API인 ExchangeRate-API를 사용합니다.
+                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+                const data = await response.json();
+                
+                if (data && data.rates && data.rates.KRW) {
+                    liveKrwRate = data.rates.KRW; // 전역 변수 업데이트
+                    
+                    // 현재 select 박스의 값이 'live' 라면 적용 환율도 갱신해줍니다.
+                    const rateSelect = document.getElementById('krw-rate-select');
+                    if (rateSelect && rateSelect.value === 'live') {
+                        appliedKrwRate = liveKrwRate;
+                    }
+                    
+                    // HTML DOM 업데이트
+                    const rateEl = document.getElementById('live-rate');
+                    if (rateEl) {
+                        rateEl.textContent = `₩${liveKrwRate.toLocaleString('en-US', {maximumFractionDigits: 2})}`;
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch live exchange rate:", error);
+                const rateEl = document.getElementById('live-rate');
+                if (rateEl) {
+                    rateEl.textContent = "Error fetching rate";
+                }
+            }
+        }
+
         async function initDashboard() {
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const todayStr = new Date().toLocaleDateString('en-US', options);
             const dateEl = document.getElementById('current-date');
             if (dateEl) dateEl.textContent = `Today: ${todayStr}`;
+
+            // 페이지 로드 시 실시간 환율을 가장 먼저 호출합니다.
+            await fetchLiveExchangeRate();
 
             try {
                 const { data: rawProducts, error: prodErr } = await supabaseClient
