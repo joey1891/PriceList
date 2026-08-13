@@ -120,6 +120,7 @@
                 <div class="flex items-center gap-2">
                     <span class="bg-red-600 text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-widest">Super Admin</span>
                     <h3 class="text-lg font-montserrat font-semibold" id="admin-modal-title">Add / Edit Product</h3>
+                    <button type="button" id="btn-load-draft" onclick="loadDraft()" class="hidden bg-blue-600 hover:bg-blue-500 text-white text-[10px] px-2 py-1 rounded tracking-wider uppercase transition-colors ml-3 shadow-sm">임시저장 불러오기</button>
                 </div>
                 <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
             </div>
@@ -227,9 +228,10 @@
                 </div>
 
                 <div class="pt-2 flex gap-3">
-                    <button type="button" onclick="closeAdminModal()" class="w-1/3 border border-gray-300 py-2.5 text-xs font-semibold text-gray-700 uppercase tracking-wider rounded hover:bg-gray-100 transition-colors">Cancel</button>
-                    <button type="submit" id="btn-submit-product" class="w-2/3 bg-gray-900 hover:bg-black text-white py-2.5 text-xs font-semibold uppercase tracking-wider rounded transition-colors shadow-md flex items-center justify-center gap-2">
-                        <span>Save Product to Database</span>
+                    <button type="button" onclick="closeAdminModal()" class="w-1/4 border border-gray-300 py-2.5 text-xs font-semibold text-gray-700 uppercase tracking-wider rounded hover:bg-gray-100 transition-colors">Cancel</button>
+                    <button type="button" onclick="saveDraft()" class="w-1/4 bg-blue-50 border border-blue-200 text-blue-700 py-2.5 text-xs font-semibold uppercase tracking-wider rounded hover:bg-blue-100 transition-colors">Draft</button>
+                    <button type="submit" id="btn-submit-product" class="w-2/4 bg-gray-900 hover:bg-black text-white py-2.5 text-xs font-semibold uppercase tracking-wider rounded transition-colors shadow-md flex items-center justify-center gap-2">
+                        <span>Save to Database</span>
                     </button>
                 </div>
             </form>
@@ -725,6 +727,77 @@
         let isSuperAdmin = false;
         let selectedFileForUpload = null;
 
+        function saveDraft() {
+            const section = document.getElementById('form-target-section').value;
+            const editId = document.getElementById('form-edit-id').value || 'new';
+            const draftKey = `medifab_draft_${section}_${editId}`;
+            
+            const draftData = {
+                name: document.getElementById('p-name').value,
+                ingredients: document.getElementById('p-ingredients').value,
+                mainCat: document.getElementById('p-main-cat').value,
+                type: document.getElementById('p-type').value,
+                volume: document.getElementById('p-volume').value,
+                ctQty: document.getElementById('p-ct-qty').value,
+                currency: document.getElementById('p-currency').value,
+                msrp: document.getElementById('p-price-msrp').value,
+                promo: document.getElementById('p-price-promo').value,
+                t1: document.getElementById('p-price-t1').value,
+                t2: document.getElementById('p-price-t2').value,
+                t3: document.getElementById('p-price-t3').value,
+                t4: document.getElementById('p-price-t4').value,
+            };
+
+            localStorage.setItem(draftKey, JSON.stringify(draftData));
+            showToast("임시저장 되었습니다. (로컬 브라우저)", "success");
+            checkDraft(section, editId);
+        }
+
+        function loadDraft() {
+            const section = document.getElementById('form-target-section').value;
+            const editId = document.getElementById('form-edit-id').value || 'new';
+            const draftKey = `medifab_draft_${section}_${editId}`;
+            
+            const draftStr = localStorage.getItem(draftKey);
+            if(draftStr) {
+                try {
+                    const draftData = JSON.parse(draftStr);
+                    document.getElementById('p-name').value = draftData.name || '';
+                    document.getElementById('p-ingredients').value = draftData.ingredients || '';
+                    document.getElementById('p-main-cat').value = draftData.mainCat || 'Skincare';
+                    document.getElementById('p-type').value = draftData.type || '';
+                    document.getElementById('p-volume').value = draftData.volume || '';
+                    document.getElementById('p-ct-qty').value = draftData.ctQty || '';
+                    document.getElementById('p-currency').value = draftData.currency || 'KRW';
+                    document.getElementById('p-price-msrp').value = draftData.msrp || '';
+                    document.getElementById('p-price-promo').value = draftData.promo || '';
+                    document.getElementById('p-price-t1').value = draftData.t1 || '';
+                    document.getElementById('p-price-t2').value = draftData.t2 || '';
+                    document.getElementById('p-price-t3').value = draftData.t3 || '';
+                    document.getElementById('p-price-t4').value = draftData.t4 || '';
+                    showToast("임시저장 데이터를 불러왔습니다.", "info");
+                } catch(e) {
+                    console.error("Draft parsing error", e);
+                }
+            }
+        }
+
+        function checkDraft(section, editId) {
+            const draftKey = `medifab_draft_${section}_${editId || 'new'}`;
+            const btnLoadDraft = document.getElementById('btn-load-draft');
+            if(localStorage.getItem(draftKey)) {
+                btnLoadDraft.classList.remove('hidden');
+            } else {
+                btnLoadDraft.classList.add('hidden');
+            }
+        }
+
+        function clearDraft(section, editId) {
+            const draftKey = `medifab_draft_${section}_${editId || 'new'}`;
+            localStorage.removeItem(draftKey);
+            checkDraft(section, editId);
+        }
+
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             if (!container) return;
@@ -794,11 +867,12 @@
                 document.getElementById('admin-product-form').reset();
                 if(document.getElementById('form-edit-id')) document.getElementById('form-edit-id').value = '';
                 document.getElementById('admin-modal-title').textContent = "Add New Product";
-                document.getElementById('btn-submit-product').innerHTML = "<span>Save Product to Database</span>";
+                document.getElementById('btn-submit-product').innerHTML = "<span>Save to Database</span>";
                 removeSelectedFile();
                 if(document.getElementById('remove-existing-image')) document.getElementById('remove-existing-image').value = 'false';
             }
             modal.classList.remove('hidden');
+            checkDraft(sectionKey, isEdit ? document.getElementById('form-edit-id').value : 'new');
         }
 
         function closeAdminModal() {
@@ -998,6 +1072,7 @@
                     }
                 }
 
+                clearDraft(section, editId);
                 showToast(editId && !editId.startsWith('RESTORED_') ? "Product successfully updated!" : "Product successfully added to database!", "success");
                 closeAdminModal();
                 await initDashboard(); 
@@ -1007,7 +1082,7 @@
                 showToast(`DB 저장 오류: ${err.message}`, "error");
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span>Save Product to Database</span>`;
+                submitBtn.innerHTML = `<span>Save to Database</span>`;
             }
         }
 
@@ -1084,7 +1159,7 @@
             openAdminModal(section, true);
             if(document.getElementById('form-edit-id')) document.getElementById('form-edit-id').value = id;
             document.getElementById('admin-modal-title').textContent = "Edit Product";
-            document.getElementById('btn-submit-product').innerHTML = "<span>Update Product in Database</span>";
+            document.getElementById('btn-submit-product').innerHTML = "<span>Update in Database</span>";
             
             if(document.getElementById('remove-existing-image')) document.getElementById('remove-existing-image').value = 'false';
             if (product.image_url) {
@@ -1140,6 +1215,8 @@
                 document.getElementById('p-price-t4').value = priceData.b2b_tier4_over_70_ct || '';
                 document.getElementById('p-currency').value = priceData.currency || 'KRW';
             }
+            
+            checkDraft(section, id);
         }
 
         async function deleteProduct(id, tableName, productName) {
@@ -1688,10 +1765,22 @@
                 };
             });
 
-            function calcSpans(key) {
-                let spanArr = [], currentVal = null, count = 0;
+            function calcSpans(key, dependKey = null) {
+                let spanArr = [], currentVal = null, currentDep = null, count = 0;
                 for (let i = 0; i < filteredData.length; i++) {
-                    if (filteredData[i][key] !== currentVal) { if (count > 0) spanArr.push(count); currentVal = filteredData[i][key]; count = 1; } 
+                    let isDiff = false;
+                    if (dependKey) {
+                        if (filteredData[i][key] !== currentVal || filteredData[i][dependKey] !== currentDep) isDiff = true;
+                    } else {
+                        if (filteredData[i][key] !== currentVal) isDiff = true;
+                    }
+                    
+                    if (isDiff) { 
+                        if (count > 0) spanArr.push(count); 
+                        currentVal = filteredData[i][key]; 
+                        if (dependKey) currentDep = filteredData[i][dependKey];
+                        count = 1; 
+                    } 
                     else count++;
                 }
                 if (count > 0) spanArr.push(count);
@@ -1699,7 +1788,10 @@
                 spanArr.forEach(c => { result.push(c); for(let i = 0; i < c - 1; i++) result.push(0); });
                 return result;
             }
-            const itemSpans = calcSpans('item'), ingSpans = calcSpans('ingredients'), typeSpans = calcSpans('type');
+            
+            const itemSpans = calcSpans('item');
+            const ingSpans = calcSpans('ingredients', 'item');
+            const typeSpans = calcSpans('type', 'item');
 
             filteredData.forEach((p, idx) => {
                 const tr = document.createElement('tr');
