@@ -78,12 +78,9 @@
             background-color: #eff6ff;
         }
 
-        /* Drag & Drop Reordering Styles */
-        .draggable-row { cursor: grab; }
-        .draggable-row:active { cursor: grabbing; }
-        .drag-over { border-top: 2px solid #3b82f6 !important; background-color: #eff6ff !important; }
-        .drag-handle-icon { opacity: 0.3; transition: opacity 0.2s; }
-        .draggable-row:hover .drag-handle-icon { opacity: 1; }
+        /* Order Control Arrows */
+        .order-arrow-btn { opacity: 0.3; transition: opacity 0.2s, background-color 0.2s; }
+        tr:hover .order-arrow-btn { opacity: 1; }
 
         /* Table Print Enhancements */
         body.print-table-mode .unified-table { min-width: 0 !important; width: 100% !important; }
@@ -98,18 +95,9 @@
         @media print {
             body { background-color: #ffffff; margin: 0; padding: 0; }
             #toast-container, .no-print, #admin-badge-bar { display: none !important; }
-            
             #main-content { padding: 0 !important; margin: 0 !important; display: block !important; }
-            
             #main-content > div { display: none !important; }
-            
-            #main-content > div.print-active-section { 
-                display: block !important; 
-                margin-top: 0 !important; 
-                padding-top: 0 !important; 
-                border: none !important; 
-            }
-            
+            #main-content > div.print-active-section { display: block !important; margin-top: 0 !important; padding-top: 0 !important; border: none !important; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
     </style>
@@ -122,20 +110,14 @@
     <!-- Password Lock Screen -->
     <div id="lock-screen" class="fixed inset-0 z-[9999] bg-gray-900 flex flex-col items-center justify-center transition-opacity duration-500 no-print">
         <div class="bg-white p-10 rounded shadow-2xl max-w-sm w-full text-center mx-4">
-            <svg class="w-12 h-12 mx-auto text-gray-900 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7z"></path>
-            </svg>
+            <svg class="w-12 h-12 mx-auto text-gray-900 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7z"></path></svg>
             <h2 class="text-2xl font-montserrat font-bold text-gray-900 tracking-widest mb-1">MEDIFAB</h2>
             <p class="text-xs text-gray-400 uppercase tracking-widest mb-8">Confidential Document</p>
-
             <div class="relative">
                 <input type="password" id="password-input" placeholder="Enter Password" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent mb-2 text-center tracking-widest placeholder-gray-300 text-gray-900" onkeypress="handleLockKeyPress(event)">
                 <p id="lock-error" class="text-red-500 text-[10px] uppercase tracking-widest h-4 opacity-0 transition-opacity absolute w-full text-center">Incorrect password</p>
             </div>
-
-            <button onclick="unlockScreen()" class="w-full bg-gray-900 text-white font-montserrat font-semibold py-3 mt-6 rounded hover:bg-black transition-colors uppercase tracking-widest text-sm shadow-md">
-                Unlock
-            </button>
+            <button onclick="unlockScreen()" class="w-full bg-gray-900 text-white font-montserrat font-semibold py-3 mt-6 rounded hover:bg-black transition-colors uppercase tracking-widest text-sm shadow-md">Unlock</button>
         </div>
     </div>
 
@@ -147,7 +129,7 @@
         </div>
     </div>
 
-    <!-- Admin Super Modal (Add/Edit Product DB & Image Drag/Drop) -->
+    <!-- Admin Super Modal -->
     <div id="admin-add-modal" class="fixed inset-0 z-[101] hidden flex items-center justify-center bg-black/70 backdrop-blur-sm no-print" onclick="closeAdminModal(event)">
         <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full mx-4 overflow-hidden flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
             <div class="bg-gray-900 px-6 py-4 flex justify-between items-center text-white">
@@ -237,15 +219,17 @@
                     </div>
                 </div>
 
-                <!-- Drag & Drop Image Upload Zone -->
+                <!-- File Upload Zone -->
                 <div>
-                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Product Image (Drag & Drop)</label>
-                    <div id="drag-drop-zone" class="drop-zone p-4 text-center cursor-pointer bg-gray-50 hover:bg-gray-100" onclick="document.getElementById('file-input').click()">
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Product Image</label>
+                    <div id="drag-drop-zone" class="drop-zone p-4 text-center bg-gray-50 hover:bg-gray-100 cursor-pointer" onclick="document.getElementById('file-input').click()">
                         <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
-                        <div id="drop-zone-prompt" class="space-y-1">
+                        <div id="drop-zone-prompt" class="space-y-2 pointer-events-none">
                             <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                            <p class="text-xs font-semibold text-gray-600">Drag & Drop product image here, or <span class="text-blue-600 underline">browse</span></p>
-                            <p class="text-[10px] text-gray-400">PNG, JPG, WEBP or AVIF up to 5MB</p>
+                            <p class="text-xs font-semibold text-gray-600">Drag & Drop product image here, or 
+                                <button type="button" class="text-blue-600 underline pointer-events-auto font-bold" onclick="document.getElementById('file-input').click(); event.stopPropagation();">Browse Files</button>
+                            </p>
+                            <p class="text-[10px] text-gray-400">PNG, JPG, WEBP up to 5MB</p>
                         </div>
                         <div id="drop-zone-preview" class="hidden flex items-center justify-center gap-3">
                             <img id="preview-img" src="" class="w-12 h-12 object-contain border rounded bg-white">
@@ -275,7 +259,7 @@
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span class="font-bold tracking-widest uppercase text-[11px] text-emerald-400">Super Admin Mode Active</span>
-                <span class="text-gray-400 text-[10px] ml-2">| Direct DB Edit & Image Upload Enabled</span>
+                <span class="text-gray-400 text-[10px] ml-2">| Direct DB Edit, Image Upload & Sort Order Enabled</span>
             </div>
             <button onclick="logoutSuperAdmin()" class="bg-gray-800 hover:bg-red-700 px-3 py-1 rounded text-[10px] uppercase tracking-wider transition-colors">Exit Admin Mode</button>
         </div>
@@ -554,13 +538,7 @@
                     <div id="container-raw" class="overflow-x-auto table-container bg-white hidden">
                         <table class="w-full text-left border-collapse unified-table">
                             <colgroup>
-                                <col style="width: 5%;">   <!-- Img -->
-                                <col style="width: 15%;">  <!-- Name -->
-                                <col style="width: 25%;">  <!-- Active Ingredient -->
-                                <col style="width: 15%;">  <!-- Grade -->
-                                <col style="width: 10%;">  <!-- Form -->
-                                <col style="width: 15%;">  <!-- Unit -->
-                                <col style="width: 15%;">  <!-- Price -->
+                                <col style="width: 5%;">   <col style="width: 15%;">  <col style="width: 25%;">  <col style="width: 15%;">  <col style="width: 10%;">  <col style="width: 15%;">  <col style="width: 15%;">
                             </colgroup>
                             <thead>
                                 <tr>
@@ -611,23 +589,7 @@
                     <div id="container-raclinic" class="overflow-x-auto table-container bg-white shadow-sm hidden">
                         <table class="w-full text-left border-collapse unified-table">
                             <colgroup>
-                                <col style="width: 4%;">  <!-- Img -->
-                                <col style="width: 12%;"> <!-- Item -->
-                                <col style="width: 9%;">  <!-- Ingr. -->
-                                <col style="width: 7%;">  <!-- Cat. -->
-                                <col style="width: 6%;">  <!-- Type -->
-                                <col style="width: 3%;">  <!-- Pkg -->
-                                <col style="width: 3%;">  <!-- Vol -->
-                                <col style="width: 3%;">  <!-- Qty -->
-                                <col style="width: 3%;">  <!-- CT -->
-                                <col style="width: 5%;">  <!-- CT Size -->
-                                <col style="width: 6.4%;"> <!-- Clinic MSRP -->
-                                <col style="width: 6.4%;"> <!-- Clinic Promo -->
-                                <col style="width: 6.4%;"> <!-- Price 1 -->
-                                <col style="width: 6.4%;"> <!-- Price 2 -->
-                                <col style="width: 6.4%;"> <!-- Price 3 -->
-                                <col style="width: 6.4%;"> <!-- Price 4 -->
-                                <col style="width: 6.4%;"> <!-- Price 5 -->
+                                <col style="width: 4%;">  <col style="width: 12%;"> <col style="width: 9%;">  <col style="width: 7%;">  <col style="width: 6%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 5%;">  <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;">
                             </colgroup>
                             <thead>
                                 <tr>
@@ -697,21 +659,7 @@
                     <div id="container-charmacist" class="overflow-x-auto table-container bg-white shadow-sm hidden">
                         <table class="w-full text-left border-collapse unified-table">
                             <colgroup>
-                                <col style="width: 4%;">  <!-- Img -->
-                                <col style="width: 12%;"> <!-- Item -->
-                                <col style="width: 9%;">  <!-- Ingr. -->
-                                <col style="width: 7%;">  <!-- Cat. -->
-                                <col style="width: 6%;">  <!-- Type -->
-                                <col style="width: 3%;">  <!-- Pkg -->
-                                <col style="width: 3%;">  <!-- Vol -->
-                                <col style="width: 3%;">  <!-- Qty -->
-                                <col style="width: 3%;">  <!-- CT -->
-                                <col style="width: 5%;">  <!-- CT Size -->
-                                <col style="width: 9%;"> <!-- Clinic MSRP -->
-                                <col style="width: 9%;"> <!-- Clinic Promo -->
-                                <col style="width: 9%;"> <!-- Price 1 -->
-                                <col style="width: 9%;"> <!-- Price 2 -->
-                                <col style="width: 9%;"> <!-- Price 3 -->
+                                <col style="width: 4%;">  <col style="width: 12%;"> <col style="width: 9%;">  <col style="width: 7%;">  <col style="width: 6%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 5%;">  <col style="width: 9%;"> <col style="width: 9%;"> <col style="width: 9%;"> <col style="width: 9%;"> <col style="width: 9%;">
                             </colgroup>
                             <thead>
                                 <tr>
@@ -773,7 +721,7 @@
         }
 
         /* -------------------------------------------------------------
-           [중요] 최고 관리자 모드 관련 함수 (로그인, 모달 오픈, DB 전송 로직 등) 
+           [중요] 최고 관리자 모드 관련 함수
            ------------------------------------------------------------- */
         function promptSuperAdminLogin() {
             if (isSuperAdmin) {
@@ -841,7 +789,9 @@
             removeSelectedFile();
         }
 
-        /* 파일 드래그 앤 드롭 및 삭제 로직 */
+        /* -------------------------------------------------------------
+           파일 업로드 (드래그 앤 드롭 & 클릭 탐색기) 관련 로직
+           ------------------------------------------------------------- */
         function initDragAndDrop() {
             const dropZone = document.getElementById('drag-drop-zone');
             if(!dropZone) return;
@@ -897,7 +847,78 @@
             reader.readAsDataURL(file);
         }
 
-        /* DB 추가 및 수정(Update) 통신 메인 함수 */
+        /* -------------------------------------------------------------
+           새로운 화살표 버튼 기반 순서 변경 및 DB 통신
+           ------------------------------------------------------------- */
+        const getOrderControlHtml = (id, tableName) => `
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-1 ${isSuperAdmin ? '' : 'hidden'} admin-action-btn no-print z-10 w-6">
+                <button type="button" onclick="moveRowUp(this, '${id}', '${tableName}'); event.stopPropagation();" class="text-gray-400 hover:text-blue-600 bg-gray-100 hover:bg-blue-100 rounded p-0.5 transition-colors shadow-sm order-arrow-btn" title="Move Up">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
+                </button>
+                <button type="button" onclick="moveRowDown(this, '${id}', '${tableName}'); event.stopPropagation();" class="text-gray-400 hover:text-blue-600 bg-gray-100 hover:bg-blue-100 rounded p-0.5 transition-colors shadow-sm order-arrow-btn" title="Move Down">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+            </div>
+        `;
+
+        async function moveRowUp(btn, id, tableName) {
+            if (!isSuperAdmin) return;
+            const currentRow = btn.closest('tr');
+            const tbody = currentRow.parentNode;
+            const prevRow = currentRow.previousElementSibling;
+            
+            // 이전 형제 요소가 tr이고 data-id 속성이 있는 실 데이터 행일 때만 이동 가능
+            if (prevRow && prevRow.tagName === 'TR' && prevRow.hasAttribute('data-id')) {
+                tbody.insertBefore(currentRow, prevRow);
+                await updateOrderInDB(tbody, tableName);
+            } else {
+                showToast("You are already at the top of the group.", "info");
+            }
+        }
+
+        async function moveRowDown(btn, id, tableName) {
+            if (!isSuperAdmin) return;
+            const currentRow = btn.closest('tr');
+            const tbody = currentRow.parentNode;
+            const nextRow = currentRow.nextElementSibling;
+            
+            // 다음 형제 요소가 tr이고 data-id 속성이 있는 실 데이터 행일 때만 이동 가능
+            if (nextRow && nextRow.tagName === 'TR' && nextRow.hasAttribute('data-id')) {
+                tbody.insertBefore(currentRow, nextRow.nextSibling);
+                await updateOrderInDB(tbody, tableName);
+            } else {
+                showToast("You are already at the bottom of the group.", "info");
+            }
+        }
+
+        async function updateOrderInDB(tbody, tableName) {
+            const allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
+            const ids = allRows.map(tr => tr.getAttribute('data-id'));
+            await saveSortOrder(ids, tableName);
+        }
+
+        async function saveSortOrder(ids, tableName) {
+            showToast("Saving new order to database...", "info");
+            try {
+                const promises = ids.map((id, index) => {
+                    return supabaseClient.from(tableName).update({ sort_order: index }).eq('id', id);
+                });
+                await Promise.all(promises);
+                
+                // 로컬 배열 최신화
+                if (tableName === 'products') {
+                    ids.forEach((id, idx) => { let p = globalUniqueProducts.find(x => x.id === id); if(p) p.sort_order = idx; });
+                } else if (tableName === 'medical_aesthetic_products') {
+                    ids.forEach((id, idx) => { let p = globalMedicalProducts.find(x => x.id === id); if(p) p.sort_order = idx; });
+                } else if (tableName === 'raw_materials') {
+                    ids.forEach((id, idx) => { let p = globalRawMaterials.find(x => x.id === id); if(p) p.sort_order = idx; });
+                }
+                showToast("Sort order successfully updated.", "success");
+            } catch (err) {
+                showToast("Sort order save failed: " + err.message, "error");
+            }
+        }
+
         async function submitNewProduct(e) {
             e.preventDefault();
             if (!isSuperAdmin) return;
@@ -926,7 +947,6 @@
 
                 let imageUrl = "";
 
-                // Upload Image to Supabase Storage if file selected
                 if (selectedFileForUpload) {
                     const fileExt = selectedFileForUpload.name.split('.').pop();
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -939,7 +959,6 @@
 
                     if (uploadErr) {
                         console.warn("Storage upload fail, using base64 fallback:", uploadErr);
-                        // Storage 업로드 권한이 없을 경우, DB에 텍스트 형태로 직접 저장하는 Base64 백업 로직
                         imageUrl = await new Promise((resolve) => {
                             const reader = new FileReader();
                             reader.onloadend = () => resolve(reader.result);
@@ -953,12 +972,7 @@
 
                 if (section === 'raw') {
                     const payload = {
-                        product_name: name,
-                        active_ingredients: ingredients,
-                        grade: mainCat,
-                        form: type || 'Solution',
-                        unit: volume || '1L',
-                        unit_price_usd: msrp
+                        product_name: name, active_ingredients: ingredients, grade: mainCat, form: type || 'Solution', unit: volume || '1L', unit_price_usd: msrp
                     };
                     if (editId) {
                         const { error } = await supabaseClient.from('raw_materials').update(payload).eq('id', editId);
@@ -970,17 +984,8 @@
                     }
                 } else if (section === 'medical') {
                     const payload = {
-                        item: name,
-                        ingredients: ingredients,
-                        type: type || 'Medical',
-                        specs: `${volume} ${ctQty}`.trim(),
-                        clinic_msrp: msrp,
-                        clinic_promotion: promo,
-                        dist_1000: t1,
-                        dist_3000: t2,
-                        dist_5000: t3,
-                        dist_10000: t4,
-                        currency: currency
+                        item: name, ingredients: ingredients, type: type || 'Medical', specs: `${volume} ${ctQty}`.trim(),
+                        clinic_msrp: msrp, clinic_promotion: promo, dist_1000: t1, dist_3000: t2, dist_5000: t3, dist_10000: t4, currency: currency
                     };
                     if (editId) {
                         const { error } = await supabaseClient.from('medical_aesthetic_products').update(payload).eq('id', editId);
@@ -995,23 +1000,13 @@
                     if (section === 'raclinic') subCategory = 'RA Clinic Exclusive';
                     else if (section === 'charmacist') subCategory = 'Charmacist Exclusive';
 
-                    /* [중요] ct_quantity는 빈 문자열이 전송되면 DB 오류 발생 방지를 위해 null 처리 */
                     const payload = {
-                        clean_name: name,
-                        main_category: mainCat,
-                        sub_category: subCategory,
-                        active_ingredients: ingredients,
-                        type: type,
-                        volume: volume,
-                        ct_quantity: ctQty ? parseInt(ctQty, 10) : null,
-                        qty: '1EA'
+                        clean_name: name, main_category: mainCat, sub_category: subCategory, active_ingredients: ingredients,
+                        type: type, volume: volume, ct_quantity: ctQty ? parseInt(ctQty, 10) : null, qty: '1EA'
                     };
                     
-                    if (imageUrl) {
-                        payload.image_url = imageUrl;
-                    } else if (document.getElementById('remove-existing-image').value === 'true') {
-                        payload.image_url = null; // 사용자가 삭제버튼을 눌렀을 경우 DB에서도 이미지 URL 삭제
-                    }
+                    if (imageUrl) payload.image_url = imageUrl;
+                    else if (document.getElementById('remove-existing-image').value === 'true') payload.image_url = null; 
 
                     let prodId = editId;
 
@@ -1022,19 +1017,12 @@
                         const { data: insertedProd, error: prodErr } = await supabaseClient.from('products').insert([payload]).select();
                         if (prodErr) throw prodErr;
                         if (insertedProd && insertedProd.length > 0) prodId = insertedProd[0].id;
-                        else throw new Error("데이터 추가에 실패했습니다. (DB RLS 권한을 다시 한 번 확인해 주세요)");
+                        else throw new Error("Database Row Insert Failed.");
                     }
 
                     if (prodId) {
                         const pricePayload = {
-                            currency: currency,
-                            b2c_msrp: msrp,
-                            b2c_promotion: promo,
-                            b2b_tier1_1_to_10_ct: t1,
-                            b2b_tier2_10_to_30_ct: t2,
-                            b2b_tier3_30_to_70_ct: t3,
-                            b2b_tier4_over_70_ct: t4,
-                            oem_tier1_10000_ct: t1
+                            currency: currency, b2c_msrp: msrp, b2c_promotion: promo, b2b_tier1_1_to_10_ct: t1, b2b_tier2_10_to_30_ct: t2, b2b_tier3_30_to_70_ct: t3, b2b_tier4_over_70_ct: t4, oem_tier1_10000_ct: t1
                         };
 
                         if (editId && !editId.startsWith('RESTORED_')) {
@@ -1068,7 +1056,6 @@
             }
         }
 
-        /* 테이블 행(Row)에 띄워주는 수정/삭제 아이콘 컴포넌트 */
         const getActionHtml = (id, section, table, name) => `
             <div class="absolute right-1 top-1/2 -translate-y-1/2 flex gap-1 ${isSuperAdmin ? '' : 'hidden'} admin-action-btn bg-white/90 p-1 rounded shadow-sm border border-gray-200 no-print z-10">
                 <button type="button" onclick="editProduct('${id}', '${section}', '${table}'); event.stopPropagation();" class="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="Edit">
@@ -1163,7 +1150,6 @@
 
             try {
                 if (tableName === 'products') {
-                    // product를 지우기 전에 외래키 연동된 price 부터 안전하게 제거
                     await supabaseClient.from('product_prices').delete().eq('product_id', id);
                 }
                 const { error } = await supabaseClient.from(tableName).delete().eq('id', id);
@@ -1176,23 +1162,18 @@
             }
         }
 
-        /* 기타 UI 관련 함수 */
         function unlockScreen() {
             const pwd = document.getElementById('password-input').value;
             const errorEl = document.getElementById('lock-error');
             if (pwd === 'global2026') {
                 const lockScreen = document.getElementById('lock-screen');
                 const appContent = document.getElementById('app-content');
-                
                 lockScreen.classList.add('opacity-0');
                 setTimeout(() => {
                     lockScreen.style.display = 'none';
                     document.body.classList.remove('overflow-hidden');
                     appContent.classList.remove('hidden');
-                    
-                    requestAnimationFrame(() => {
-                        appContent.classList.remove('opacity-0');
-                    });
+                    requestAnimationFrame(() => { appContent.classList.remove('opacity-0'); });
                 }, 500); 
             } else {
                 errorEl.classList.remove('opacity-0');
@@ -1201,11 +1182,7 @@
             }
         }
 
-        function handleLockKeyPress(e) {
-            if (e.key === 'Enter') {
-                unlockScreen();
-            }
-        }
+        function handleLockKeyPress(e) { if (e.key === 'Enter') unlockScreen(); }
 
         function openImageModal(imgSrc) {
             const modal = document.getElementById('image-modal');
@@ -1237,106 +1214,6 @@
                 }
             }
         }
-
-        /* -------------------------------------------------------------
-           [새로운 기능] 테이블 행(Row) 드래그 앤 드롭 순서 변경 로직
-           ------------------------------------------------------------- */
-        let draggedRow = null;
-        let dragSourceTable = null;
-
-        function handleRowDragStart(e, tableName) {
-            if (!isSuperAdmin) return;
-            draggedRow = e.target.closest('tr');
-            dragSourceTable = tableName;
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', draggedRow.getAttribute('data-id'));
-            
-            // 시각적 피드백을 위해 약간의 딜레이 적용
-            setTimeout(() => { draggedRow.classList.add('opacity-50', 'bg-gray-100'); }, 0);
-        }
-
-        function handleRowDragOver(e) {
-            if (!isSuperAdmin || !draggedRow) return;
-            e.preventDefault();
-            const targetRow = e.target.closest('tr');
-            if (targetRow && targetRow !== draggedRow && targetRow.hasAttribute('data-id')) {
-                targetRow.classList.add('drag-over');
-            }
-        }
-
-        function handleRowDragLeave(e) {
-            const targetRow = e.target.closest('tr');
-            if (targetRow) {
-                targetRow.classList.remove('drag-over');
-            }
-        }
-
-        async function handleRowDrop(e, tableName) {
-            if (!isSuperAdmin || !draggedRow) return;
-            e.preventDefault();
-            
-            const targetRow = e.target.closest('tr');
-            if (targetRow) targetRow.classList.remove('drag-over');
-            draggedRow.classList.remove('opacity-50', 'bg-gray-100');
-            
-            // 유효한 드롭 위치인지 확인 (같은 테이블, 대상이 id를 가짐)
-            if (targetRow && draggedRow !== targetRow && targetRow.hasAttribute('data-id') && dragSourceTable === tableName) {
-                const tbody = targetRow.parentNode;
-                const allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
-                const draggedIdx = allRows.indexOf(draggedRow);
-                const targetIdx = allRows.indexOf(targetRow);
-                
-                // DOM 상에서 위치 변경
-                if (draggedIdx < targetIdx) targetRow.after(draggedRow);
-                else targetRow.before(draggedRow);
-                
-                // 새로운 순서 배열 추출
-                const newOrderIds = Array.from(tbody.querySelectorAll('tr[data-id]')).map(tr => tr.getAttribute('data-id'));
-                
-                // DB에 일괄 저장
-                await saveSortOrder(newOrderIds, tableName);
-            }
-            draggedRow = null;
-        }
-
-        async function saveSortOrder(ids, tableName) {
-            showToast("순서 저장 중...", "info");
-            try {
-                // Supabase 다중 업데이트 (Promise.all 활용)
-                const promises = ids.map((id, index) => {
-                    return supabaseClient.from(tableName).update({ sort_order: index }).eq('id', id);
-                });
-                await Promise.all(promises);
-                
-                // 로컬 전역 변수 메모리 순서 최신화 (리렌더링 시 원상복구 방지)
-                if (tableName === 'products') {
-                    ids.forEach((id, idx) => {
-                        let p = globalUniqueProducts.find(x => x.id === id);
-                        if(p) p.sort_order = idx;
-                    });
-                } else if (tableName === 'medical_aesthetic_products') {
-                    ids.forEach((id, idx) => {
-                        let p = globalMedicalProducts.find(x => x.id === id);
-                        if(p) p.sort_order = idx;
-                    });
-                } else if (tableName === 'raw_materials') {
-                    ids.forEach((id, idx) => {
-                        let p = globalRawMaterials.find(x => x.id === id);
-                        if(p) p.sort_order = idx;
-                    });
-                }
-                showToast("순서가 성공적으로 변경되었습니다.", "success");
-            } catch (err) {
-                showToast("순서 저장 실패: " + err.message, "error");
-            }
-        }
-
-        // 관리자용 드래그 핸들 아이콘 HTML 반환기
-        const getDragHandleHtml = () => `
-            <div class="absolute left-1 top-1/2 -translate-y-1/2 flex items-center justify-center ${isSuperAdmin ? '' : 'hidden'} admin-action-btn no-print z-10 w-4 h-full cursor-grab drag-handle-icon" title="Drag to reorder">
-                <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
-            </div>
-        `;
 
         const SUPABASE_URL = 'https://rayhgqcpupwmwpymtkwg.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
@@ -1395,7 +1272,6 @@
             if (dateEl) dateEl.textContent = `Today: ${todayStr}`;
 
             try {
-                // 데이터 Fetch 시 sort_order 기준 오름차순 정렬 추가
                 const { data: rawProducts, error: prodErr } = await supabaseClient
                     .from('products')
                     .select('*')
@@ -1406,13 +1282,11 @@
                 if (rawProducts) debugProductsLength = rawProducts.length;
 
                 const { data: rawPrices, error: priceErr } = await supabaseClient.from('product_prices').select('*');
-
                 const { data: rawMasterData, error: masterErr } = await supabaseClient.from('form_catalog_master').select('*');
 
                 if (rawProducts && rawProducts.length > 0) {
                     rawProducts.forEach(product => {
                         product.product_prices = (rawPrices || []).filter(pr => pr.product_id === product.id);
-                        
                         if (rawMasterData && product.product_prices.length > 0) {
                             const masterMatch = rawMasterData.find(m => m.id === product.id || m.product_id === product.id || m.clean_name === product.clean_name);
                             if (masterMatch) {
@@ -1433,31 +1307,14 @@
                     
                     globalUniqueProducts = rawProducts;
                     
-                    // 삭제된 블루 앰플 임시 자동 복구 로직
                     if (!globalUniqueProducts.some(p => (p.clean_name || '').toLowerCase() === 'blue crystal hydrating ampoule')) {
                          globalUniqueProducts.push({
-                             id: 'RESTORED_BLUE_AMPOULE',
-                             clean_name: 'Blue crystal hydrating ampoule',
-                             display_name: 'Blue crystal hydrating ampoule',
-                             main_category: 'Skincare',
-                             sub_category: 'Cosmetic',
-                             volume: '30ml',
-                             qty: '1EA',
-                             ct_quantity: 72,
-                             product_prices: [{
-                                 currency: 'KRW',
-                                 b2c_msrp: 35000,
-                                 b2c_promotion: 24500,
-                                 b2b_tier1_1_to_10_ct: 15750,
-                                 b2b_tier2_10_to_30_ct: 14000,
-                                 b2b_tier3_30_to_70_ct: 12250,
-                             }]
+                             id: 'RESTORED_BLUE_AMPOULE', clean_name: 'Blue crystal hydrating ampoule', display_name: 'Blue crystal hydrating ampoule', main_category: 'Skincare', sub_category: 'Cosmetic', volume: '30ml', qty: '1EA', ct_quantity: 72,
+                             product_prices: [{ currency: 'KRW', b2c_msrp: 35000, b2c_promotion: 24500, b2b_tier1_1_to_10_ct: 15750, b2b_tier2_10_to_30_ct: 14000, b2b_tier3_30_to_70_ct: 12250 }]
                          });
                     }
                 }
-            } catch (err) {
-                debugProductsError = err.message;
-            }
+            } catch (err) { debugProductsError = err.message; }
 
             try {
                 const { data: dbMedicals, error: medErr } = await supabaseClient
@@ -1481,7 +1338,6 @@
                 });
             }
 
-            // 요청된 순서 정렬: 1. 크리스탈 -> 2. 크리스탈 플러스 -> 3. 루비 MTS -> 4. 스칼프 MD -> 5. 이끌레버
             function getMedicalOrder(itemName) {
                 if (!itemName) return 999;
                 const lower = itemName.toLowerCase().trim();
@@ -1492,7 +1348,6 @@
                 if (lower.includes('echrever')) return 5;
                 return 999;
             }
-            // 이미 정렬된 상태를 깨지 않기 위해 기본값(초기화) 경우에만 정렬 실행
             if(globalMedicalProducts.length <= 5) {
                 globalMedicalProducts.sort((a, b) => getMedicalOrder(a.item) - getMedicalOrder(b.item));
             }
@@ -1521,20 +1376,14 @@
             renderRawMaterialsTableData();
             renderRAClinicTableData();
             renderCharmacistTableData();
-            
             initDragAndDrop();
             
-            if(isSuperAdmin) toggleAdminUI(true); // 리렌더링 후 어드민 UI 재생성
+            if(isSuperAdmin) toggleAdminUI(true); 
         }
 
         function changeExchangeRate(val) {
             appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
-            renderTableData();
-            renderMedicalTableData();
-            renderPharmacyTableData();
-            renderRawMaterialsTableData();
-            renderRAClinicTableData();
-            renderCharmacistTableData();
+            renderTableData(); renderMedicalTableData(); renderPharmacyTableData(); renderRawMaterialsTableData(); renderRAClinicTableData(); renderCharmacistTableData();
             if(isSuperAdmin) toggleAdminUI(true);
         }
 
@@ -1551,21 +1400,14 @@
                 if (currency === 'USD') {
                     btnUsd.className = "px-4 py-1.5 text-xs bg-white shadow-sm text-gray-900 transition-all uppercase tracking-wider border border-gray-300";
                     btnKrw.className = "px-4 py-1.5 text-xs text-gray-400 hover:text-gray-900 transition-all uppercase tracking-wider";
-                    rateContainer.classList.add('hidden');
-                    rateContainer.classList.remove('flex');
+                    rateContainer.classList.add('hidden'); rateContainer.classList.remove('flex');
                 } else {
                     btnKrw.className = "px-4 py-1.5 text-xs bg-white shadow-sm text-gray-900 transition-all uppercase tracking-wider border border-gray-300";
                     btnUsd.className = "px-4 py-1.5 text-xs text-gray-400 hover:text-gray-900 transition-all uppercase tracking-wider";
-                    rateContainer.classList.remove('hidden');
-                    rateContainer.classList.add('flex');
+                    rateContainer.classList.remove('hidden'); rateContainer.classList.add('flex');
                 }
             }
-            renderTableData();
-            renderMedicalTableData();
-            renderPharmacyTableData();
-            renderRawMaterialsTableData();
-            renderRAClinicTableData();
-            renderCharmacistTableData();
+            renderTableData(); renderMedicalTableData(); renderPharmacyTableData(); renderRawMaterialsTableData(); renderRAClinicTableData(); renderCharmacistTableData();
             if(isSuperAdmin) toggleAdminUI(true);
         }
 
@@ -1585,7 +1427,6 @@
         function renderTableData() {
             const tbody = document.getElementById('price-table-body');
             if (!tbody) return;
-            
             tbody.innerHTML = '';
             
             if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
@@ -1597,62 +1438,35 @@
                 const mainCat = (p.main_category || '').trim().toLowerCase();
                 const subCat = (p.sub_category || '').trim().toLowerCase();
                 const cleanName = (p.clean_name || '').trim().toLowerCase();
-                
-                // 1. 파트너/익스클루시브 및 메디컬 전용 라인은 엄격히 제외 (이끌레버, 루비, 스칼프MD 등 차단)
                 if (subCat.includes('ra clinic') || subCat.includes('pharmacy') || subCat.includes('charmacist') || mainCat.includes('pharmacy') || mainCat.includes('exclusive') || mainCat.includes('medical') || subCat.includes('medical')) return false;
                 if (cleanName.includes('scalp md') || cleanName.includes('echrever') || cleanName.includes('ruby')) return false;
-                
-                // 2. 뷰티 디바이스 및 화장품, 헤어 라인만 포함되도록 조건부 승인
                 return mainCat.includes('device') || mainCat.includes('skincare') || mainCat.includes('cosmetic') || 
                        mainCat.includes('hair') || subCat.includes('hair') || 
                        cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot') || cleanName.includes('core impact') || cleanName.includes('hyper shot') || cleanName.includes('ampoule') || cleanName.includes('cream') || cleanName.includes('mask') || cleanName.includes('booster');
             });
 
             const faceDevices = cosmeticAndDeviceProducts.filter(p => {
-                const main = (p.main_category || '').toLowerCase();
-                const sub = (p.sub_category || '').toLowerCase();
-                const name = (p.clean_name || '').toLowerCase();
-                const noSpaceName = name.replace(/\s/g, '');
-                
+                const main = (p.main_category || '').toLowerCase(); const sub = (p.sub_category || '').toLowerCase(); const name = (p.clean_name || '').toLowerCase(); const noSpaceName = name.replace(/\s/g, '');
                 const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
                 const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
-                
                 return isDevice && !isHair;
             });
-            
             const faceCosmetics = cosmeticAndDeviceProducts.filter(p => {
-                const main = (p.main_category || '').toLowerCase();
-                const sub = (p.sub_category || '').toLowerCase();
-                const name = (p.clean_name || '').toLowerCase();
-                const noSpaceName = name.replace(/\s/g, '');
-                
+                const main = (p.main_category || '').toLowerCase(); const sub = (p.sub_category || '').toLowerCase(); const name = (p.clean_name || '').toLowerCase(); const noSpaceName = name.replace(/\s/g, '');
                 const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
                 const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
-                
                 return !isDevice && !isHair;
             });
-            
             const hairDevices = cosmeticAndDeviceProducts.filter(p => {
-                const main = (p.main_category || '').toLowerCase();
-                const sub = (p.sub_category || '').toLowerCase();
-                const name = (p.clean_name || '').toLowerCase();
-                const noSpaceName = name.replace(/\s/g, '');
-                
+                const main = (p.main_category || '').toLowerCase(); const sub = (p.sub_category || '').toLowerCase(); const name = (p.clean_name || '').toLowerCase(); const noSpaceName = name.replace(/\s/g, '');
                 const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
                 const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
-                
                 return isDevice && isHair;
             });
-            
             const hairCosmetics = cosmeticAndDeviceProducts.filter(p => {
-                const main = (p.main_category || '').toLowerCase();
-                const sub = (p.sub_category || '').toLowerCase();
-                const name = (p.clean_name || '').toLowerCase();
-                const noSpaceName = name.replace(/\s/g, '');
-                
+                const main = (p.main_category || '').toLowerCase(); const sub = (p.sub_category || '').toLowerCase(); const name = (p.clean_name || '').toLowerCase(); const noSpaceName = name.replace(/\s/g, '');
                 const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
                 const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
-                
                 return !isDevice && isHair;
             });
 
@@ -1682,19 +1496,10 @@
                     const nativeCurrency = (priceData.currency || 'KRW').trim().toUpperCase();
 
                     const tr = document.createElement('tr');
-                    // 관리자일 경우 드래그 이벤트 주입
-                    tr.className = `text-sm hover:bg-gray-50 transition-colors ${isSuperAdmin ? 'draggable-row' : ''}`;
-                    if (isSuperAdmin) {
-                        tr.setAttribute('draggable', 'true');
-                        tr.setAttribute('ondragstart', `handleRowDragStart(event, 'products')`);
-                        tr.setAttribute('ondragover', `handleRowDragOver(event)`);
-                        tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
-                        tr.setAttribute('ondrop', `handleRowDrop(event, 'products')`);
-                    }
+                    tr.className = `text-sm hover:bg-gray-50 transition-colors relative`;
                     tr.setAttribute('data-id', p.id);
 
                     const isKrw = currentCurrency === 'KRW';
-                    
                     let rate = 1;
                     if (nativeCurrency === 'KRW' && currentCurrency === 'USD') rate = 1 / appliedKrwRate;
                     else if (nativeCurrency === 'USD' && currentCurrency === 'KRW') rate = appliedKrwRate;
@@ -1712,11 +1517,8 @@
                     const b2b2 = getPrice(priceData.b2b_tier2_10_to_30_ct, rate);
                     const b2b3 = getPrice(priceData.b2b_tier3_30_to_70_ct, rate);
 
-                    let name = p.display_name;
-                    let volume = (p.volume && p.volume.trim() !== '') ? p.volume : '-';
-                    let qty = (p.qty && p.qty.trim() !== '') ? p.qty : '1EA';
+                    let name = p.display_name; let volume = (p.volume && p.volume.trim() !== '') ? p.volume : '-'; let qty = (p.qty && p.qty.trim() !== '') ? p.qty : '1EA';
 
-                    // 이미지 로드 순위: 1. DB의 image_url 우선 적용 -> 2. 하드코딩된 map
                     let mappedImg = p.image_url || "";
                     if (!mappedImg) {
                         let longestMatch = "";
@@ -1730,7 +1532,7 @@
 
                     const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img cursor-pointer hover:opacity-80 transition-opacity" alt="${name}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img">N/A</div>`;
                     tr.innerHTML = `
-                        <td class="py-2 px-4 text-center align-middle relative">${getDragHandleHtml()}<div class="flex justify-center">${imgHtml}</div></td>
+                        <td class="py-2 px-4 text-center align-middle relative">${getOrderControlHtml(p.id, 'products')}<div class="flex justify-center">${imgHtml}</div></td>
                         <td class="py-3 pr-6 align-middle"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${name}</span></div>${getActionHtml(p.id, 'cosmetic', 'products', name)}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${volume}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${qty}</td>
@@ -1749,22 +1551,14 @@
                 const groups = { 'AMPOULE BOOSTER': [], 'AMPOULE': [], 'MASK': [], 'CREAM': [], 'SHAMPOO': [] };
                 cosmetics.forEach(p => { 
                     const type = getCosmeticType(p.display_name || ''); 
-                    if(groups[type]) {
-                        groups[type].push(p); 
-                    } else {
-                        // 명확한 구분이 어려운 제품은 사라짐을 방지하기 위해 기본 분류로 자동 편입 (ETC 노출 방지)
-                        if ((p.display_name || '').toLowerCase().includes('shampoo') || (p.main_category || '').toLowerCase().includes('hair')) {
-                            groups['SHAMPOO'].push(p);
-                        } else {
-                            groups['AMPOULE'].push(p);
-                        }
+                    if(groups[type]) groups[type].push(p); 
+                    else {
+                        if ((p.display_name || '').toLowerCase().includes('shampoo') || (p.main_category || '').toLowerCase().includes('hair')) groups['SHAMPOO'].push(p);
+                        else groups['AMPOULE'].push(p);
                     }
                 });
                 ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM', 'SHAMPOO'].forEach(type => {
-                    if (groups[type] && groups[type].length > 0) { 
-                        renderHeader(type, 3); 
-                        renderProducts(groups[type]); 
-                    }
+                    if (groups[type] && groups[type].length > 0) { renderHeader(type, 3); renderProducts(groups[type]); }
                 });
             }
 
@@ -1797,16 +1591,8 @@
                 };
 
                 return {
-                    ...p,
-                    clinic_msrp: roundPrice(p.clinic_msrp),
-                    clinic_promotion: roundPrice(p.clinic_promotion),
-                    dist_1000: roundPrice(p.dist_1000),
-                    dist_3000: roundPrice(p.dist_3000),
-                    dist_5000: roundPrice(p.dist_5000),
-                    dist_10000: roundPrice(p.dist_10000),
-                    oem_10000: roundPrice(p.oem_10000),
-                    oem_30000: roundPrice(p.oem_30000),
-                    oem_50000: roundPrice(p.oem_50000)
+                    ...p, clinic_msrp: roundPrice(p.clinic_msrp), clinic_promotion: roundPrice(p.clinic_promotion), dist_1000: roundPrice(p.dist_1000), dist_3000: roundPrice(p.dist_3000), dist_5000: roundPrice(p.dist_5000),
+                    dist_10000: roundPrice(p.dist_10000), oem_10000: roundPrice(p.oem_10000), oem_30000: roundPrice(p.oem_30000), oem_50000: roundPrice(p.oem_50000)
                 };
             });
 
@@ -1825,21 +1611,14 @@
 
             filteredData.forEach((p, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
-                if (isSuperAdmin) {
-                    tr.setAttribute('draggable', 'true');
-                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'medical_aesthetic_products')`);
-                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
-                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
-                    tr.setAttribute('ondrop', `handleRowDrop(event, 'medical_aesthetic_products')`);
-                }
+                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
                 tr.setAttribute('data-id', p.id);
                 
                 let html = '';
                 if (itemSpans[idx] > 0) {
                     let mappedImg = medImageMap[p.item] || productImageMap[p.item];
                     const imgHtml = mappedImg ? `<img src="${mappedImg}" class="med-product-img mx-auto cursor-pointer hover:opacity-80 transition-opacity" alt="${p.item}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8"></div>`;
-                    html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}${imgHtml}</td>`;
+                    html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'medical_aesthetic_products')}${imgHtml}</td>`;
                 }
                 if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center text-black align-middle relative group/item">${p.item || ''}${getActionHtml(p.id, 'medical', 'medical_aesthetic_products', p.item)}</td>`;
                 if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.ingredients || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
@@ -1851,14 +1630,9 @@
                 if (volMatch) { specVol = volMatch[0]; specPkg = rawSpecs.replace(volMatch[0], '').trim().replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); }
                 if (!specPkg) specPkg = '-';
 
-                let ctQty = p.ct_quantity;
-                let pkgForm = specPkg; 
-                let pkgVol = specVol;  
-
+                let ctQty = p.ct_quantity; let pkgForm = specPkg; let pkgVol = specVol;  
                 const matchedProduct = globalUniqueProducts.find(prod => {
-                    const medItemName = (p.item || '').toLowerCase().trim();
-                    const prodName = (prod.clean_name || '').toLowerCase().trim();
-                    const dispName = (prod.display_name || '').toLowerCase().trim();
+                    const medItemName = (p.item || '').toLowerCase().trim(); const prodName = (prod.clean_name || '').toLowerCase().trim(); const dispName = (prod.display_name || '').toLowerCase().trim();
                     return prodName === medItemName || dispName === medItemName;
                 });
 
@@ -1890,27 +1664,11 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             
-            const targetNames = [
-                '셀슈틱스 리투디엔 더마플라스트 크림',
-                '셀슈틱스 리투지엔 더마플라스트 립밤',
-                'medinovae CHITOGENIX Spot Relief Patch'
-            ];
-
-            const engNames = {
-                '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Retudien Dermaplast Cream',
-                '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Retudien Dermaplast Lip Balm'
-            };
-
-            const engIngr = {
-                '돼지유래 ECM, PDRN': 'Porcine-derived ECM, PDRN',
-                '돼지유래 ECM, 보르피린': 'Porcine-derived ECM, Volufiline'
-            };
+            const targetNames = ['셀슈틱스 리투디엔 더마플라스트 크림', '셀슈틱스 리투지엔 더마플라스트 립밤', 'medinovae CHITOGENIX Spot Relief Patch'];
+            const engNames = { '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Retudien Dermaplast Cream', '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Retudien Dermaplast Lip Balm' };
+            const engIngr = { '돼지유래 ECM, PDRN': 'Porcine-derived ECM, PDRN', '돼지유래 ECM, 보르피린': 'Porcine-derived ECM, Volufiline' };
             
-            const pharmacyProducts = globalUniqueProducts.filter(p => {
-                const cName = (p.clean_name || '').trim();
-                return targetNames.includes(cName);
-            });
-            
+            const pharmacyProducts = globalUniqueProducts.filter(p => targetNames.includes((p.clean_name || '').trim()));
             if (!pharmacyProducts || pharmacyProducts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching Pharmacy data...</td></tr>`;
                 return;
@@ -1927,7 +1685,6 @@
                     let krwMsrp = nativeCurrency === 'USD' ? Number(msrpValue) * appliedKrwRate : Number(msrpValue);
                     let targetKrw = krwMsrp * ratio;
                     let roundedKrw = Math.ceil(targetKrw / 1000) * 1000;
-                    
                     if (currentCurrency === 'USD') return Math.ceil(roundedKrw / appliedKrwRate);
                     return roundedKrw;
                 };
@@ -1935,36 +1692,23 @@
                 const fPrice = (val) => val ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val) : '-';
 
                 const baseMsrp = priceData.b2c_msrp;
-                const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0);
-                const clinicPromo = getCalculatedPrice(baseMsrp, 0.80);
-                const dist1000 = getCalculatedPrice(baseMsrp, 0.45); 
-                const dist3000 = getCalculatedPrice(baseMsrp, 0.42);
-                const dist5000 = getCalculatedPrice(baseMsrp, 0.37);
-                const dist10000 = getCalculatedPrice(baseMsrp, 0.34);
-                const oem10000 = getCalculatedPrice(baseMsrp, 0.33);
-                const oem30000 = getCalculatedPrice(baseMsrp, 0.30); 
-                const oem50000 = getCalculatedPrice(baseMsrp, 0.27);
+                const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0); const clinicPromo = getCalculatedPrice(baseMsrp, 0.80);
+                const dist1000 = getCalculatedPrice(baseMsrp, 0.45); const dist3000 = getCalculatedPrice(baseMsrp, 0.42);
+                const dist5000 = getCalculatedPrice(baseMsrp, 0.37); const dist10000 = getCalculatedPrice(baseMsrp, 0.34);
+                const oem10000 = getCalculatedPrice(baseMsrp, 0.33); const oem30000 = getCalculatedPrice(baseMsrp, 0.30); const oem50000 = getCalculatedPrice(baseMsrp, 0.27);
 
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
-                if (isSuperAdmin) {
-                    tr.setAttribute('draggable', 'true');
-                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'products')`);
-                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
-                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
-                    tr.setAttribute('ondrop', `handleRowDrop(event, 'products')`);
-                }
+                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
                 tr.setAttribute('data-id', p.id);
 
                 let cName = (p.clean_name || '').trim();
                 let dispName = engNames[cName] || p.display_name || '-';
                 let dispIngr = engIngr[p.active_ingredients] || p.active_ingredients || '-';
-
                 let mappedImg = raImageMap[cName] || raImageMap[p.display_name] || ""; 
                 const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
 
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}${imgHtml}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'products')}${imgHtml}</td>
                     <td class="py-3 px-4 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'pharmacy', 'products', dispName)}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light">Cosmetic</td>
@@ -1996,11 +1740,8 @@
             function calcSpans(key) {
                 let spanArr = [], currentVal = null, count = 0;
                 for (let i = 0; i < globalRawMaterials.length; i++) {
-                    if (globalRawMaterials[i][key] !== currentVal) {
-                        if (count > 0) spanArr.push(count);
-                        currentVal = globalRawMaterials[i][key];
-                        count = 1;
-                    } else count++;
+                    if (globalRawMaterials[i][key] !== currentVal) { if (count > 0) spanArr.push(count); currentVal = globalRawMaterials[i][key]; count = 1; } 
+                    else count++;
                 }
                 if (count > 0) spanArr.push(count);
                 let result = [];
@@ -2013,14 +1754,7 @@
 
             globalRawMaterials.forEach((p, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
-                if (isSuperAdmin) {
-                    tr.setAttribute('draggable', 'true');
-                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'raw_materials')`);
-                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
-                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
-                    tr.setAttribute('ondrop', `handleRowDrop(event, 'raw_materials')`);
-                }
+                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
                 tr.setAttribute('data-id', p.id);
                 
                 let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
@@ -2028,7 +1762,7 @@
 
                 let html = '';
                 if (nameSpans[idx] > 0) {
-                    html += `<td rowspan="${nameSpans[idx]}" class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100">RM</div></td>`;
+                    html += `<td rowspan="${nameSpans[idx]}" class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'raw_materials')}<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100">RM</div></td>`;
                     html += `<td rowspan="${nameSpans[idx]}" class="py-3 px-4 text-center text-gray-900 font-medium align-middle relative group/item">${p.product_name}${getActionHtml(p.id, 'raw', 'raw_materials', p.product_name)}</td>`;
                 }
                 if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center text-gray-700 font-light align-middle">${p.active_ingredients}</td>`;
@@ -2050,7 +1784,6 @@
             tbody.innerHTML = '';
             
             const raProducts = globalUniqueProducts.filter(p => p.sub_category === 'RA Clinic Exclusive');
-            
             if (!raProducts || raProducts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching RA Clinic data from server...</td></tr>`;
                 return;
@@ -2072,35 +1805,23 @@
 
                 const fPrice = (val) => val ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val) : '-';
 
-                const clinicMsrp = getPrice(priceData.b2c_msrp);
-                const clinicPromo = getPrice(priceData.b2c_promotion);
-                const mf_tdl = getPrice(priceData.b2b_tier4_over_70_ct);
-                const tdl_ra = getPrice(priceData.b2b_tier3_30_to_70_ct);
-                const ra_d1 = getPrice(priceData.b2b_tier2_10_to_30_ct);
-                const d1_d2 = getPrice(priceData.b2b_tier1_1_to_10_ct);
+                const clinicMsrp = getPrice(priceData.b2c_msrp); const clinicPromo = getPrice(priceData.b2c_promotion);
+                const mf_tdl = getPrice(priceData.b2b_tier4_over_70_ct); const tdl_ra = getPrice(priceData.b2b_tier3_30_to_70_ct);
+                const ra_d1 = getPrice(priceData.b2b_tier2_10_to_30_ct); const d1_d2 = getPrice(priceData.b2b_tier1_1_to_10_ct);
                 const d2_shop = getPrice(priceData.oem_tier1_10000_ct);
 
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
-                if (isSuperAdmin) {
-                    tr.setAttribute('draggable', 'true');
-                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'products')`);
-                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
-                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
-                    tr.setAttribute('ondrop', `handleRowDrop(event, 'products')`);
-                }
+                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
                 tr.setAttribute('data-id', p.id);
 
                 let mappedImg = raImageMap[p.clean_name] || raImageMap[p.display_name] || ""; 
                 const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
 
                 let dispName = p.display_name || p.clean_name || '-';
-                if (dispName === '수정광 주사 (Crystal Glow)') {
-                    dispName = '수정광 주사<br><span class="text-[10px] font-light text-gray-500">Crystal Glow</span>';
-                }
+                if (dispName === '수정광 주사 (Crystal Glow)') dispName = '수정광 주사<br><span class="text-[10px] font-light text-gray-500">Crystal Glow</span>';
 
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}${imgHtml}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'products')}${imgHtml}</td>
                     <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'raclinic', 'products', p.display_name || p.clean_name)}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${p.active_ingredients || '-'}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-medium">Cosmetic</td>
@@ -2127,25 +1848,11 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             
-            const pharmacyTargetNames = [
-                '셀슈틱스 리투디엔 더마플라스트 크림',
-                '셀슈틱스 리투지엔 더마플라스트 립밤'
-            ];
-
-            const engNames = {
-                '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Retudien Dermaplast Cream',
-                '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Retudien Dermaplast Lip Balm'
-            };
-
-            const engIngr = {
-                '돼지유래 ECM, PDRN': 'Porcine-derived ECM, PDRN',
-                '돼지유래 ECM, 보르피린': 'Porcine-derived ECM, Volufiline'
-            };
+            const pharmacyTargetNames = ['셀슈틱스 리투디엔 더마플라스트 크림', '셀슈틱스 리투지엔 더마플라스트 립밤'];
+            const engNames = { '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Retudien Dermaplast Cream', '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Retudien Dermaplast Lip Balm' };
+            const engIngr = { '돼지유래 ECM, PDRN': 'Porcine-derived ECM, PDRN', '돼지유래 ECM, 보르피린': 'Porcine-derived ECM, Volufiline' };
             
-            const charmacistProducts = globalUniqueProducts.filter(p => {
-                const cName = (p.clean_name || '').trim();
-                return pharmacyTargetNames.includes(cName) || p.sub_category === 'Charmacist Exclusive';
-            });
+            const charmacistProducts = globalUniqueProducts.filter(p => pharmacyTargetNames.includes((p.clean_name || '').trim()) || p.sub_category === 'Charmacist Exclusive');
             
             if (!charmacistProducts || charmacistProducts.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching Charmacist data...</td></tr>`;
@@ -2170,32 +1877,21 @@
                 const fPrice = (val) => val ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val) : '-';
 
                 const baseMsrp = priceData.b2c_msrp;
-                const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0);
-                const clinicPromo = getCalculatedPrice(baseMsrp, 0.80);
-                const mf_tdl = getCalculatedPrice(baseMsrp, 0.27);
-                const tdl_cmc = getCalculatedPrice(baseMsrp, 0.36); 
-                const cmc_chain = getCalculatedPrice(baseMsrp, 0.45); 
+                const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0); const clinicPromo = getCalculatedPrice(baseMsrp, 0.80);
+                const mf_tdl = getCalculatedPrice(baseMsrp, 0.27); const tdl_cmc = getCalculatedPrice(baseMsrp, 0.36); const cmc_chain = getCalculatedPrice(baseMsrp, 0.45); 
 
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs ${isSuperAdmin ? 'draggable-row' : ''}`;
-                if (isSuperAdmin) {
-                    tr.setAttribute('draggable', 'true');
-                    tr.setAttribute('ondragstart', `handleRowDragStart(event, 'products')`);
-                    tr.setAttribute('ondragover', `handleRowDragOver(event)`);
-                    tr.setAttribute('ondragleave', `handleRowDragLeave(event)`);
-                    tr.setAttribute('ondrop', `handleRowDrop(event, 'products')`);
-                }
+                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
                 tr.setAttribute('data-id', p.id);
 
                 let cName = (p.clean_name || '').trim();
                 let dispName = engNames[cName] || p.display_name || '-';
                 let dispIngr = engIngr[p.active_ingredients] || p.active_ingredients || '-';
-
                 let mappedImg = raImageMap[cName] || raImageMap[p.display_name] || ""; 
                 const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
 
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle relative">${getDragHandleHtml()}${imgHtml}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'products')}${imgHtml}</td>
                     <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'charmacist', 'products', p.display_name || p.clean_name)}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-medium">Cosmetic</td>
@@ -2277,6 +1973,7 @@
                         .unified-table thead { display: table-header-group !important; }
                         h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
                         .border-l-4 { border-left: none !important; padding-left: 0 !important; }
+                        .order-arrow-btn { display: none !important; }
                     }
                 `;
             }
