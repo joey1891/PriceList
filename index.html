@@ -1533,7 +1533,7 @@
                     const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img cursor-pointer hover:opacity-80 transition-opacity" alt="${name}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img">N/A</div>`;
                     tr.innerHTML = `
                         <td class="py-2 px-4 text-center align-middle relative">${getOrderControlHtml(p.id, 'products')}<div class="flex justify-center">${imgHtml}</div></td>
-                        <td class="py-3 pr-6 align-middle"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${name}</span></div>${getActionHtml(p.id, 'cosmetic', 'products', name)}</td>
+                        <td class="py-3 pr-6 align-middle relative group/item"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${name}</span></div>${getActionHtml(p.id, 'cosmetic', 'products', name)}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${volume}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${qty}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${p.ct_quantity || '-'}</td>
