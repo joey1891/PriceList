@@ -1110,7 +1110,20 @@
             const tr = btn.closest('tr');
             const tbody = tr.parentNode;
             let prev = tr.previousElementSibling;
-            while(prev && !prev.hasAttribute('data-id')) { prev = prev.previousElementSibling; }
+            let crossedBoundary = false;
+            
+            while(prev && !prev.hasAttribute('data-id')) { 
+                if(prev.classList.contains('category-header') || prev.classList.contains('sub-category-header') || prev.classList.contains('type-header')) {
+                    crossedBoundary = true;
+                }
+                prev = prev.previousElementSibling; 
+            }
+            
+            if(crossedBoundary) {
+                showToast("카테고리 그룹 경계를 넘어 순서를 변경할 수 없습니다. 소속 변경은 Edit(수정)을 이용하세요.", "error");
+                return;
+            }
+            
             if(prev) {
                 tbody.insertBefore(tr, prev);
                 tr.classList.add('bg-blue-50'); setTimeout(() => tr.classList.remove('bg-blue-50'), 500);
@@ -1123,7 +1136,20 @@
             const tr = btn.closest('tr');
             const tbody = tr.parentNode;
             let next = tr.nextElementSibling;
-            while(next && !next.hasAttribute('data-id')) { next = next.nextElementSibling; }
+            let crossedBoundary = false;
+            
+            while(next && !next.hasAttribute('data-id')) { 
+                if(next.classList.contains('category-header') || next.classList.contains('sub-category-header') || next.classList.contains('type-header')) {
+                    crossedBoundary = true;
+                }
+                next = next.nextElementSibling; 
+            }
+            
+            if(crossedBoundary) {
+                showToast("카테고리 그룹 경계를 넘어 순서를 변경할 수 없습니다. 소속 변경은 Edit(수정)을 이용하세요.", "error");
+                return;
+            }
+            
             if(next) {
                 next.after(tr);
                 tr.classList.add('bg-blue-50'); setTimeout(() => tr.classList.remove('bg-blue-50'), 500);
