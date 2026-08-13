@@ -29,12 +29,8 @@
             word-break: keep-all;
             overflow-wrap: break-word;
         }
-        .unified-table th {
-            border: 1px solid #374151; 
-        }
-        .unified-table td {
-            border: 1px solid #e5e7eb; 
-        }
+        .unified-table th { border: 1px solid #374151; }
+        .unified-table td { border: 1px solid #e5e7eb; }
         
         .unified-table thead {
             position: -webkit-sticky;
@@ -58,31 +54,17 @@
         .cosmetic-table tr.type-header td { border-left: none; border-right: none; border-bottom: 1px solid #f3f4f6 !important; }
         
         .unified-table tr.loading-row td { border: none; border-bottom: 1px solid #e5e7eb; }
-        .unified-table tr.note-row td { border-left: none; border-right: none; border-bottom: none; border-top: 1px solid #e5e7eb; }
         .cosmetic-table tr:hover:not(.category-header):not(.sub-category-header):not(.type-header) { background-color: #f9fafb; transition: background-color 0.2s ease; }
         
-        .currency-cell { display: flex; justify-content: space-between; width: 100%; min-width: 65px; }
-
         .product-img { width: 36px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid #e5e7eb; }
         .med-product-img { width: 44px; height: 44px; object-fit: contain; }
         .placeholder-img { width: 36px; height: 36px; border-radius: 4px; background-color: #f3f4f6; border: 1px dashed #d1d5db; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px; font-weight: bold; }
 
-        /* Drag & Drop Zone Styling */
-        .drop-zone {
-            border: 2px dashed #9ca3af;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-        .drop-zone.dragover {
-            border-color: #2563eb;
-            background-color: #eff6ff;
-        }
+        .drop-zone { border: 2px dashed #9ca3af; border-radius: 6px; transition: all 0.2s ease; }
+        .drop-zone.dragover { border-color: #2563eb; background-color: #eff6ff; }
+        .row-transition { transition: transform 0.3s ease, background-color 0.3s ease; }
 
-        /* Order Control Arrows */
-        .order-arrow-btn { opacity: 0.3; transition: opacity 0.2s, background-color 0.2s; }
-        tr:hover .order-arrow-btn { opacity: 1; }
-
-        /* Table Print Enhancements */
+        /* Print Enhancements */
         body.print-table-mode .unified-table { min-width: 0 !important; width: 100% !important; }
         body.print-table-mode .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
         body.print-table-mode .unified-table th, body.print-table-mode .unified-table td { padding: 6px 4px !important; font-size: 9px !important; line-height: 1.2 !important; }
@@ -91,7 +73,6 @@
         body.print-table-mode h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
         body.print-table-mode .no-print-border { border: none !important; padding-left: 0 !important; }
 
-        /* Print Styles */
         @media print {
             body { background-color: #ffffff; margin: 0; padding: 0; }
             #toast-container, .no-print, #admin-badge-bar { display: none !important; }
@@ -104,20 +85,24 @@
 </head>
 <body class="text-gray-800 antialiased selection:bg-gray-900 selection:text-white relative overflow-hidden" onload="initDashboard()">
 
-    <!-- Toast Notification -->
     <div id="toast-container" class="fixed top-5 right-5 z-[10000] flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Password Lock Screen -->
     <div id="lock-screen" class="fixed inset-0 z-[9999] bg-gray-900 flex flex-col items-center justify-center transition-opacity duration-500 no-print">
         <div class="bg-white p-10 rounded shadow-2xl max-w-sm w-full text-center mx-4">
-            <svg class="w-12 h-12 mx-auto text-gray-900 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7z"></path></svg>
+            <svg class="w-12 h-12 mx-auto text-gray-900 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7z"></path>
+            </svg>
             <h2 class="text-2xl font-montserrat font-bold text-gray-900 tracking-widest mb-1">MEDIFAB</h2>
             <p class="text-xs text-gray-400 uppercase tracking-widest mb-8">Confidential Document</p>
+
             <div class="relative">
                 <input type="password" id="password-input" placeholder="Enter Password" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent mb-2 text-center tracking-widest placeholder-gray-300 text-gray-900" onkeypress="handleLockKeyPress(event)">
                 <p id="lock-error" class="text-red-500 text-[10px] uppercase tracking-widest h-4 opacity-0 transition-opacity absolute w-full text-center">Incorrect password</p>
             </div>
-            <button onclick="unlockScreen()" class="w-full bg-gray-900 text-white font-montserrat font-semibold py-3 mt-6 rounded hover:bg-black transition-colors uppercase tracking-widest text-sm shadow-md">Unlock</button>
+
+            <button onclick="unlockScreen()" class="w-full bg-gray-900 text-white font-montserrat font-semibold py-3 mt-6 rounded hover:bg-black transition-colors uppercase tracking-widest text-sm shadow-md">
+                Unlock
+            </button>
         </div>
     </div>
 
@@ -129,7 +114,6 @@
         </div>
     </div>
 
-    <!-- Admin Super Modal -->
     <div id="admin-add-modal" class="fixed inset-0 z-[101] hidden flex items-center justify-center bg-black/70 backdrop-blur-sm no-print" onclick="closeAdminModal(event)">
         <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full mx-4 overflow-hidden flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
             <div class="bg-gray-900 px-6 py-4 flex justify-between items-center text-white">
@@ -219,23 +203,23 @@
                     </div>
                 </div>
 
-                <!-- File Upload Zone -->
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Product Image</label>
-                    <div id="drag-drop-zone" class="drop-zone p-4 text-center bg-gray-50 hover:bg-gray-100 cursor-pointer" onclick="document.getElementById('file-input').click()">
+                    <div id="drag-drop-zone" class="drop-zone p-6 text-center cursor-pointer bg-gray-50 hover:bg-gray-100 flex flex-col items-center justify-center" onclick="document.getElementById('file-input').click()">
                         <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
-                        <div id="drop-zone-prompt" class="space-y-2 pointer-events-none">
+                        
+                        <div id="drop-zone-prompt" class="space-y-2">
                             <svg class="w-8 h-8 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                            <p class="text-xs font-semibold text-gray-600">Drag & Drop product image here, or 
-                                <button type="button" class="text-blue-600 underline pointer-events-auto font-bold" onclick="document.getElementById('file-input').click(); event.stopPropagation();">Browse Files</button>
-                            </p>
-                            <p class="text-[10px] text-gray-400">PNG, JPG, WEBP up to 5MB</p>
+                            <p class="text-xs font-semibold text-gray-600">Drag & Drop product image here</p>
+                            <button type="button" class="mt-2 bg-white border border-gray-300 text-gray-700 font-semibold px-4 py-1.5 rounded shadow-sm text-xs hover:bg-gray-200 transition-colors pointer-events-none uppercase tracking-wider">Browse File</button>
+                            <p class="text-[10px] text-gray-400 pt-1">PNG, JPG, WEBP or AVIF up to 5MB</p>
                         </div>
-                        <div id="drop-zone-preview" class="hidden flex items-center justify-center gap-3">
-                            <img id="preview-img" src="" class="w-12 h-12 object-contain border rounded bg-white">
-                            <div class="text-left">
-                                <p id="preview-filename" class="text-xs font-bold text-gray-800 truncate max-w-[200px]">filename.png</p>
-                                <button type="button" onclick="removeSelectedFile(event)" class="text-[10px] text-red-500 hover:underline">Remove image</button>
+                        
+                        <div id="drop-zone-preview" class="hidden flex items-center justify-center gap-4 w-full">
+                            <img id="preview-img" src="" class="w-16 h-16 object-contain border rounded bg-white shadow-sm">
+                            <div class="text-left flex-1 max-w-xs">
+                                <p id="preview-filename" class="text-xs font-bold text-gray-800 truncate mb-1">filename.png</p>
+                                <button type="button" onclick="removeSelectedFile(event)" class="text-[10px] text-red-500 hover:bg-red-50 px-2 py-1 border border-red-200 rounded transition-colors font-semibold uppercase tracking-wider">Remove image</button>
                             </div>
                         </div>
                     </div>
@@ -251,7 +235,6 @@
         </div>
     </div>
 
-    <!-- Main Content Area -->
     <div id="app-content" class="hidden opacity-0 transition-opacity duration-500">
 
         <!-- Top Super Admin Control Bar -->
@@ -259,7 +242,7 @@
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span class="font-bold tracking-widest uppercase text-[11px] text-emerald-400">Super Admin Mode Active</span>
-                <span class="text-gray-400 text-[10px] ml-2">| Direct DB Edit, Image Upload & Sort Order Enabled</span>
+                <span class="text-gray-400 text-[10px] ml-2">| Direct DB Edit & Reorder Enabled</span>
             </div>
             <button onclick="logoutSuperAdmin()" class="bg-gray-800 hover:bg-red-700 px-3 py-1 rounded text-[10px] uppercase tracking-wider transition-colors">Exit Admin Mode</button>
         </div>
@@ -538,7 +521,13 @@
                     <div id="container-raw" class="overflow-x-auto table-container bg-white hidden">
                         <table class="w-full text-left border-collapse unified-table">
                             <colgroup>
-                                <col style="width: 5%;">   <col style="width: 15%;">  <col style="width: 25%;">  <col style="width: 15%;">  <col style="width: 10%;">  <col style="width: 15%;">  <col style="width: 15%;">
+                                <col style="width: 5%;">   <!-- Img -->
+                                <col style="width: 15%;">  <!-- Name -->
+                                <col style="width: 25%;">  <!-- Active Ingredient -->
+                                <col style="width: 15%;">  <!-- Grade -->
+                                <col style="width: 10%;">  <!-- Form -->
+                                <col style="width: 15%;">  <!-- Unit -->
+                                <col style="width: 15%;">  <!-- Price -->
                             </colgroup>
                             <thead>
                                 <tr>
@@ -589,7 +578,23 @@
                     <div id="container-raclinic" class="overflow-x-auto table-container bg-white shadow-sm hidden">
                         <table class="w-full text-left border-collapse unified-table">
                             <colgroup>
-                                <col style="width: 4%;">  <col style="width: 12%;"> <col style="width: 9%;">  <col style="width: 7%;">  <col style="width: 6%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 5%;">  <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;"> <col style="width: 6.4%;">
+                                <col style="width: 4%;">  <!-- Img -->
+                                <col style="width: 12%;"> <!-- Item -->
+                                <col style="width: 9%;">  <!-- Ingr. -->
+                                <col style="width: 7%;">  <!-- Cat. -->
+                                <col style="width: 6%;">  <!-- Type -->
+                                <col style="width: 3%;">  <!-- Pkg -->
+                                <col style="width: 3%;">  <!-- Vol -->
+                                <col style="width: 3%;">  <!-- Qty -->
+                                <col style="width: 3%;">  <!-- CT -->
+                                <col style="width: 5%;">  <!-- CT Size -->
+                                <col style="width: 6.4%;"> <!-- Clinic MSRP -->
+                                <col style="width: 6.4%;"> <!-- Clinic Promo -->
+                                <col style="width: 6.4%;"> <!-- Price 1 -->
+                                <col style="width: 6.4%;"> <!-- Price 2 -->
+                                <col style="width: 6.4%;"> <!-- Price 3 -->
+                                <col style="width: 6.4%;"> <!-- Price 4 -->
+                                <col style="width: 6.4%;"> <!-- Price 5 -->
                             </colgroup>
                             <thead>
                                 <tr>
@@ -659,7 +664,21 @@
                     <div id="container-charmacist" class="overflow-x-auto table-container bg-white shadow-sm hidden">
                         <table class="w-full text-left border-collapse unified-table">
                             <colgroup>
-                                <col style="width: 4%;">  <col style="width: 12%;"> <col style="width: 9%;">  <col style="width: 7%;">  <col style="width: 6%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 3%;">  <col style="width: 5%;">  <col style="width: 9%;"> <col style="width: 9%;"> <col style="width: 9%;"> <col style="width: 9%;"> <col style="width: 9%;">
+                                <col style="width: 4%;">  <!-- Img -->
+                                <col style="width: 12%;"> <!-- Item -->
+                                <col style="width: 9%;">  <!-- Ingr. -->
+                                <col style="width: 7%;">  <!-- Cat. -->
+                                <col style="width: 6%;">  <!-- Type -->
+                                <col style="width: 3%;">  <!-- Pkg -->
+                                <col style="width: 3%;">  <!-- Vol -->
+                                <col style="width: 3%;">  <!-- Qty -->
+                                <col style="width: 3%;">  <!-- CT -->
+                                <col style="width: 5%;">  <!-- CT Size -->
+                                <col style="width: 9%;"> <!-- Clinic MSRP -->
+                                <col style="width: 9%;"> <!-- Clinic Promo -->
+                                <col style="width: 9%;"> <!-- Price 1 -->
+                                <col style="width: 9%;"> <!-- Price 2 -->
+                                <col style="width: 9%;"> <!-- Price 3 -->
                             </colgroup>
                             <thead>
                                 <tr>
@@ -702,7 +721,6 @@
     </div>
 
     <script>
-        /* UI 및 전역 변수 설정 */
         let isSuperAdmin = false;
         let selectedFileForUpload = null;
 
@@ -720,28 +738,16 @@
             }, 3500);
         }
 
-        /* -------------------------------------------------------------
-           [중요] 최고 관리자 모드 관련 함수
-           ------------------------------------------------------------- */
         function promptSuperAdminLogin() {
-            if (isSuperAdmin) {
-                showToast("Already logged in as Super Admin", "info");
-                return;
-            }
+            if (isSuperAdmin) { showToast("Already logged in as Super Admin", "info"); return; }
             const pwd = prompt("Enter Super Admin Security Password:");
             if (pwd === "admin2026!") {
-                isSuperAdmin = true;
-                toggleAdminUI(true);
-                showToast("Super Admin Mode Authenticated", "success");
-            } else if (pwd !== null) {
-                showToast("Invalid Admin Password", "error");
-            }
+                isSuperAdmin = true; toggleAdminUI(true); showToast("Super Admin Mode Authenticated", "success");
+            } else if (pwd !== null) showToast("Invalid Admin Password", "error");
         }
 
         function logoutSuperAdmin() {
-            isSuperAdmin = false;
-            toggleAdminUI(false);
-            showToast("Logged out from Super Admin Mode", "info");
+            isSuperAdmin = false; toggleAdminUI(false); showToast("Logged out from Super Admin Mode", "info");
         }
 
         function toggleAdminUI(active) {
@@ -764,10 +770,7 @@
         }
 
         function openAdminModal(sectionKey, isEdit = false) {
-            if (!isSuperAdmin) {
-                showToast("Super Admin privilege required", "error");
-                return;
-            }
+            if (!isSuperAdmin) { showToast("Super Admin privilege required", "error"); return; }
             const modal = document.getElementById('admin-add-modal');
             document.getElementById('form-target-section').value = sectionKey;
             
@@ -789,32 +792,7 @@
             removeSelectedFile();
         }
 
-        /* -------------------------------------------------------------
-           파일 업로드 (드래그 앤 드롭 & 클릭 탐색기) 관련 로직
-           ------------------------------------------------------------- */
-        function initDragAndDrop() {
-            const dropZone = document.getElementById('drag-drop-zone');
-            if(!dropZone) return;
-
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.classList.add('dragover');
-            });
-
-            dropZone.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-            });
-
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                    processFile(e.dataTransfer.files[0]);
-                }
-            });
-        }
-
+        // Image Selection Handlers
         function removeSelectedFile(e) {
             if(e) e.stopPropagation();
             selectedFileForUpload = null;
@@ -831,10 +809,7 @@
         }
 
         function processFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showToast("Only image files are allowed", "error");
-                return;
-            }
+            if (!file.type.startsWith('image/')) { showToast("Only image files are allowed", "error"); return; }
             selectedFileForUpload = file;
             if(document.getElementById('remove-existing-image')) document.getElementById('remove-existing-image').value = 'false';
             const reader = new FileReader();
@@ -845,78 +820,6 @@
                 document.getElementById('drop-zone-preview').classList.remove('hidden');
             };
             reader.readAsDataURL(file);
-        }
-
-        /* -------------------------------------------------------------
-           새로운 화살표 버튼 기반 순서 변경 및 DB 통신
-           ------------------------------------------------------------- */
-        const getOrderControlHtml = (id, tableName) => `
-            <div class="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-1 ${isSuperAdmin ? '' : 'hidden'} admin-action-btn no-print z-10 w-6">
-                <button type="button" onclick="moveRowUp(this, '${id}', '${tableName}'); event.stopPropagation();" class="text-gray-400 hover:text-blue-600 bg-gray-100 hover:bg-blue-100 rounded p-0.5 transition-colors shadow-sm order-arrow-btn" title="Move Up">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg>
-                </button>
-                <button type="button" onclick="moveRowDown(this, '${id}', '${tableName}'); event.stopPropagation();" class="text-gray-400 hover:text-blue-600 bg-gray-100 hover:bg-blue-100 rounded p-0.5 transition-colors shadow-sm order-arrow-btn" title="Move Down">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
-            </div>
-        `;
-
-        async function moveRowUp(btn, id, tableName) {
-            if (!isSuperAdmin) return;
-            const currentRow = btn.closest('tr');
-            const tbody = currentRow.parentNode;
-            const prevRow = currentRow.previousElementSibling;
-            
-            // 이전 형제 요소가 tr이고 data-id 속성이 있는 실 데이터 행일 때만 이동 가능
-            if (prevRow && prevRow.tagName === 'TR' && prevRow.hasAttribute('data-id')) {
-                tbody.insertBefore(currentRow, prevRow);
-                await updateOrderInDB(tbody, tableName);
-            } else {
-                showToast("You are already at the top of the group.", "info");
-            }
-        }
-
-        async function moveRowDown(btn, id, tableName) {
-            if (!isSuperAdmin) return;
-            const currentRow = btn.closest('tr');
-            const tbody = currentRow.parentNode;
-            const nextRow = currentRow.nextElementSibling;
-            
-            // 다음 형제 요소가 tr이고 data-id 속성이 있는 실 데이터 행일 때만 이동 가능
-            if (nextRow && nextRow.tagName === 'TR' && nextRow.hasAttribute('data-id')) {
-                tbody.insertBefore(currentRow, nextRow.nextSibling);
-                await updateOrderInDB(tbody, tableName);
-            } else {
-                showToast("You are already at the bottom of the group.", "info");
-            }
-        }
-
-        async function updateOrderInDB(tbody, tableName) {
-            const allRows = Array.from(tbody.querySelectorAll('tr[data-id]'));
-            const ids = allRows.map(tr => tr.getAttribute('data-id'));
-            await saveSortOrder(ids, tableName);
-        }
-
-        async function saveSortOrder(ids, tableName) {
-            showToast("Saving new order to database...", "info");
-            try {
-                const promises = ids.map((id, index) => {
-                    return supabaseClient.from(tableName).update({ sort_order: index }).eq('id', id);
-                });
-                await Promise.all(promises);
-                
-                // 로컬 배열 최신화
-                if (tableName === 'products') {
-                    ids.forEach((id, idx) => { let p = globalUniqueProducts.find(x => x.id === id); if(p) p.sort_order = idx; });
-                } else if (tableName === 'medical_aesthetic_products') {
-                    ids.forEach((id, idx) => { let p = globalMedicalProducts.find(x => x.id === id); if(p) p.sort_order = idx; });
-                } else if (tableName === 'raw_materials') {
-                    ids.forEach((id, idx) => { let p = globalRawMaterials.find(x => x.id === id); if(p) p.sort_order = idx; });
-                }
-                showToast("Sort order successfully updated.", "success");
-            } catch (err) {
-                showToast("Sort order save failed: " + err.message, "error");
-            }
         }
 
         async function submitNewProduct(e) {
@@ -958,7 +861,7 @@
                         .upload(filePath, selectedFileForUpload);
 
                     if (uploadErr) {
-                        console.warn("Storage upload fail, using base64 fallback:", uploadErr);
+                        console.warn("Storage upload fail, using fallback");
                         imageUrl = await new Promise((resolve) => {
                             const reader = new FileReader();
                             reader.onloadend = () => resolve(reader.result);
@@ -971,9 +874,7 @@
                 }
 
                 if (section === 'raw') {
-                    const payload = {
-                        product_name: name, active_ingredients: ingredients, grade: mainCat, form: type || 'Solution', unit: volume || '1L', unit_price_usd: msrp
-                    };
+                    const payload = { product_name: name, active_ingredients: ingredients, grade: mainCat, form: type || 'Solution', unit: volume || '1L', unit_price_usd: msrp };
                     if (editId) {
                         const { error } = await supabaseClient.from('raw_materials').update(payload).eq('id', editId);
                         if (error) throw error;
@@ -991,6 +892,7 @@
                         const { error } = await supabaseClient.from('medical_aesthetic_products').update(payload).eq('id', editId);
                         if (error) throw error;
                     } else {
+                        payload.id = 'MED_' + Date.now(); // Not-null DB constraint fix
                         const { error } = await supabaseClient.from('medical_aesthetic_products').insert([payload]);
                         if (error) throw error;
                     }
@@ -1006,7 +908,7 @@
                     };
                     
                     if (imageUrl) payload.image_url = imageUrl;
-                    else if (document.getElementById('remove-existing-image').value === 'true') payload.image_url = null; 
+                    else if (document.getElementById('remove-existing-image').value === 'true') payload.image_url = null;
 
                     let prodId = editId;
 
@@ -1014,15 +916,18 @@
                         const { error: prodErr } = await supabaseClient.from('products').update(payload).eq('id', editId);
                         if (prodErr) throw prodErr;
                     } else {
+                        payload.id = 'PRD_' + Date.now(); // Not-null DB constraint fix
                         const { data: insertedProd, error: prodErr } = await supabaseClient.from('products').insert([payload]).select();
                         if (prodErr) throw prodErr;
                         if (insertedProd && insertedProd.length > 0) prodId = insertedProd[0].id;
-                        else throw new Error("Database Row Insert Failed.");
+                        else prodId = payload.id;
                     }
 
                     if (prodId) {
                         const pricePayload = {
-                            currency: currency, b2c_msrp: msrp, b2c_promotion: promo, b2b_tier1_1_to_10_ct: t1, b2b_tier2_10_to_30_ct: t2, b2b_tier3_30_to_70_ct: t3, b2b_tier4_over_70_ct: t4, oem_tier1_10000_ct: t1
+                            currency: currency, b2c_msrp: msrp, b2c_promotion: promo,
+                            b2b_tier1_1_to_10_ct: t1, b2b_tier2_10_to_30_ct: t2, b2b_tier3_30_to_70_ct: t3,
+                            b2b_tier4_over_70_ct: t4, oem_tier1_10000_ct: t1
                         };
 
                         if (editId && !editId.startsWith('RESTORED_')) {
@@ -1031,11 +936,13 @@
                                 const { error: priceErr } = await supabaseClient.from('product_prices').update(pricePayload).eq('product_id', prodId);
                                 if (priceErr) throw priceErr;
                             } else {
+                                pricePayload.id = 'PRC_' + Date.now();
                                 pricePayload.product_id = prodId;
                                 const { error: priceErr } = await supabaseClient.from('product_prices').insert([pricePayload]);
                                 if (priceErr) throw priceErr;
                             }
                         } else {
+                            pricePayload.id = 'PRC_' + Date.now();
                             pricePayload.product_id = prodId;
                             const { error: priceErr } = await supabaseClient.from('product_prices').insert([pricePayload]);
                             if (priceErr) throw priceErr;
@@ -1057,7 +964,7 @@
         }
 
         const getActionHtml = (id, section, table, name) => `
-            <div class="absolute right-1 top-1/2 -translate-y-1/2 flex gap-1 ${isSuperAdmin ? '' : 'hidden'} admin-action-btn bg-white/90 p-1 rounded shadow-sm border border-gray-200 no-print z-10">
+            <div class="absolute right-1 top-1/2 -translate-y-1/2 flex gap-1 ${isSuperAdmin ? '' : 'hidden'} admin-action-btn bg-white/95 p-1 rounded shadow-sm border border-gray-200 no-print z-10">
                 <button type="button" onclick="editProduct('${id}', '${section}', '${table}'); event.stopPropagation();" class="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="Edit">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                 </button>
@@ -1066,6 +973,56 @@
                 </button>
             </div>
         `;
+
+        const getOrderArrowHtml = (tableName) => `
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 flex flex-col gap-0.5 ${isSuperAdmin ? '' : 'hidden'} admin-action-btn no-print z-10 w-5 items-center justify-center bg-white/80 py-1 rounded shadow-sm border border-gray-100">
+                <button type="button" onclick="moveRowUp(this, '${tableName}'); event.stopPropagation();" class="text-gray-400 hover:text-blue-600 transition-colors p-0.5" title="Move Up"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"></path></svg></button>
+                <button type="button" onclick="moveRowDown(this, '${tableName}'); event.stopPropagation();" class="text-gray-400 hover:text-blue-600 transition-colors p-0.5" title="Move Down"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg></button>
+            </div>
+        `;
+
+        async function moveRowUp(btn, tableName) {
+            if(!isSuperAdmin) return;
+            const tr = btn.closest('tr');
+            const tbody = tr.parentNode;
+            let prev = tr.previousElementSibling;
+            while(prev && !prev.hasAttribute('data-id')) { prev = prev.previousElementSibling; }
+            if(prev) {
+                tbody.insertBefore(tr, prev);
+                tr.classList.add('bg-blue-50'); setTimeout(() => tr.classList.remove('bg-blue-50'), 500);
+                await updateOrderFromDOM(tbody, tableName);
+            }
+        }
+
+        async function moveRowDown(btn, tableName) {
+            if(!isSuperAdmin) return;
+            const tr = btn.closest('tr');
+            const tbody = tr.parentNode;
+            let next = tr.nextElementSibling;
+            while(next && !next.hasAttribute('data-id')) { next = next.nextElementSibling; }
+            if(next) {
+                tbody.insertBefore(next, tr);
+                tr.classList.add('bg-blue-50'); setTimeout(() => tr.classList.remove('bg-blue-50'), 500);
+                await updateOrderFromDOM(tbody, tableName);
+            }
+        }
+
+        async function updateOrderFromDOM(tbody, tableName) {
+            const ids = Array.from(tbody.querySelectorAll('tr[data-id]')).map(row => row.getAttribute('data-id'));
+            showToast("순서 저장 중...", "info");
+            try {
+                const promises = ids.map((id, index) => supabaseClient.from(tableName).update({ sort_order: index }).eq('id', id));
+                await Promise.all(promises);
+                
+                if (tableName === 'products') { ids.forEach((id, idx) => { let p = globalUniqueProducts.find(x => x.id === id); if(p) p.sort_order = idx; }); }
+                else if (tableName === 'medical_aesthetic_products') { ids.forEach((id, idx) => { let p = globalMedicalProducts.find(x => x.id === id); if(p) p.sort_order = idx; }); }
+                else if (tableName === 'raw_materials') { ids.forEach((id, idx) => { let p = globalRawMaterials.find(x => x.id === id); if(p) p.sort_order = idx; }); }
+                
+                showToast("순서가 성공적으로 변경되었습니다.", "success");
+            } catch (err) {
+                showToast("순서 저장 실패: " + err.message, "error");
+            }
+        }
 
         function editProduct(id, section, tableName) {
             if (!isSuperAdmin) return;
@@ -1149,12 +1106,9 @@
             }
 
             try {
-                if (tableName === 'products') {
-                    await supabaseClient.from('product_prices').delete().eq('product_id', id);
-                }
+                if (tableName === 'products') await supabaseClient.from('product_prices').delete().eq('product_id', id);
                 const { error } = await supabaseClient.from(tableName).delete().eq('id', id);
                 if (error) throw error;
-                
                 showToast(`Product deleted successfully`, "success");
                 await initDashboard();
             } catch (err) {
@@ -1173,7 +1127,7 @@
                     lockScreen.style.display = 'none';
                     document.body.classList.remove('overflow-hidden');
                     appContent.classList.remove('hidden');
-                    requestAnimationFrame(() => { appContent.classList.remove('opacity-0'); });
+                    requestAnimationFrame(() => appContent.classList.remove('opacity-0'));
                 }, 500); 
             } else {
                 errorEl.classList.remove('opacity-0');
@@ -1183,33 +1137,27 @@
         }
 
         function handleLockKeyPress(e) { if (e.key === 'Enter') unlockScreen(); }
-
         function openImageModal(imgSrc) {
             const modal = document.getElementById('image-modal');
             document.getElementById('modal-img').src = imgSrc;
             modal.classList.remove('hidden');
             requestAnimationFrame(() => modal.classList.remove('opacity-0'));
         }
-        
         function closeImageModal(e) {
             const modal = document.getElementById('image-modal');
             modal.classList.add('opacity-0');
             setTimeout(() => { modal.classList.add('hidden'); document.getElementById('modal-img').src = ''; }, 300);
         }
-
         function toggleSection(containerId, iconId) {
             const container = document.getElementById(containerId);
             const icon = document.getElementById(iconId);
             const legend = document.getElementById('legend-' + containerId.split('-')[1]);
-            
             if (container && icon) {
                 if (container.classList.contains('hidden')) {
-                    container.classList.remove('hidden');
-                    icon.classList.remove('-rotate-90');
+                    container.classList.remove('hidden'); icon.classList.remove('-rotate-90');
                     if(legend) legend.classList.remove('hidden');
                 } else {
-                    container.classList.add('hidden');
-                    icon.classList.add('-rotate-90');
+                    container.classList.add('hidden'); icon.classList.add('-rotate-90');
                     if(legend) legend.classList.add('hidden');
                 }
             }
@@ -1225,8 +1173,6 @@
         let globalUniqueProducts = [];
         let globalMedicalProducts = [];
         let globalRawMaterials = [];
-
-        let debugProductsLength = 0;
         let debugProductsError = null;
 
         const productImageMap = {
@@ -1253,55 +1199,44 @@
             "Crystal Plus": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/f8ead94e5360b.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9mOGVhZDk0ZTUzNjBiLnBuZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODY1MDk3NjAsImV4cCI6MTc4NzM3Mzc2MH0.wGfYtTG-UTobOACcffzZAi1lCdvPRk7ATPBu9kLZI4k",
             "Scalp MD": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/ScalpMD%20(1).png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9TY2FscE1EICgxKS5wbmciLCJpYXQiOjE3ODA2MjYxMjAsImV4cCI6MjA5NTk4NjEyMH0.9U_nU_gxKrs0mhXBgNlmKwi81fywoK57EF9670E-Va8",
             "Echrever": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Medifab%20Global%20Image/echrever.avif?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJNZWRpZmFiIEdsb2JhbCBJbWFnZS9lY2hyZXZlci5hdmlmIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4MTAwNDkwNCwiZXhwIjoyMDk2MzY0OTA0fQ.gTqgle5g_hgh9Cp-oRP2OexYmpMUa47QaTYXorlJYyM",
-            "RUBY M T S": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/public/product_images/images/KakaoTalk_20260812_095727781.png",
-            "RUBY MTS": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/public/product_images/images/KakaoTalk_20260812_095727781.png"
+            "RUBY M T S": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/public/product_images/images/KakaoTalk_20260812_095727781.png"
         };
 
         const raImageMap = {
             "셀슈틱스 리투디엔 더마플라스트 크림": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/RA%20Clinic/CELLCEUTIX%20Cream.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJSQSBDbGluaWMvQ0VMTENFVVRJWCBDcmVhbS5qcGciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzgxOTI4NDk3LCJleHAiOjIwOTcyODg0OTd9.9YdxsdvmxYA3WRKz89BszAbISsG2KkbkVGk7JpFv4ng",
             "셀슈틱스 리투지엔 더마플라스트 립밤": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/RA%20Clinic/CELLCEUTIX%20Lip.jpg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJSQSBDbGluaWMvQ0VMTENFVVRJWCBMaXAuanBnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4MTkyODUwOSwiZXhwIjoyMDk3Mjg4NTA5fQ.SHrZ21M_n0w7Us5rNpUR7uZL0xWMsVwWrb_hHdcIseY",
             "수정광 주사 (Crystal Glow)": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/RA%20Clinic/Crystal.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJSQSBDbGluaWMvQ3J5c3RhbC5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzgzNTY1MDM5LCJleHAiOjIwOTg5MjUwMzl9.5ycT72_RXhl-EIHxQrysvivNRlHR-xScqRlgLd4VUIM",
-            "수정광 주사": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/RA%20Clinic/Crystal.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJSQSBDbGluaWMvQ3J5c3RhbC5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzgzNTY1MDM5LCJleHAiOjIwOTg5MjUwMzl9.5ycT72_RXhl-EIHxQrysvivNRlHR-xScqRlgLd4VUIM",
             "medinovae CHITOGENIX Spot Relief Patch": "https://rayhgqcpupwmwpymtkwg.supabase.co/storage/v1/object/sign/Pharma/Patch.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzc5OGQ0YS02MzU1LTRlNmUtYTBjMC1mYjYwMGZlMWIxYzciLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJQaGFybWEvUGF0Y2gucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4MzU2NTA5MCwiZXhwIjoyMDk4OTI1MDkwfQ.vkLQLUrbiShUOr0IrRbxI22D7Rn7PxYHBsJLiu5SwoQ"
         };
 
         async function initDashboard() {
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const todayStr = new Date().toLocaleDateString('en-US', options);
             const dateEl = document.getElementById('current-date');
-            if (dateEl) dateEl.textContent = `Today: ${todayStr}`;
+            if (dateEl) dateEl.textContent = `Today: ${new Date().toLocaleDateString('en-US', options)}`;
 
             try {
                 const { data: rawProducts, error: prodErr } = await supabaseClient
-                    .from('products')
-                    .select('*')
+                    .from('products').select('*')
                     .order('sort_order', { ascending: true, nullsFirst: false })
                     .order('created_at', { ascending: true });
                     
                 if (prodErr) debugProductsError = prodErr.message;
-                if (rawProducts) debugProductsLength = rawProducts.length;
-
-                const { data: rawPrices, error: priceErr } = await supabaseClient.from('product_prices').select('*');
-                const { data: rawMasterData, error: masterErr } = await supabaseClient.from('form_catalog_master').select('*');
+                const { data: rawPrices } = await supabaseClient.from('product_prices').select('*');
+                const { data: rawMasterData } = await supabaseClient.from('form_catalog_master').select('*');
 
                 if (rawProducts && rawProducts.length > 0) {
                     rawProducts.forEach(product => {
                         product.product_prices = (rawPrices || []).filter(pr => pr.product_id === product.id);
                         if (rawMasterData && product.product_prices.length > 0) {
                             const masterMatch = rawMasterData.find(m => m.id === product.id || m.product_id === product.id || m.clean_name === product.clean_name);
-                            if (masterMatch) {
-                                if (masterMatch.b2c_msrp !== undefined) product.product_prices[0].b2c_msrp = masterMatch.b2c_msrp;
-                                else if (masterMatch.msrp !== undefined) product.product_prices[0].b2c_msrp = masterMatch.msrp;
-                            }
+                            if (masterMatch && masterMatch.b2c_msrp !== undefined) product.product_prices[0].b2c_msrp = masterMatch.b2c_msrp;
                         }
                         
                         let cleanName = (product.clean_name || '').trim();
                         let displayName = cleanName;
-
                         if (cleanName.toLowerCase().includes('core impact')) displayName = "Core impact";
                         else if (cleanName.toLowerCase().includes('hyper shot')) displayName = "Hyper shot";
                         else if (cleanName.toLowerCase() === 'cellular water ampoule booster' && product.volume === '50ml') product.volume = '60ml';
-                        
                         product.display_name = displayName;
                     });
                     
@@ -1309,7 +1244,8 @@
                     
                     if (!globalUniqueProducts.some(p => (p.clean_name || '').toLowerCase() === 'blue crystal hydrating ampoule')) {
                          globalUniqueProducts.push({
-                             id: 'RESTORED_BLUE_AMPOULE', clean_name: 'Blue crystal hydrating ampoule', display_name: 'Blue crystal hydrating ampoule', main_category: 'Skincare', sub_category: 'Cosmetic', volume: '30ml', qty: '1EA', ct_quantity: 72,
+                             id: 'RESTORED_BLUE_AMPOULE', clean_name: 'Blue crystal hydrating ampoule', display_name: 'Blue crystal hydrating ampoule',
+                             main_category: 'Skincare', sub_category: 'Cosmetic', volume: '30ml', qty: '1EA', ct_quantity: 72,
                              product_prices: [{ currency: 'KRW', b2c_msrp: 35000, b2c_promotion: 24500, b2b_tier1_1_to_10_ct: 15750, b2b_tier2_10_to_30_ct: 14000, b2b_tier3_30_to_70_ct: 12250 }]
                          });
                     }
@@ -1318,9 +1254,7 @@
 
             try {
                 const { data: dbMedicals, error: medErr } = await supabaseClient
-                    .from('medical_aesthetic_products')
-                    .select('*')
-                    .order('sort_order', { ascending: true, nullsFirst: false });
+                    .from('medical_aesthetic_products').select('*').order('sort_order', { ascending: true, nullsFirst: false });
                 if (!medErr && dbMedicals && dbMedicals.length > 0) globalMedicalProducts = dbMedicals;
             } catch (err) {}
 
@@ -1330,42 +1264,31 @@
                     clinic_msrp: 150000, clinic_promotion: 120000, dist_1000: 80000, dist_3000: 70000, dist_5000: 60000, dist_10000: 50000, oem_10000: 45000, oem_30000: 40000, oem_50000: 35000, currency: 'KRW'
                 });
             }
-
             if (!globalMedicalProducts.some(p => p.item && p.item.toLowerCase().includes('echrever'))) {
                 globalMedicalProducts.push({
                     item: 'Echrever', ingredients: 'DVS Filler', type: 'Collagen Stimulator', specs: '200mg * 1ea', 
-                    clinic_msrp: 150, clinic_promotion: 130, dist_1000: 75, dist_3000: 70, dist_5000: 65, dist_10000: 60, oem_10000: null, oem_30000: null, oem_50000: null, currency: 'USD'
+                    clinic_msrp: 150, clinic_promotion: 130, dist_1000: 75, dist_3000: 70, dist_5000: 65, dist_10000: 60, currency: 'USD'
                 });
             }
 
-            function getMedicalOrder(itemName) {
-                if (!itemName) return 999;
-                const lower = itemName.toLowerCase().trim();
-                if (lower === 'crystal') return 1;
-                if (lower === 'crystal plus') return 2;
-                if (lower.includes('ruby')) return 3;
-                if (lower.includes('scalp')) return 4;
-                if (lower.includes('echrever')) return 5;
-                return 999;
-            }
             if(globalMedicalProducts.length <= 5) {
+                const getMedicalOrder = (itemName) => {
+                    if (!itemName) return 999;
+                    const lower = itemName.toLowerCase().trim();
+                    if (lower === 'crystal') return 1; if (lower === 'crystal plus') return 2;
+                    if (lower.includes('ruby')) return 3; if (lower.includes('scalp')) return 4;
+                    if (lower.includes('echrever')) return 5; return 999;
+                };
                 globalMedicalProducts.sort((a, b) => getMedicalOrder(a.item) - getMedicalOrder(b.item));
             }
 
             try {
-                const { data: dbRaw, error: rawErr } = await supabaseClient.from('raw_materials').select('*')
-                    .order('sort_order', { ascending: true, nullsFirst: false })
-                    .order('product_name', { ascending: true });
+                const { data: dbRaw, error: rawErr } = await supabaseClient.from('raw_materials').select('*').order('sort_order', { ascending: true, nullsFirst: false }).order('product_name', { ascending: true });
                 if (!rawErr && dbRaw && dbRaw.length > 0) globalRawMaterials = dbRaw;
                 else throw new Error();
             } catch (err) {
                 globalRawMaterials = [
                     { id: 'RM1', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 9500 },
-                    { id: 'RM2', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Medical", form: "Solution", unit: "2%/1L", unit_price_usd: 20000 },
-                    { id: 'RM3', product_name: "Chitogen™", active_ingredients: "Carboxymethyl Chitosan", grade: "Medical", form: "Powder", unit: "100g", unit_price_usd: 60000 },
-                    { id: 'RM4', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 11000 },
-                    { id: 'RM5', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Medical", form: "Solution", unit: "2%/1L", unit_price_usd: 16000 },
-                    { id: 'RM6', product_name: "Regentrix™", active_ingredients: "Decellularized Extracellular Matrix (dECM)", grade: "Medical", form: "Powder", unit: "100g", unit_price_usd: 20000 },
                     { id: 'RM7', product_name: "Chitogenix™", active_ingredients: "dECM & Carboxymethyl Chitosan Complex", grade: "Cosmetic", form: "Solution", unit: "2%/1L", unit_price_usd: 18000 }
                 ];
             }
@@ -1376,22 +1299,19 @@
             renderRawMaterialsTableData();
             renderRAClinicTableData();
             renderCharmacistTableData();
-            initDragAndDrop();
             
             if(isSuperAdmin) toggleAdminUI(true); 
         }
 
         function changeExchangeRate(val) {
             appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
-            renderTableData(); renderMedicalTableData(); renderPharmacyTableData(); renderRawMaterialsTableData(); renderRAClinicTableData(); renderCharmacistTableData();
-            if(isSuperAdmin) toggleAdminUI(true);
+            initDashboard(); // re-render all
         }
 
         function setCurrency(currency) {
             currentCurrency = currency;
             const unitEl = document.getElementById('unit-display');
             if (unitEl) unitEl.textContent = `[Unit: ${currency}]`;
-            
             const btnUsd = document.getElementById('btn-usd');
             const btnKrw = document.getElementById('btn-krw');
             const rateContainer = document.getElementById('krw-rate-container');
@@ -1407,8 +1327,7 @@
                     rateContainer.classList.remove('hidden'); rateContainer.classList.add('flex');
                 }
             }
-            renderTableData(); renderMedicalTableData(); renderPharmacyTableData(); renderRawMaterialsTableData(); renderRAClinicTableData(); renderCharmacistTableData();
-            if(isSuperAdmin) toggleAdminUI(true);
+            initDashboard(); // re-render all
         }
 
         function formatCurrency(amount, roundKrwToThousands = false) {
@@ -1430,7 +1349,7 @@
             tbody.innerHTML = '';
             
             if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 bg-red-50 text-red-600 text-sm tracking-wide">데이터를 불러오지 못했습니다. 에러: ${debugProductsError || '알 수 없음'}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 bg-red-50 text-red-600 text-sm tracking-wide">데이터를 불러오지 못했습니다.</td></tr>`;
                 return;
             }
             
@@ -1438,222 +1357,134 @@
                 const mainCat = (p.main_category || '').trim().toLowerCase();
                 const subCat = (p.sub_category || '').trim().toLowerCase();
                 const cleanName = (p.clean_name || '').trim().toLowerCase();
+                
                 if (subCat.includes('ra clinic') || subCat.includes('pharmacy') || subCat.includes('charmacist') || mainCat.includes('pharmacy') || mainCat.includes('exclusive') || mainCat.includes('medical') || subCat.includes('medical')) return false;
                 if (cleanName.includes('scalp md') || cleanName.includes('echrever') || cleanName.includes('ruby')) return false;
+                
                 return mainCat.includes('device') || mainCat.includes('skincare') || mainCat.includes('cosmetic') || 
                        mainCat.includes('hair') || subCat.includes('hair') || 
                        cleanName.includes('scalp') || cleanName.includes('shampoo') || cleanName.includes('expert shot') || cleanName.includes('core impact') || cleanName.includes('hyper shot') || cleanName.includes('ampoule') || cleanName.includes('cream') || cleanName.includes('mask') || cleanName.includes('booster');
             });
 
-            const faceDevices = cosmeticAndDeviceProducts.filter(p => {
-                const main = (p.main_category || '').toLowerCase(); const sub = (p.sub_category || '').toLowerCase(); const name = (p.clean_name || '').toLowerCase(); const noSpaceName = name.replace(/\s/g, '');
-                const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
-                const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
-                return isDevice && !isHair;
-            });
-            const faceCosmetics = cosmeticAndDeviceProducts.filter(p => {
-                const main = (p.main_category || '').toLowerCase(); const sub = (p.sub_category || '').toLowerCase(); const name = (p.clean_name || '').toLowerCase(); const noSpaceName = name.replace(/\s/g, '');
-                const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
-                const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
-                return !isDevice && !isHair;
-            });
-            const hairDevices = cosmeticAndDeviceProducts.filter(p => {
-                const main = (p.main_category || '').toLowerCase(); const sub = (p.sub_category || '').toLowerCase(); const name = (p.clean_name || '').toLowerCase(); const noSpaceName = name.replace(/\s/g, '');
-                const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
-                const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
-                return isDevice && isHair;
-            });
-            const hairCosmetics = cosmeticAndDeviceProducts.filter(p => {
-                const main = (p.main_category || '').toLowerCase(); const sub = (p.sub_category || '').toLowerCase(); const name = (p.clean_name || '').toLowerCase(); const noSpaceName = name.replace(/\s/g, '');
-                const isHair = main.includes('hair') || sub.includes('hair') || name.includes('scalp') || name.includes('shampoo') || name.includes('expert shot') || noSpaceName.includes('hypershot');
-                const isDevice = main.includes('device') || sub.includes('device') || name.includes('core impact') || noSpaceName.includes('coreimpact') || noSpaceName.includes('hypershot');
-                return !isDevice && isHair;
-            });
+            const faceDevices = cosmeticAndDeviceProducts.filter(p => { const n = (p.clean_name||'').toLowerCase().replace(/\s/g, ''); return (p.main_category||'').toLowerCase().includes('device') || n.includes('coreimpact') || n.includes('hypershot'); });
+            const faceCosmetics = cosmeticAndDeviceProducts.filter(p => !faceDevices.includes(p) && !(p.main_category||'').toLowerCase().includes('hair') && !(p.clean_name||'').toLowerCase().includes('scalp'));
+            const hairDevices = [];
+            const hairCosmetics = cosmeticAndDeviceProducts.filter(p => (p.main_category||'').toLowerCase().includes('hair') || (p.clean_name||'').toLowerCase().includes('scalp') || (p.clean_name||'').toLowerCase().includes('shampoo'));
 
-            function getCosmeticType(name) {
-                const lowerName = name.toLowerCase();
-                if ((lowerName.includes('ampoule') && lowerName.includes('booster')) || lowerName.includes('ampoule booster')) return 'AMPOULE BOOSTER';
-                if (lowerName.includes('ampoule')) return 'AMPOULE';
-                if (lowerName.includes('mask')) return 'MASK';
-                if (lowerName.includes('cream') || lowerName.includes('protector')) return 'CREAM';
-                if (lowerName.includes('shampoo')) return 'SHAMPOO';
-                return 'UNKNOWN';
-            }
+            const getCosmeticType = (name) => {
+                const l = name.toLowerCase();
+                if(l.includes('ampoule booster')) return 'AMPOULE BOOSTER';
+                if(l.includes('ampoule')) return 'AMPOULE';
+                if(l.includes('mask')) return 'MASK';
+                if(l.includes('cream') || l.includes('protector')) return 'CREAM';
+                if(l.includes('shampoo')) return 'SHAMPOO';
+                return 'AMPOULE';
+            };
             
-            function renderHeader(title, level) {
+            const renderHeader = (title, level) => {
                 const tr = document.createElement('tr');
-                if (level === 1) { tr.className = 'category-header bg-transparent'; tr.innerHTML = `<td colspan="10" class="py-6 px-4 font-montserrat text-lg text-black uppercase tracking-widest">${title}</td>`; } 
-                else if (level === 2) { tr.className = 'sub-category-header bg-transparent'; tr.innerHTML = `<td colspan="10" class="py-4 px-5"><div class="flex items-center gap-2"><div class="w-1.5 h-4 bg-black"></div><span class="text-black text-sm tracking-widest uppercase">${title}</span></div></td>`; } 
-                else if (level === 3) { tr.className = 'type-header bg-transparent'; tr.innerHTML = `<td colspan="10" class="py-3 px-8"><div class="flex items-center gap-2"><span class="text-black text-[10px]">◆</span><span class="text-black text-xs tracking-widest uppercase">${title}</span></div></td>`; }
+                if (level === 1) tr.innerHTML = `<td colspan="10" class="py-6 px-4 font-montserrat text-lg text-black uppercase tracking-widest">${title}</td>`;
+                else if (level === 2) tr.innerHTML = `<td colspan="10" class="py-4 px-5"><div class="flex items-center gap-2"><div class="w-1.5 h-4 bg-black"></div><span class="text-black text-sm tracking-widest uppercase">${title}</span></div></td>`;
+                else if (level === 3) tr.innerHTML = `<td colspan="10" class="py-3 px-8"><div class="flex items-center gap-2"><span class="text-black text-[10px]">◆</span><span class="text-black text-xs tracking-widest uppercase">${title}</span></div></td>`;
+                tr.className = level === 1 ? 'category-header bg-transparent' : level === 2 ? 'sub-category-header bg-transparent' : 'type-header bg-transparent';
                 tbody.appendChild(tr);
-            }
+            };
             
-            function renderProducts(products) {
+            const renderProducts = (products) => {
                 products.forEach(p => {
-                    let pricesArray = p.product_prices || [];
-                    if (!Array.isArray(pricesArray)) pricesArray = [pricesArray];
-                    const priceData = pricesArray[0] || {};
-                    const nativeCurrency = (priceData.currency || 'KRW').trim().toUpperCase();
+                    const priceData = (p.product_prices || [])[0] || {};
+                    const rate = ((priceData.currency || 'KRW').toUpperCase() === 'USD' && currentCurrency === 'KRW') ? appliedKrwRate : ((priceData.currency || 'KRW').toUpperCase() === 'KRW' && currentCurrency === 'USD') ? 1/appliedKrwRate : 1;
+                    const getP = (v) => v ? Number(v)*rate : null;
 
                     const tr = document.createElement('tr');
-                    tr.className = `text-sm hover:bg-gray-50 transition-colors relative`;
+                    tr.className = `text-sm hover:bg-gray-50 transition-colors row-transition`;
                     tr.setAttribute('data-id', p.id);
-
-                    const isKrw = currentCurrency === 'KRW';
-                    let rate = 1;
-                    if (nativeCurrency === 'KRW' && currentCurrency === 'USD') rate = 1 / appliedKrwRate;
-                    else if (nativeCurrency === 'USD' && currentCurrency === 'KRW') rate = appliedKrwRate;
-
-                    const getPrice = (val, rate) => {
-                        if (val === undefined || val === null || val === '') return null;
-                        let amount = Number(val) * rate;
-                        if (currentCurrency === 'KRW') return Math.ceil(amount / 1000) * 1000;
-                        return amount;
-                    }
-
-                    const b2c_msrp = getPrice(priceData.b2c_msrp, rate);
-                    const b2c_promotion = getPrice(priceData.b2c_promotion, rate);
-                    const b2b1 = getPrice(priceData.b2b_tier1_1_to_10_ct, rate);
-                    const b2b2 = getPrice(priceData.b2b_tier2_10_to_30_ct, rate);
-                    const b2b3 = getPrice(priceData.b2b_tier3_30_to_70_ct, rate);
-
-                    let name = p.display_name; let volume = (p.volume && p.volume.trim() !== '') ? p.volume : '-'; let qty = (p.qty && p.qty.trim() !== '') ? p.qty : '1EA';
 
                     let mappedImg = p.image_url || "";
                     if (!mappedImg) {
-                        let longestMatch = "";
-                        const searchString = `${name} ${volume}`.toLowerCase();
-                        for (const [key, url] of Object.entries(productImageMap)) {
-                            if (searchString.includes(key.toLowerCase()) || name.toLowerCase().includes(key.toLowerCase())) {
-                                if (key.length > longestMatch.length) { longestMatch = key; mappedImg = url; }
-                            }
+                        for (const [k, url] of Object.entries(productImageMap)) {
+                            if (`${p.display_name} ${p.volume}`.toLowerCase().includes(k.toLowerCase())) mappedImg = url;
                         }
                     }
 
-                    const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img cursor-pointer hover:opacity-80 transition-opacity" alt="${name}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img">N/A</div>`;
                     tr.innerHTML = `
-                        <td class="py-2 px-4 text-center align-middle relative">${getOrderControlHtml(p.id, 'products')}<div class="flex justify-center">${imgHtml}</div></td>
-                        <td class="py-3 pr-6 align-middle relative group/item"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${name}</span></div>${getActionHtml(p.id, 'cosmetic', 'products', name)}</td>
-                        <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${volume}</td>
-                        <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${qty}</td>
+                        <td class="py-2 px-4 text-center align-middle relative">${getOrderArrowHtml('products')}<div class="flex justify-center">${mappedImg ? `<img src="${mappedImg}" class="product-img cursor-pointer" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img">N/A</div>`}</div></td>
+                        <td class="py-3 pr-6 align-middle relative group/item"><div class="flex items-center gap-3"><span class="text-gray-300 text-sm font-light">|</span><span class="text-black">${p.display_name}</span></div>${getActionHtml(p.id, 'cosmetic', 'products', p.display_name)}</td>
+                        <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${p.volume || '-'}</td>
+                        <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${p.qty || '1EA'}</td>
                         <td class="py-3 px-4 text-center text-black text-xs font-light align-middle">${p.ct_quantity || '-'}</td>
-                        <td class="py-3 px-4 text-black font-light align-middle">${formatCurrency(b2c_msrp, isKrw)}</td>
-                        <td class="py-3 px-4 text-black align-middle">${formatCurrency(b2c_promotion, isKrw)}</td>
-                        <td class="py-3 px-4 font-light text-black align-middle">${formatCurrency(b2b1, isKrw)}</td>
-                        <td class="py-3 px-4 font-light text-black align-middle">${formatCurrency(b2b2, isKrw)}</td>
-                        <td class="py-3 px-4 font-light text-black align-middle">${formatCurrency(b2b3, isKrw)}</td>
+                        <td class="py-3 px-4 text-black font-light align-middle">${formatCurrency(getP(priceData.b2c_msrp), currentCurrency==='KRW')}</td>
+                        <td class="py-3 px-4 text-black align-middle">${formatCurrency(getP(priceData.b2c_promotion), currentCurrency==='KRW')}</td>
+                        <td class="py-3 px-4 font-light text-black align-middle">${formatCurrency(getP(priceData.b2b_tier1_1_to_10_ct), currentCurrency==='KRW')}</td>
+                        <td class="py-3 px-4 font-light text-black align-middle">${formatCurrency(getP(priceData.b2b_tier2_10_to_30_ct), currentCurrency==='KRW')}</td>
+                        <td class="py-3 px-4 font-light text-black align-middle">${formatCurrency(getP(priceData.b2b_tier3_30_to_70_ct), currentCurrency==='KRW')}</td>
                     `;
                     tbody.appendChild(tr);
                 });
-            }
+            };
             
-            function renderCategorizedCosmetics(cosmetics) {
-                const groups = { 'AMPOULE BOOSTER': [], 'AMPOULE': [], 'MASK': [], 'CREAM': [], 'SHAMPOO': [] };
-                cosmetics.forEach(p => { 
-                    const type = getCosmeticType(p.display_name || ''); 
-                    if(groups[type]) groups[type].push(p); 
-                    else {
-                        if ((p.display_name || '').toLowerCase().includes('shampoo') || (p.main_category || '').toLowerCase().includes('hair')) groups['SHAMPOO'].push(p);
-                        else groups['AMPOULE'].push(p);
-                    }
-                });
-                ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM', 'SHAMPOO'].forEach(type => {
-                    if (groups[type] && groups[type].length > 0) { renderHeader(type, 3); renderProducts(groups[type]); }
-                });
-            }
-
             renderHeader('FACE CATEGORY', 1);
             if (faceDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(faceDevices); }
-            if (faceCosmetics.length > 0) { renderHeader('COSMETIC', 2); renderCategorizedCosmetics(faceCosmetics); }
+            if (faceCosmetics.length > 0) {
+                renderHeader('COSMETIC', 2);
+                ['AMPOULE BOOSTER', 'AMPOULE', 'MASK', 'CREAM'].forEach(type => {
+                    const subset = faceCosmetics.filter(p => getCosmeticType(p.display_name) === type);
+                    if(subset.length > 0) { renderHeader(type, 3); renderProducts(subset); }
+                });
+            }
             renderHeader('HAIR CATEGORY', 1);
-            if (hairDevices.length > 0) { renderHeader('DEVICE', 2); renderProducts(hairDevices); }
-            if (hairCosmetics.length > 0) { renderHeader('COSMETIC', 2); renderCategorizedCosmetics(hairCosmetics); }
+            if (hairCosmetics.length > 0) { 
+                renderHeader('COSMETIC', 2); 
+                ['AMPOULE', 'SHAMPOO'].forEach(type => {
+                    const subset = hairCosmetics.filter(p => getCosmeticType(p.display_name) === type);
+                    if(subset.length > 0) { renderHeader(type, 3); renderProducts(subset); }
+                });
+            }
         }
 
         function renderMedicalTableData() {
             const tbody = document.getElementById('medical-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            
+            if (!tbody) return; tbody.innerHTML = '';
             if (!globalMedicalProducts || globalMedicalProducts.length === 0) return;
 
-            const filteredData = globalMedicalProducts.map(p => {
-                const nativeCurrency = (p.currency || 'USD').toUpperCase();
-                let rate = 1;
-                if (nativeCurrency === 'USD' && currentCurrency === 'KRW') rate = appliedKrwRate;
-                else if (nativeCurrency === 'KRW' && currentCurrency === 'USD') rate = 1 / appliedKrwRate;
-
-                const roundPrice = (val) => {
-                    if(val === null || val === undefined) return null;
-                    let amount = val * rate;
-                    if(currentCurrency === 'KRW') return Math.ceil(amount / 1000) * 1000;
-                    return amount;
-                };
-
-                return {
-                    ...p, clinic_msrp: roundPrice(p.clinic_msrp), clinic_promotion: roundPrice(p.clinic_promotion), dist_1000: roundPrice(p.dist_1000), dist_3000: roundPrice(p.dist_3000), dist_5000: roundPrice(p.dist_5000),
-                    dist_10000: roundPrice(p.dist_10000), oem_10000: roundPrice(p.oem_10000), oem_30000: roundPrice(p.oem_30000), oem_50000: roundPrice(p.oem_50000)
-                };
-            });
-
-            function calcSpans(key) {
-                let spanArr = [], currentVal = null, count = 0;
-                for (let i = 0; i < filteredData.length; i++) {
-                    if (filteredData[i][key] !== currentVal) { if (count > 0) spanArr.push(count); currentVal = filteredData[i][key]; count = 1; } 
-                    else count++;
-                }
-                if (count > 0) spanArr.push(count);
-                let result = [];
-                spanArr.forEach(c => { result.push(c); for(let i = 0; i < c - 1; i++) result.push(0); });
-                return result;
-            }
-            const itemSpans = calcSpans('item'), ingSpans = calcSpans('ingredients'), typeSpans = calcSpans('type');
-
-            filteredData.forEach((p, idx) => {
+            let prevItem = null, spanCount = 0;
+            globalMedicalProducts.forEach((p, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
+                tr.className = `hover:bg-gray-50 transition-colors text-xs row-transition`;
                 tr.setAttribute('data-id', p.id);
                 
+                let rate = 1;
+                if ((p.currency||'USD').toUpperCase() === 'USD' && currentCurrency === 'KRW') rate = appliedKrwRate;
+                else if ((p.currency||'USD').toUpperCase() === 'KRW' && currentCurrency === 'USD') rate = 1 / appliedKrwRate;
+                const getP = (v) => v ? (currentCurrency==='KRW' ? Math.ceil(v*rate/1000)*1000 : v*rate) : null;
+
+                let isNewItem = (p.item !== prevItem);
+                if (isNewItem) { prevItem = p.item; spanCount = globalMedicalProducts.filter(x => x.item === p.item).length; }
+
                 let html = '';
-                if (itemSpans[idx] > 0) {
+                if (isNewItem) {
                     let mappedImg = medImageMap[p.item] || productImageMap[p.item];
-                    const imgHtml = mappedImg ? `<img src="${mappedImg}" class="med-product-img mx-auto cursor-pointer hover:opacity-80 transition-opacity" alt="${p.item}" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8"></div>`;
-                    html += `<td rowspan="${itemSpans[idx]}" class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'medical_aesthetic_products')}${imgHtml}</td>`;
+                    html += `<td rowspan="${spanCount}" class="py-2 px-2 text-center align-middle relative">${getOrderArrowHtml('medical_aesthetic_products')}${mappedImg ? `<img src="${mappedImg}" class="med-product-img mx-auto" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8"></div>`}</td>`;
+                    html += `<td rowspan="${spanCount}" class="py-3 px-4 text-center text-black align-middle relative group/item">${p.item || ''}${getActionHtml(p.id, 'medical', 'medical_aesthetic_products', p.item)}</td>`;
+                    html += `<td rowspan="${spanCount}" class="py-3 px-4 text-center font-light text-black align-middle">${p.ingredients || ''}</td>`;
+                    html += `<td rowspan="${spanCount}" class="py-3 px-4 text-center font-light text-black align-middle">${p.type || ''}</td>`;
                 }
-                if (itemSpans[idx] > 0) html += `<td rowspan="${itemSpans[idx]}" class="py-3 px-4 text-center text-black align-middle relative group/item">${p.item || ''}${getActionHtml(p.id, 'medical', 'medical_aesthetic_products', p.item)}</td>`;
-                if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.ingredients || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
-                if (typeSpans[idx] > 0) html += `<td rowspan="${typeSpans[idx]}" class="py-3 px-4 text-center font-light text-black align-middle">${(p.type || '').replace(/Chitosan-based\s*\/\s*/gi, 'Chitosan-based ')}</td>`;
                 
-                let rawSpecs = p.specs || '', specPkg = rawSpecs, specVol = '-';
-                const volRegex = /(\d+(?:\.\d+)?\s*(?:cc|ml|g|mg)(?:\s*(?:\*|x|X)\s*\d+(?:\.\d+)?\s*(?:cc|ml|g|mg|ea|vial))?)/i;
-                const volMatch = rawSpecs.match(volRegex);
-                if (volMatch) { specVol = volMatch[0]; specPkg = rawSpecs.replace(volMatch[0], '').trim().replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim(); }
-                if (!specPkg) specPkg = '-';
+                let specPkg = p.specs || '-', specVol = '-';
+                const vM = (p.specs||'').match(/(\d+(?:\.\d+)?\s*(?:cc|ml|g|mg)(?:\s*(?:\*|x|X)\s*\d+(?:\.\d+)?\s*(?:cc|ml|g|mg|ea|vial))?)/i);
+                if(vM) { specVol = vM[0]; specPkg = p.specs.replace(vM[0], '').trim().replace(/^[\/\,\(\)]+|[\/\,\(\)]+$/g, '').trim() || '-'; }
 
-                let ctQty = p.ct_quantity; let pkgForm = specPkg; let pkgVol = specVol;  
-                const matchedProduct = globalUniqueProducts.find(prod => {
-                    const medItemName = (p.item || '').toLowerCase().trim(); const prodName = (prod.clean_name || '').toLowerCase().trim(); const dispName = (prod.display_name || '').toLowerCase().trim();
-                    return prodName === medItemName || dispName === medItemName;
-                });
-
-                if (matchedProduct) {
-                    if (!ctQty && matchedProduct.ct_quantity) ctQty = matchedProduct.ct_quantity;
-                    if (matchedProduct.form) pkgForm = matchedProduct.form;
-                    if (matchedProduct.volume) pkgVol = matchedProduct.volume;
-                }
-                const finalCtQty = ctQty || '-';
-
-                html += `<td class="py-3 px-2 text-center font-light text-black">${pkgForm}</td><td class="py-3 px-2 text-center font-light text-black">${pkgVol}</td>`;
-                html += `<td class="py-3 px-2 text-center font-light text-black">1ea</td><td class="py-3 px-2 text-center font-light text-black">${finalCtQty}</td>`;
-                html += `<td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.clinic_msrp)}</td>
-                         <td class="py-3 px-3 text-center text-black">${formatMedCurrency(p.clinic_promotion)}</td>
-                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_1000)}</td>
-                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_3000)}</td>
-                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_5000)}</td>
-                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.dist_10000)}</td>
-                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_10000)}</td>
-                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_30000)}</td>
-                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(p.oem_50000)}</td>`;
+                html += `<td class="py-3 px-2 text-center font-light text-black">${specPkg}</td><td class="py-3 px-2 text-center font-light text-black">${specVol}</td>`;
+                html += `<td class="py-3 px-2 text-center font-light text-black">1ea</td><td class="py-3 px-2 text-center font-light text-black">${p.ct_quantity || '-'}</td>`;
+                html += `<td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(getP(p.clinic_msrp))}</td>
+                         <td class="py-3 px-3 text-center text-black">${formatMedCurrency(getP(p.clinic_promotion))}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(getP(p.dist_1000))}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(getP(p.dist_3000))}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(getP(p.dist_5000))}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(getP(p.dist_10000))}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(getP(p.oem_10000))}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(getP(p.oem_30000))}</td>
+                         <td class="py-3 px-3 text-center font-light text-black">${formatMedCurrency(getP(p.oem_50000))}</td>`;
                 tr.innerHTML = html;
                 tbody.appendChild(tr);
             });
@@ -1661,70 +1492,41 @@
 
         function renderPharmacyTableData() {
             const tbody = document.getElementById('pharmacy-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = '';
+            if (!tbody) return; tbody.innerHTML = '';
             
-            const targetNames = ['셀슈틱스 리투디엔 더마플라스트 크림', '셀슈틱스 리투지엔 더마플라스트 립밤', 'medinovae CHITOGENIX Spot Relief Patch'];
-            const engNames = { '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Retudien Dermaplast Cream', '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Retudien Dermaplast Lip Balm' };
-            const engIngr = { '돼지유래 ECM, PDRN': 'Porcine-derived ECM, PDRN', '돼지유래 ECM, 보르피린': 'Porcine-derived ECM, Volufiline' };
-            
-            const pharmacyProducts = globalUniqueProducts.filter(p => targetNames.includes((p.clean_name || '').trim()));
-            if (!pharmacyProducts || pharmacyProducts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching Pharmacy data...</td></tr>`;
-                return;
-            }
+            const tg = ['셀슈틱스 리투디엔 더마플라스트 크림', '셀슈틱스 리투지엔 더마플라스트 립밤', 'medinovae CHITOGENIX Spot Relief Patch'];
+            const pData = globalUniqueProducts.filter(p => tg.includes((p.clean_name || '').trim()));
+            if (!pData.length) { tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50">No data</td></tr>`; return; }
 
-            pharmacyProducts.forEach(p => {
-                let pricesArray = p.product_prices || [];
-                if (!Array.isArray(pricesArray)) pricesArray = [pricesArray];
-                const priceData = pricesArray[0] || {};
-                const nativeCurrency = (priceData.currency || 'KRW').trim().toUpperCase();
-
-                const getCalculatedPrice = (msrpValue, ratio) => {
-                    if (msrpValue === undefined || msrpValue === null || msrpValue === '') return null;
-                    let krwMsrp = nativeCurrency === 'USD' ? Number(msrpValue) * appliedKrwRate : Number(msrpValue);
-                    let targetKrw = krwMsrp * ratio;
-                    let roundedKrw = Math.ceil(targetKrw / 1000) * 1000;
-                    if (currentCurrency === 'USD') return Math.ceil(roundedKrw / appliedKrwRate);
-                    return roundedKrw;
-                };
-
-                const fPrice = (val) => val ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val) : '-';
-
+            pData.forEach(p => {
+                const tr = document.createElement('tr'); tr.className = `hover:bg-gray-50 transition-colors text-xs row-transition`; tr.setAttribute('data-id', p.id);
+                const priceData = (p.product_prices || [])[0] || {};
                 const baseMsrp = priceData.b2c_msrp;
-                const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0); const clinicPromo = getCalculatedPrice(baseMsrp, 0.80);
-                const dist1000 = getCalculatedPrice(baseMsrp, 0.45); const dist3000 = getCalculatedPrice(baseMsrp, 0.42);
-                const dist5000 = getCalculatedPrice(baseMsrp, 0.37); const dist10000 = getCalculatedPrice(baseMsrp, 0.34);
-                const oem10000 = getCalculatedPrice(baseMsrp, 0.33); const oem30000 = getCalculatedPrice(baseMsrp, 0.30); const oem50000 = getCalculatedPrice(baseMsrp, 0.27);
+                const r = (priceData.currency === 'USD' && currentCurrency === 'KRW') ? appliedKrwRate : (priceData.currency === 'KRW' && currentCurrency === 'USD' ? 1/appliedKrwRate : 1);
+                
+                const calc = (ratio) => baseMsrp ? Math.round((baseMsrp * r * ratio) / (currentCurrency==='KRW'?1000:1)) * (currentCurrency==='KRW'?1000:1) : null;
+                const f = (val) => val ? new Intl.NumberFormat('en-US', {maximumFractionDigits:0}).format(val) : '-';
 
-                const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
-                tr.setAttribute('data-id', p.id);
-
-                let cName = (p.clean_name || '').trim();
-                let dispName = engNames[cName] || p.display_name || '-';
-                let dispIngr = engIngr[p.active_ingredients] || p.active_ingredients || '-';
-                let mappedImg = raImageMap[cName] || raImageMap[p.display_name] || ""; 
-                const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
-
+                let img = raImageMap[(p.clean_name||'').trim()] || "";
+                
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'products')}${imgHtml}</td>
-                    <td class="py-3 px-4 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'pharmacy', 'products', dispName)}</td>
-                    <td class="py-3 px-4 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getOrderArrowHtml('products')}${img ? `<img src="${img}" class="product-img mx-auto" onclick="openImageModal('${img}')">` : `<div class="placeholder-img mx-auto w-8 h-8">N/A</div>`}</td>
+                    <td class="py-3 px-4 text-center text-black font-medium align-middle relative group/item">${p.display_name}${getActionHtml(p.id, 'pharmacy', 'products', p.display_name)}</td>
+                    <td class="py-3 px-4 text-center text-black align-middle font-light leading-tight">${p.active_ingredients || '-'}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light">Cosmetic</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.form || '-'}</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.volume || '-'}</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.qty || '-'}</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.ct_quantity || '-'}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(clinicMsrp)}</td>
-                    <td class="py-3 px-3 text-center text-black">${fPrice(clinicPromo)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist1000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist3000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist5000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist10000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(oem10000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(oem30000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(oem50000)}</td>
+                    <td class="py-3 px-3 text-center font-medium text-black">${f(calc(1.0))}</td>
+                    <td class="py-3 px-3 text-center text-black">${f(calc(0.80))}</td>
+                    <td class="py-3 px-3 text-center font-medium text-black">${f(calc(0.45))}</td>
+                    <td class="py-3 px-3 text-center font-medium text-black">${f(calc(0.42))}</td>
+                    <td class="py-3 px-3 text-center font-medium text-black">${f(calc(0.37))}</td>
+                    <td class="py-3 px-3 text-center font-medium text-black">${f(calc(0.34))}</td>
+                    <td class="py-3 px-3 text-center font-medium text-black">${f(calc(0.33))}</td>
+                    <td class="py-3 px-3 text-center font-medium text-black">${f(calc(0.30))}</td>
+                    <td class="py-3 px-3 text-center font-medium text-black">${f(calc(0.27))}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1732,40 +1534,23 @@
 
         function renderRawMaterialsTableData() {
             const tbody = document.getElementById('raw-materials-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            
+            if (!tbody) return; tbody.innerHTML = '';
             if (!globalRawMaterials || globalRawMaterials.length === 0) return;
 
-            function calcSpans(key) {
-                let spanArr = [], currentVal = null, count = 0;
-                for (let i = 0; i < globalRawMaterials.length; i++) {
-                    if (globalRawMaterials[i][key] !== currentVal) { if (count > 0) spanArr.push(count); currentVal = globalRawMaterials[i][key]; count = 1; } 
-                    else count++;
-                }
-                if (count > 0) spanArr.push(count);
-                let result = [];
-                spanArr.forEach(c => { result.push(c); for(let i = 0; i < c - 1; i++) result.push(0); });
-                return result;
-            }
-
-            const nameSpans = calcSpans('product_name');
-            const ingSpans = calcSpans('active_ingredients');
-
+            let prevItem = null, spanCount = 0;
             globalRawMaterials.forEach((p, idx) => {
-                const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
-                tr.setAttribute('data-id', p.id);
-                
-                let rate = currentCurrency === 'KRW' ? appliedKrwRate : 1;
-                let price = (Number(p.unit_price_usd) || 0) * rate;
+                const tr = document.createElement('tr'); tr.className = `hover:bg-gray-50 transition-colors text-xs row-transition`; tr.setAttribute('data-id', p.id);
+                let price = (Number(p.unit_price_usd) || 0) * (currentCurrency === 'KRW' ? appliedKrwRate : 1);
+
+                let isNewItem = (p.product_name !== prevItem);
+                if(isNewItem) { prevItem = p.product_name; spanCount = globalRawMaterials.filter(x => x.product_name === p.product_name).length; }
 
                 let html = '';
-                if (nameSpans[idx] > 0) {
-                    html += `<td rowspan="${nameSpans[idx]}" class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'raw_materials')}<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100">RM</div></td>`;
-                    html += `<td rowspan="${nameSpans[idx]}" class="py-3 px-4 text-center text-gray-900 font-medium align-middle relative group/item">${p.product_name}${getActionHtml(p.id, 'raw', 'raw_materials', p.product_name)}</td>`;
+                if(isNewItem) {
+                    html += `<td rowspan="${spanCount}" class="py-2 px-2 text-center align-middle relative">${getOrderArrowHtml('raw_materials')}<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100">RM</div></td>`;
+                    html += `<td rowspan="${spanCount}" class="py-3 px-4 text-center text-gray-900 font-medium align-middle relative group/item">${p.product_name}${getActionHtml(p.id, 'raw', 'raw_materials', p.product_name)}</td>`;
+                    html += `<td rowspan="${spanCount}" class="py-3 px-4 text-center text-gray-700 font-light align-middle">${p.active_ingredients}</td>`;
                 }
-                if (ingSpans[idx] > 0) html += `<td rowspan="${ingSpans[idx]}" class="py-3 px-4 text-center text-gray-700 font-light align-middle">${p.active_ingredients}</td>`;
                 
                 html += `
                     <td class="py-3 px-4 text-center font-light text-black">${p.grade}</td>
@@ -1773,56 +1558,30 @@
                     <td class="py-3 px-4 text-center font-light text-black">${p.unit}</td>
                     <td class="py-3 px-6 text-center font-medium text-black">${formatMedCurrency(price)}</td>
                 `;
-                tr.innerHTML = html;
-                tbody.appendChild(tr);
+                tr.innerHTML = html; tbody.appendChild(tr);
             });
         }
 
         function renderRAClinicTableData() {
             const tbody = document.getElementById('raclinic-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = '';
+            if (!tbody) return; tbody.innerHTML = '';
             
             const raProducts = globalUniqueProducts.filter(p => p.sub_category === 'RA Clinic Exclusive');
-            if (!raProducts || raProducts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching RA Clinic data from server...</td></tr>`;
-                return;
-            }
+            if (!raProducts.length) { tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50">No data</td></tr>`; return; }
 
             raProducts.forEach(p => {
-                let pricesArray = p.product_prices || [];
-                if (!Array.isArray(pricesArray)) pricesArray = [pricesArray];
-                const priceData = pricesArray[0] || {};
-                const nativeCurrency = (priceData.currency || 'KRW').trim().toUpperCase();
+                const tr = document.createElement('tr'); tr.className = `hover:bg-gray-50 transition-colors text-xs row-transition`; tr.setAttribute('data-id', p.id);
+                const priceData = (p.product_prices || [])[0] || {};
+                const r = (priceData.currency === 'USD' && currentCurrency === 'KRW') ? appliedKrwRate : (priceData.currency === 'KRW' && currentCurrency === 'USD' ? 1/appliedKrwRate : 1);
+                
+                const calc = (val) => val ? Math.round((val * r) / (currentCurrency==='KRW'?1000:1)) * (currentCurrency==='KRW'?1000:1) : null;
+                const f = (val) => val ? new Intl.NumberFormat('en-US', {maximumFractionDigits:0}).format(val) : '-';
 
-                const getPrice = (val) => {
-                    if (val === undefined || val === null || val === '') return null;
-                    let krwPrice = nativeCurrency === 'USD' ? Number(val) * appliedKrwRate : Number(val);
-                    let roundedKrw = Math.ceil(krwPrice / 1000) * 1000;
-                    if (currentCurrency === 'USD') return Math.ceil(roundedKrw / appliedKrwRate);
-                    return roundedKrw;
-                };
-
-                const fPrice = (val) => val ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val) : '-';
-
-                const clinicMsrp = getPrice(priceData.b2c_msrp); const clinicPromo = getPrice(priceData.b2c_promotion);
-                const mf_tdl = getPrice(priceData.b2b_tier4_over_70_ct); const tdl_ra = getPrice(priceData.b2b_tier3_30_to_70_ct);
-                const ra_d1 = getPrice(priceData.b2b_tier2_10_to_30_ct); const d1_d2 = getPrice(priceData.b2b_tier1_1_to_10_ct);
-                const d2_shop = getPrice(priceData.oem_tier1_10000_ct);
-
-                const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
-                tr.setAttribute('data-id', p.id);
-
-                let mappedImg = raImageMap[p.clean_name] || raImageMap[p.display_name] || ""; 
-                const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
-
-                let dispName = p.display_name || p.clean_name || '-';
-                if (dispName === '수정광 주사 (Crystal Glow)') dispName = '수정광 주사<br><span class="text-[10px] font-light text-gray-500">Crystal Glow</span>';
-
+                let img = raImageMap[p.clean_name] || raImageMap[p.display_name] || ""; 
+                
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'products')}${imgHtml}</td>
-                    <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'raclinic', 'products', p.display_name || p.clean_name)}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getOrderArrowHtml('products')}${img ? `<img src="${img}" class="product-img mx-auto" onclick="openImageModal('${img}')">` : `<div class="placeholder-img mx-auto w-8 h-8">N/A</div>`}</td>
+                    <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${p.display_name}${getActionHtml(p.id, 'raclinic', 'products', p.display_name)}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${p.active_ingredients || '-'}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-medium">Cosmetic</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light">${p.type || '-'}</td>
@@ -1831,13 +1590,13 @@
                     <td class="py-3 px-1 text-center font-light text-black">${p.qty || '-'}</td>
                     <td class="py-3 px-1 text-center font-light text-black">${p.ct_quantity || '-'}</td>
                     <td class="py-3 px-1 text-center font-light text-black text-[10px] tracking-tighter">${p.ct_size || '-'}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(clinicMsrp)}</td>
-                    <td class="py-3 px-2 text-center text-black">${fPrice(clinicPromo)}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(mf_tdl)}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(tdl_ra)}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(ra_d1)}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(d1_d2)}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(d2_shop)}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(priceData.b2c_msrp))}</td>
+                    <td class="py-3 px-2 text-center text-black">${f(calc(priceData.b2c_promotion))}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(priceData.b2b_tier4_over_70_ct))}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(priceData.b2b_tier3_30_to_70_ct))}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(priceData.b2b_tier2_10_to_30_ct))}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(priceData.b2b_tier1_1_to_10_ct))}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(priceData.oem_tier1_10000_ct))}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1845,55 +1604,27 @@
 
         function renderCharmacistTableData() {
             const tbody = document.getElementById('charmacist-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = '';
+            if (!tbody) return; tbody.innerHTML = '';
             
-            const pharmacyTargetNames = ['셀슈틱스 리투디엔 더마플라스트 크림', '셀슈틱스 리투지엔 더마플라스트 립밤'];
-            const engNames = { '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Retudien Dermaplast Cream', '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Retudien Dermaplast Lip Balm' };
-            const engIngr = { '돼지유래 ECM, PDRN': 'Porcine-derived ECM, PDRN', '돼지유래 ECM, 보르피린': 'Porcine-derived ECM, Volufiline' };
-            
-            const charmacistProducts = globalUniqueProducts.filter(p => pharmacyTargetNames.includes((p.clean_name || '').trim()) || p.sub_category === 'Charmacist Exclusive');
-            
-            if (!charmacistProducts || charmacistProducts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching Charmacist data...</td></tr>`;
-                return;
-            }
+            const tg = ['셀슈틱스 리투디엔 더마플라스트 크림', '셀슈틱스 리투지엔 더마플라스트 립밤'];
+            const cProducts = globalUniqueProducts.filter(p => tg.includes((p.clean_name || '').trim()) || p.sub_category === 'Charmacist Exclusive');
+            if (!cProducts.length) { tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50">No data</td></tr>`; return; }
 
-            charmacistProducts.forEach(p => {
-                let pricesArray = p.product_prices || [];
-                if (!Array.isArray(pricesArray)) pricesArray = [pricesArray];
-                const priceData = pricesArray[0] || {};
-                const nativeCurrency = (priceData.currency || 'KRW').trim().toUpperCase();
-
-                const getCalculatedPrice = (msrpValue, ratio) => {
-                    if (msrpValue === undefined || msrpValue === null || msrpValue === '') return null;
-                    let krwMsrp = nativeCurrency === 'USD' ? Number(msrpValue) * appliedKrwRate : Number(msrpValue);
-                    let targetKrw = krwMsrp * ratio;
-                    let roundedKrw = Math.ceil(targetKrw / 1000) * 1000;
-                    if (currentCurrency === 'USD') return Math.ceil(roundedKrw / appliedKrwRate);
-                    return roundedKrw;
-                };
-
-                const fPrice = (val) => val ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val) : '-';
-
+            cProducts.forEach(p => {
+                const tr = document.createElement('tr'); tr.className = `hover:bg-gray-50 transition-colors text-xs row-transition`; tr.setAttribute('data-id', p.id);
+                const priceData = (p.product_prices || [])[0] || {};
                 const baseMsrp = priceData.b2c_msrp;
-                const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0); const clinicPromo = getCalculatedPrice(baseMsrp, 0.80);
-                const mf_tdl = getCalculatedPrice(baseMsrp, 0.27); const tdl_cmc = getCalculatedPrice(baseMsrp, 0.36); const cmc_chain = getCalculatedPrice(baseMsrp, 0.45); 
+                const r = (priceData.currency === 'USD' && currentCurrency === 'KRW') ? appliedKrwRate : (priceData.currency === 'KRW' && currentCurrency === 'USD' ? 1/appliedKrwRate : 1);
+                
+                const calc = (ratio) => baseMsrp ? Math.round((baseMsrp * r * ratio) / (currentCurrency==='KRW'?1000:1)) * (currentCurrency==='KRW'?1000:1) : null;
+                const f = (val) => val ? new Intl.NumberFormat('en-US', {maximumFractionDigits:0}).format(val) : '-';
 
-                const tr = document.createElement('tr');
-                tr.className = `hover:bg-gray-50 transition-colors text-xs relative`;
-                tr.setAttribute('data-id', p.id);
-
-                let cName = (p.clean_name || '').trim();
-                let dispName = engNames[cName] || p.display_name || '-';
-                let dispIngr = engIngr[p.active_ingredients] || p.active_ingredients || '-';
-                let mappedImg = raImageMap[cName] || raImageMap[p.display_name] || ""; 
-                const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
-
+                let img = raImageMap[(p.clean_name||'').trim()] || "";
+                
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle relative">${getOrderControlHtml(p.id, 'products')}${imgHtml}</td>
-                    <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'charmacist', 'products', p.display_name || p.clean_name)}</td>
-                    <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getOrderArrowHtml('products')}${img ? `<img src="${img}" class="product-img mx-auto" onclick="openImageModal('${img}')">` : `<div class="placeholder-img mx-auto w-8 h-8">N/A</div>`}</td>
+                    <td class="py-3 px-2 text-center text-black font-medium align-middle relative group/item">${p.display_name}${getActionHtml(p.id, 'charmacist', 'products', p.display_name)}</td>
+                    <td class="py-3 px-2 text-center text-black align-middle font-light leading-tight">${p.active_ingredients || '-'}</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-medium">Cosmetic</td>
                     <td class="py-3 px-2 text-center text-black align-middle font-light">${p.type || '-'}</td>
                     <td class="py-3 px-1 text-center font-light text-black">${p.form || '-'}</td>
@@ -1901,11 +1632,11 @@
                     <td class="py-3 px-1 text-center font-light text-black">${p.qty || '-'}</td>
                     <td class="py-3 px-1 text-center font-light text-black">${p.ct_quantity || '-'}</td>
                     <td class="py-3 px-1 text-center font-light text-black text-[10px] tracking-tighter">${p.ct_size || '-'}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(clinicMsrp)}</td>
-                    <td class="py-3 px-2 text-center text-black">${fPrice(clinicPromo)}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(mf_tdl)}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(tdl_cmc)}</td>
-                    <td class="py-3 px-2 text-center font-medium text-black">${fPrice(cmc_chain)}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(1.0))}</td>
+                    <td class="py-3 px-2 text-center text-black">${f(calc(0.80))}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(0.27))}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(0.36))}</td>
+                    <td class="py-3 px-2 text-center font-medium text-black">${f(calc(0.45))}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1917,67 +1648,31 @@
             
             const tableContainer = targetSection.querySelector('.table-container');
             const icon = targetSection.querySelector('svg[id^="icon-"]');
-            if (tableContainer && tableContainer.classList.contains('hidden')) {
-                tableContainer.classList.remove('hidden');
-                if (icon) icon.classList.remove('-rotate-90');
-            }
+            if (tableContainer && tableContainer.classList.contains('hidden')) { tableContainer.classList.remove('hidden'); if (icon) icon.classList.remove('-rotate-90'); }
 
             document.body.classList.add('print-table-mode');
-            applyPrintStyle('landscape');
+            const style = document.createElement('style'); style.id = 'dynamic-print-style';
+            style.innerHTML = `@media print { @page { size: A4 landscape; margin: 5mm; } body { zoom: 0.65; } #main-content { padding: 0 !important; width: 100% !important; } .table-container { max-height: none !important; border: none !important; overflow: visible !important;} .unified-table { min-width: 0 !important; width: 100% !important; } }`;
+            document.head.appendChild(style);
 
             const allDirectChildren = document.querySelectorAll('#main-content > div');
             allDirectChildren.forEach(child => child.classList.add('no-print'));
             
             const parentGroup = targetSection.closest('.border-l-4');
-            if(parentGroup) {
-                parentGroup.classList.remove('no-print');
-                parentGroup.classList.add('print-active-section');
-            } else {
-                targetSection.classList.remove('no-print');
-                targetSection.classList.add('print-active-section');
-            }
+            if(parentGroup) { parentGroup.classList.remove('no-print'); parentGroup.classList.add('print-active-section'); } 
+            else { targetSection.classList.remove('no-print'); targetSection.classList.add('print-active-section'); }
             
             const originalTitle = document.title;
-            const quoteDate = new Date().toISOString().split('T')[0];
-            document.title = `${titleName}_${quoteDate}`;
+            document.title = `${titleName}_${new Date().toISOString().split('T')[0]}`;
             
             window.print();
             
             setTimeout(() => {
-                document.title = originalTitle;
-                document.body.classList.remove('print-table-mode');
+                document.title = originalTitle; document.body.classList.remove('print-table-mode');
                 allDirectChildren.forEach(child => child.classList.remove('no-print'));
-                if(parentGroup) parentGroup.classList.remove('print-active-section');
-                else targetSection.classList.remove('print-active-section');
-                const styleEl = document.getElementById('dynamic-print-style');
-                if (styleEl) styleEl.remove();
+                if(parentGroup) parentGroup.classList.remove('print-active-section'); else targetSection.classList.remove('print-active-section');
+                if (document.getElementById('dynamic-print-style')) document.getElementById('dynamic-print-style').remove();
             }, 1000);
-        }
-
-        function applyPrintStyle(type) {
-            const oldStyle = document.getElementById('dynamic-print-style');
-            if (oldStyle) oldStyle.remove();
-            
-            const style = document.createElement('style');
-            style.id = 'dynamic-print-style';
-            if (type === 'landscape') {
-                style.innerHTML = `
-                    @media print { 
-                        @page { size: A4 landscape; margin: 5mm; } 
-                        body { zoom: 0.65; }
-                        #main-content { padding: 0 !important; max-width: 100% !important; width: 100% !important; }
-                        .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
-                        .unified-table { min-width: 0 !important; width: 100% !important; table-layout: auto !important; }
-                        .unified-table th, .unified-table td { padding: 6px 4px !important; font-size: 8pt !important; line-height: 1.2 !important; white-space: normal !important; word-break: break-word !important; }
-                        .unified-table tr { page-break-inside: avoid !important; break-inside: avoid !important; }
-                        .unified-table thead { display: table-header-group !important; }
-                        h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
-                        .border-l-4 { border-left: none !important; padding-left: 0 !important; }
-                        .order-arrow-btn { display: none !important; }
-                    }
-                `;
-            }
-            document.head.appendChild(style);
         }
     </script>
 </body>
