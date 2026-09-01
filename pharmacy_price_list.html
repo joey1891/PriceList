@@ -64,11 +64,49 @@
                 padding: 10px 0 !important;
             }
 
-            /* Table container adjustments */
+            /* Table container adjustments - CRITICAL FOR PRINTING MULTIPLE PAGES */
             .bg-white.rounded-xl.shadow-sm.border.overflow-hidden {
                 border: none !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
+                overflow: visible !important; /* Allow content to overflow for page breaks */
+            }
+
+            /* Container holding the table */
+            .overflow-x-auto { 
+                overflow: visible !important; 
+                max-height: none !important; /* Remove height restrictions */
+            }
+
+            table {
+                width: 100% !important;
+                min-width: 100% !important;
+                border-collapse: collapse !important;
+                page-break-inside: auto !important; /* Allow table to break */
+            }
+
+            /* Ensure rows don't break awkwardly across pages */
+            tr { 
+                page-break-inside: avoid !important; 
+                page-break-after: auto !important; 
+            }
+            
+            /* Repeat table header on new pages (supported by most modern browsers) */
+            thead { 
+                display: table-header-group !important; 
+            }
+            
+            tbody { 
+                display: table-row-group !important; 
+            }
+
+            /* Keep colors for print */
+            th {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background-color: #f8fafc !important; /* slate-50 */
+                border-bottom: 2px solid #cbd5e1 !important;
+                position: static !important; /* Remove sticky behavior for print */
             }
 
             /* Table specific print styles */
@@ -370,8 +408,8 @@
             'melano cut brightening ampoule': '멜라노 컷 브라이트닝 앰플',
             'root vitality volume shampoo': '루트 바이탈리티 볼륨 샴푸',
             'expert shot scalp ampoule': '엑스퍼트 샷 스칼프 앰플',
-            'phyto protein volumizing ampoule': '파이토 파로틴 볼류마이징 앰플',
-            'plan tox lifting ampoule': '플랜 톡스 리프팅 앰플',
+            'phyto protein volumizing ampoule': '파이토 프로틴 볼류마이징 앰플',
+            'plan tox lifting ampoule': '플랜톡스 리프팅 앰플',
             'hyper shot': '하이퍼 샷',
             'cellular water ampoule booster': '셀룰러 워터 앰플 부스터',
             'core impact': '코어 임팩트',
@@ -561,7 +599,7 @@
                     if (fullName.includes('코어 임팩트') || fullName.includes('하이퍼 샷')) {
                         fullName = `[뷰티기기] ${fullName}`;
                     } else if (fullName.includes('스칼프 MD')) {
-                        fullName = `[의료기기2등급] ${fullName}`;
+                        fullName = `[의료기기][2등급] ${fullName}`;
                     } else {
                         fullName = `[화장품] ${fullName}`;
                     }
