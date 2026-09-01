@@ -16,6 +16,134 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Print Styles */
+        @media print {
+            /* Reset body background */
+            body { 
+                background: white !important; 
+                margin: 0;
+                padding: 0;
+                font-size: 11pt; /* Better base font size for A4 */
+            }
+
+            /* Hide interactive UI elements */
+            #passwordModal, 
+            header .flex.gap-3, /* Buttons */
+            #notification, 
+            #loadingOverlay, 
+            #emptyState,
+            footer {
+                display: none !important;
+            }
+
+            /* Setup A4 Page */
+            @page {
+                size: A4 portrait;
+                margin: 15mm;
+            }
+
+            /* Main container adjustments */
+            #appContainer {
+                display: block !important;
+                min-height: auto;
+            }
+            
+            main {
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: none !important;
+            }
+
+            /* Header adjustments for print */
+            header {
+                position: static !important;
+                box-shadow: none !important;
+                border-bottom: 2px solid #cbd5e1 !important;
+                margin-bottom: 10px !important;
+                padding: 10px 0 !important;
+            }
+
+            /* Table container adjustments */
+            .bg-white.rounded-xl.shadow-sm.border.overflow-hidden {
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+
+            /* Table specific print styles */
+            .overflow-x-auto { 
+                overflow: visible !important; 
+                max-height: none !important;
+            }
+
+            table {
+                width: 100% !important;
+                min-width: 100% !important;
+                border-collapse: collapse !important;
+                page-break-inside: auto; /* Allow table to break */
+            }
+
+            /* Ensure rows don't break awkwardly across pages */
+            tr { 
+                page-break-inside: avoid; 
+                page-break-after: auto; 
+            }
+            
+            /* Repeat table header on new pages */
+            thead { 
+                display: table-header-group; 
+            }
+            
+            tbody { 
+                display: table-row-group; 
+            }
+
+            /* Keep colors for print */
+            th {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background-color: #f8fafc !important; /* slate-50 */
+                border-bottom: 2px solid #cbd5e1 !important;
+                position: static !important; /* Remove sticky behavior */
+            }
+
+            th.bg-blue-50\\/50 {
+                background-color: #eff6ff !important;
+            }
+            th.bg-emerald-50\\/50 {
+                background-color: #ecfdf5 !important;
+            }
+
+            /* Background colors for group headers */
+            tr td.bg-slate-300 {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background-color: #e2e8f0 !important;
+            }
+            tr td.bg-slate-100 {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background-color: #f1f5f9 !important;
+            }
+
+            /* Price column colors */
+            td.bg-blue-50\\/30 {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background-color: #eff6ff !important;
+            }
+            td.bg-emerald-50\\/30 {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background-color: #ecfdf5 !important;
+            }
+            
+            /* Ensure text colors are preserved */
+            .text-blue-700 { color: #1d4ed8 !important; }
+            .text-emerald-700 { color: #047857 !important; }
+            .text-red-400 { color: #f87171 !important; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 font-sans min-h-screen flex flex-col">
@@ -55,14 +183,18 @@
                     <i data-lucide="pill" class="text-blue-600 h-6 w-6"></i>
                     <h1 class="text-xl font-bold text-slate-800">제품가격표</h1>
                 </div>
-                <div class="flex gap-3">
-                    <button id="loadBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-medium py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm">
+                <div class="flex gap-2 sm:gap-3">
+                    <button id="loadBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm">
                         <i data-lucide="refresh-cw" class="h-4 w-4"></i>
-                        Refresh Data
+                        <span class="hidden sm:inline">Refresh Data</span>
                     </button>
-                    <button id="exportBtn" disabled class="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm">
+                    <button id="printBtn" class="bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm">
+                        <i data-lucide="printer" class="h-4 w-4"></i>
+                        <span class="hidden sm:inline">인쇄 / PDF</span>
+                    </button>
+                    <button id="exportBtn" disabled class="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm">
                         <i data-lucide="download" class="h-4 w-4"></i>
-                        Export to Excel
+                        <span class="hidden sm:inline">Export to Excel</span>
                     </button>
                 </div>
             </div>
@@ -177,6 +309,7 @@
         // DOM Elements
         const loadBtn = document.getElementById('loadBtn');
         const exportBtn = document.getElementById('exportBtn');
+        const printBtn = document.getElementById('printBtn');
         const tableBody = document.getElementById('tableBody');
         const loadingOverlay = document.getElementById('loadingOverlay');
         const emptyState = document.getElementById('emptyState');
@@ -433,21 +566,23 @@
                         fullName = `[화장품] ${fullName}`;
                     }
 
-                    // === 스칼프 MD 소비자 정가 강제 변경 ===
+                    // === 스칼프 MD 예외 처리: 정가를 70,000원으로 강제 고정 ===
                     if (fullName.includes('스칼프 MD')) {
                         msrp = 70000;
                     }
 
                     // 십원 단위에서 반올림하여 100원 단위로 맞춤
                     msrp = Math.round(msrp / 100) * 100;
-                    // 약국 프로모션가를 소비자 정가의 75%로 변경
+                    
+                    // 약국 프로모션가를 소비자 정가의 75%로 계산
                     let promoPrice = Math.round((msrp * 0.75) / 100) * 100;
                     
-                    // 약국 공급가를 약국 프로모션가(promoPrice)의 50%로 계산하도록 수정
+                    // 약국 공급가를 약국 프로모션가(promoPrice)의 50%로 계산
                     let supplyPrice = Math.round((promoPrice * 0.5) / 100) * 100;
 
-                    // 코어 임팩트, 하이퍼 샷 특가(오버라이드) 설정 및 립밤/크림 특가 추가
                     let overrideSupplyPrice = null;
+
+                    // 특가 및 예외 로직
                     if (fullName.includes('코어 임팩트')) {
                         overrideSupplyPrice = 120000;
                     } else if (fullName.includes('하이퍼 샷')) {
@@ -458,10 +593,10 @@
                     } else if (fullName.includes('더마플라스트 크림')) { 
                         // 크림: 취소선 없이 공급가 자체를 18000원으로 고정
                         supplyPrice = 18000;
-                    } else if (fullName.includes('스칼프 MD')) { // 스칼프 MD 예외 처리
-                        promoPrice = null; // 약국 프로모션가 없음 처리
-                        supplyPrice = 35000; // 약국 공급가 35000원으로 고정
-                        overrideSupplyPrice = null; // 취소선 없이 깔끔하게 단일 가격 표시
+                    } else if (fullName.includes('스칼프 MD')) { 
+                        // 스칼프 MD: 프로모션가는 없고 공급가는 35000원 고정
+                        promoPrice = null; 
+                        supplyPrice = 35000; 
                     }
 
                     return {
@@ -560,8 +695,8 @@
                     groupedData[cat1Name][cat2Name].forEach((item) => {
                         const tr = document.createElement('tr');
                         
-                        // tr에 border-b를 통째로 주어 높이가 달라져도 선이 어긋나지 않도록 함
-                        tr.className = 'hover:bg-slate-50 transition-colors group border-b border-slate-200 align-middle';
+                        // tr 자체에만 밑줄 속성을 부여하여 렌더링 꼬임 방지
+                        tr.className = 'hover:bg-slate-50 transition-colors group align-middle border-b border-slate-200';
                         
                         let supplyPriceHtml = formatCurrency(Math.round(item.supplyPrice / 100) * 100);
                         if (item.overrideSupplyPrice !== null) {
@@ -571,6 +706,7 @@
                             `;
                         }
 
+                        // 셀(td) 안의 border-b 클래스는 모두 제거하여 하단 줄이 하나로 통일되게 함
                         tr.innerHTML = `
                             <td class="py-3 px-4 pl-12 text-sm font-medium text-slate-800 flex items-center gap-2 h-full">
                                 <span class="w-1 h-1 rounded-full bg-slate-300 flex-shrink-0"></span>
@@ -603,7 +739,7 @@
                 return;
             }
 
-            // 엑셀 헤더에서도 괄호 안의 퍼센트 표기 삭제 및 통화 삭제
+            // 헤더에서 통화 열 삭제 및 퍼센트 표기 삭제
             const headers = ['대분류', '소분류', '제품명', '소비자 정가', '약국 프로모션가', '약국 공급가'];
             let csvContent = headers.join(',') + '\n';
             
@@ -646,6 +782,7 @@
                 const finalSupplyPrice = item.overrideSupplyPrice !== null ? item.overrideSupplyPrice : item.supplyPrice;
                 const finalPromoPrice = item.promoPrice !== null ? item.promoPrice : '-';
                 
+                // 통화 정보(KRW)를 제외한 데이터 배열
                 const row = [
                     safeCat1,
                     safeCat2,
@@ -675,6 +812,9 @@
         // Event Listeners
         loadBtn.addEventListener('click', loadData);
         exportBtn.addEventListener('click', exportToCSV);
+        printBtn.addEventListener('click', () => {
+            window.print();
+        });
 
         // --- Note: loadData() is now called AFTER successful password entry, not directly on DOMContentLoaded ---
         
