@@ -24,17 +24,7 @@
                 background: white !important; 
                 margin: 0;
                 padding: 0;
-                font-size: 11pt; /* Better base font size for A4 */
-            }
-
-            /* Hide interactive UI elements */
-            #passwordModal, 
-            header .flex.gap-3, /* Buttons */
-            #notification, 
-            #loadingOverlay, 
-            #emptyState,
-            footer {
-                display: none !important;
+                font-size: 11pt;
             }
 
             /* Setup A4 Page */
@@ -55,13 +45,19 @@
                 max-width: none !important;
             }
 
-            /* Header adjustments for print */
+            /* 인쇄 전용 헤더 스타일 - 크고 깔끔하게 */
             header {
                 position: static !important;
                 box-shadow: none !important;
-                border-bottom: 2px solid #cbd5e1 !important;
-                margin-bottom: 10px !important;
-                padding: 10px 0 !important;
+                border-bottom: 3px solid #1e293b !important; /* 굵은 밑줄 */
+                margin-bottom: 20px !important;
+                padding: 10px 0 20px 0 !important;
+            }
+            
+            /* 제목 텍스트 크기 키우기 */
+            header h1 {
+                font-size: 24pt !important;
+                color: #0f172a !important;
             }
 
             /* Table container adjustments - CRITICAL FOR PRINTING MULTIPLE PAGES */
@@ -69,29 +65,26 @@
                 border: none !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
-                overflow: visible !important; /* Allow content to overflow for page breaks */
+                overflow: visible !important;
             }
 
-            /* Container holding the table */
             .overflow-x-auto { 
                 overflow: visible !important; 
-                max-height: none !important; /* Remove height restrictions */
+                max-height: none !important;
             }
 
             table {
                 width: 100% !important;
                 min-width: 100% !important;
                 border-collapse: collapse !important;
-                page-break-inside: auto !important; /* Allow table to break */
+                page-break-inside: auto !important;
             }
 
-            /* Ensure rows don't break awkwardly across pages */
             tr { 
                 page-break-inside: avoid !important; 
                 page-break-after: auto !important; 
             }
             
-            /* Repeat table header on new pages (supported by most modern browsers) */
             thead { 
                 display: table-header-group !important; 
             }
@@ -104,54 +97,13 @@
             th {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                background-color: #f8fafc !important; /* slate-50 */
+                background-color: #f8fafc !important;
                 border-bottom: 2px solid #cbd5e1 !important;
-                position: static !important; /* Remove sticky behavior for print */
+                position: static !important;
             }
 
-            /* Table specific print styles */
-            .overflow-x-auto { 
-                overflow: visible !important; 
-                max-height: none !important;
-            }
-
-            table {
-                width: 100% !important;
-                min-width: 100% !important;
-                border-collapse: collapse !important;
-                page-break-inside: auto; /* Allow table to break */
-            }
-
-            /* Ensure rows don't break awkwardly across pages */
-            tr { 
-                page-break-inside: avoid; 
-                page-break-after: auto; 
-            }
-            
-            /* Repeat table header on new pages */
-            thead { 
-                display: table-header-group; 
-            }
-            
-            tbody { 
-                display: table-row-group; 
-            }
-
-            /* Keep colors for print */
-            th {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                background-color: #f8fafc !important; /* slate-50 */
-                border-bottom: 2px solid #cbd5e1 !important;
-                position: static !important; /* Remove sticky behavior */
-            }
-
-            th.bg-blue-50\\/50 {
-                background-color: #eff6ff !important;
-            }
-            th.bg-emerald-50\\/50 {
-                background-color: #ecfdf5 !important;
-            }
+            th.bg-blue-50\\/50 { background-color: #eff6ff !important; }
+            th.bg-emerald-50\\/50 { background-color: #ecfdf5 !important; }
 
             /* Background colors for group headers */
             tr td.bg-slate-300 {
@@ -177,7 +129,6 @@
                 background-color: #ecfdf5 !important;
             }
             
-            /* Ensure text colors are preserved */
             .text-blue-700 { color: #1d4ed8 !important; }
             .text-emerald-700 { color: #047857 !important; }
             .text-red-400 { color: #f87171 !important; }
@@ -215,13 +166,14 @@
     <!-- Main App Container (Hidden initially) -->
     <div id="appContainer" class="hidden flex-col min-h-screen w-full">
         <!-- Header -->
-        <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10">
+        <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10 print:static print:border-b-4 print:border-slate-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <i data-lucide="pill" class="text-blue-600 h-6 w-6"></i>
-                    <h1 class="text-xl font-bold text-slate-800">제품가격표</h1>
+                    <i data-lucide="pill" class="text-blue-600 h-8 w-8 print:text-slate-800"></i>
+                    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">제품가격표</h1>
                 </div>
-                <div class="flex gap-2 sm:gap-3">
+                <!-- 인쇄 모드에서는 이 영역(버튼들)을 숨김 (print:hidden 속성 사용) -->
+                <div class="flex gap-2 sm:gap-3 print:hidden">
                     <button id="loadBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm">
                         <i data-lucide="refresh-cw" class="h-4 w-4"></i>
                         <span class="hidden sm:inline">Refresh Data</span>
@@ -239,22 +191,19 @@
         </header>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow flex flex-col w-full">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow flex flex-col w-full print:py-0 print:px-0">
             
-            <!-- Notification Area -->
-            <div id="notification" class="hidden mb-4 p-4 rounded-lg border"></div>
+            <div id="notification" class="hidden mb-4 p-4 rounded-lg border print:hidden"></div>
 
             <!-- Table Container -->
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-grow flex flex-col relative">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-grow flex flex-col relative print:border-none print:shadow-none print:rounded-none">
                 
-                <!-- Loading Overlay -->
-                <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center">
+                <div id="loadingOverlay" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center print:hidden">
                     <i data-lucide="loader-2" class="h-8 w-8 text-blue-600 animate-spin mb-3"></i>
                     <p class="text-slate-600 font-medium">Loading pricing data...</p>
                 </div>
 
-                <!-- Empty State -->
-                <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-white z-0 hidden">
+                <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center bg-white z-0 hidden print:hidden">
                     <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
                         <i data-lucide="database" class="h-8 w-8 text-slate-400"></i>
                     </div>
@@ -262,9 +211,9 @@
                     <p class="text-slate-500 max-w-sm">Click "Refresh Data" to load the latest pharmacy price list from the database.</p>
                 </div>
 
-                <div class="overflow-x-auto h-full max-h-[70vh]">
-                    <table class="w-full text-left border-collapse min-w-[800px]">
-                        <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                <div class="overflow-x-auto h-full max-h-[70vh] print:overflow-visible print:max-h-none">
+                    <table class="w-full text-left border-collapse min-w-[800px] print:min-w-0">
+                        <thead class="bg-slate-50 sticky top-0 z-10 shadow-sm print:static print:shadow-none">
                             <tr>
                                 <th class="py-3 px-4 font-semibold text-sm text-slate-600 border-b border-slate-200 w-2/5">제품명</th>
                                 <th class="py-3 px-4 font-semibold text-sm text-slate-600 border-b border-slate-200 text-right w-1/5">소비자 정가</th>
@@ -279,7 +228,7 @@
                 </div>
             </div>
 
-            <footer class="mt-6 text-center text-sm text-slate-400">
+            <footer class="mt-6 text-center text-sm text-slate-400 print:hidden">
                 Data sourced directly from Supabase. Prices calculated dynamically.
             </footer>
         </main>
@@ -295,55 +244,8 @@
         
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Global state to hold processed data for export
         let currentData = [];
         
-        // --- Password Protection Logic ---
-        const TARGET_PASSWORD = "2026";
-        const passwordModal = document.getElementById('passwordModal');
-        const passwordForm = document.getElementById('passwordForm');
-        const passwordInput = document.getElementById('passwordInput');
-        const passwordError = document.getElementById('passwordError');
-        const appContainer = document.getElementById('appContainer');
-
-        // Check if already authenticated in this session
-        if (sessionStorage.getItem('isAuthenticated') === 'true') {
-            unlockApp();
-        } else {
-            // Force focus on input when modal is visible
-            setTimeout(() => passwordInput.focus(), 100);
-        }
-
-        passwordForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const entered = passwordInput.value;
-            
-            if (entered === TARGET_PASSWORD) {
-                // Success
-                sessionStorage.setItem('isAuthenticated', 'true');
-                unlockApp();
-            } else {
-                // Failure
-                passwordError.classList.remove('hidden');
-                passwordInput.value = '';
-                passwordInput.focus();
-                
-                // Shake effect for visual feedback
-                passwordForm.classList.add('animate-[shake_0.5s_ease-in-out]');
-                setTimeout(() => {
-                    passwordForm.classList.remove('animate-[shake_0.5s_ease-in-out]');
-                }, 500);
-            }
-        });
-
-        function unlockApp() {
-            passwordModal.classList.add('hidden');
-            appContainer.classList.remove('hidden');
-            // Load data automatically once unlocked
-            loadData();
-        }
-
-
         // DOM Elements
         const loadBtn = document.getElementById('loadBtn');
         const exportBtn = document.getElementById('exportBtn');
@@ -352,41 +254,22 @@
         const loadingOverlay = document.getElementById('loadingOverlay');
         const emptyState = document.getElementById('emptyState');
         const notification = document.getElementById('notification');
+        const appContainer = document.getElementById('appContainer');
 
-        /**
-         * Formats a number as currency based on the currency code.
-         */
-        function formatCurrency(amount, currencyCode = 'KRW') {
+        function formatCurrency(amount) {
             if (amount === null || amount === undefined || isNaN(amount)) return '-';
-            
-            const options = {
-                style: 'decimal',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0 // 원화는 소수점 생략
-            };
-
-            const formattedNumber = new Intl.NumberFormat('en-US', options).format(amount);
-            return formattedNumber; // ₩ 기호 제거
+            return new Intl.NumberFormat('en-US', { style: 'decimal', maximumFractionDigits: 0 }).format(amount);
         }
 
-        /**
-         * Shows a notification message on the screen.
-         */
         function showNotification(message, type = 'error') {
             notification.textContent = message;
-            notification.className = `mb-4 p-4 rounded-lg border text-sm font-medium ${
+            notification.className = `mb-4 p-4 rounded-lg border text-sm font-medium print:hidden ${
                 type === 'error' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-green-50 text-green-700 border-green-200'
             }`;
             notification.classList.remove('hidden');
-            
-            setTimeout(() => {
-                notification.classList.add('hidden');
-            }, 5000);
+            setTimeout(() => notification.classList.add('hidden'), 5000);
         }
 
-        /**
-         * Helper function to rename specific categories
-         */
         const renameCategory = (catName) => {
             if (!catName) return '기타 (Other)';
             const trimmed = catName.trim();
@@ -397,9 +280,6 @@
             return trimmed;
         };
 
-        /**
-         * 영문 제품명을 한글로 변환하는 헬퍼 함수
-         */
         const translationMap = {
             'blue crystal hydrating ampoule': '블루 크리스탈 하이드레이팅 앰플',
             'lift-toning sun protector cream': '리프트 토닝 선 프로텍터 크림',
@@ -416,63 +296,32 @@
             'micro enzyme deep cleansing powder': '마이크로 엔자임 딥 클렌징 파우더',
             'scalp md': '스칼프 MD',
             'medinovae chitogenix spot relief patch': '메디노베 키토제닉스 스팟 릴리프 패치',
-            // 자주 쓰이는 단어 매핑
-            'ampoule': '앰플',
-            'cream': '크림',
-            'mask': '마스크',
-            'shampoo': '샴푸',
-            'powder': '파우더',
-            'cleansing': '클렌징',
-            'cleanser': '클렌저',
-            'toner': '토너',
-            'lotion': '로션',
-            'serum': '세럼',
-            'essence': '에센스',
-            'sun protector': '선 프로텍터',
-            'sun block': '선블록',
-            'sun cream': '선크림',
-            'peeling': '필링',
-            'gel': '젤',
-            'foam': '폼',
-            'booster': '부스터',
-            'hydrating': '하이드레이팅',
-            'brightening': '브라이트닝',
-            'lifting': '리프팅',
-            'volumizing': '볼류마이징',
-            'vitality': '바이탈리티',
-            'barrier': '배리어',
-            'active': '액티브',
-            'deep': '딥',
-            'micro': '마이크로',
-            'enzyme': '엔자임'
+            'ampoule': '앰플', 'cream': '크림', 'mask': '마스크', 'shampoo': '샴푸', 'powder': '파우더',
+            'cleansing': '클렌징', 'cleanser': '클렌저', 'toner': '토너', 'lotion': '로션', 'serum': '세럼',
+            'essence': '에센스', 'sun protector': '선 프로텍터', 'sun block': '선블록', 'sun cream': '선크림',
+            'peeling': '필링', 'gel': '젤', 'foam': '폼', 'booster': '부스터', 'hydrating': '하이드레이팅',
+            'brightening': '브라이트닝', 'lifting': '리프팅', 'volumizing': '볼류마이징', 'vitality': '바이탈리티',
+            'barrier': '배리어', 'active': '액티브', 'deep': '딥', 'micro': '마이크로', 'enzyme': '엔자임'
         };
 
         function translateToKorean(engName) {
             if (!engName) return '이름 없는 제품';
             let korName = engName;
-            
-            // Map을 순회하며 일치하는 영문 문자열을 한글로 치환
             for (const [eng, kor] of Object.entries(translationMap)) {
-                const regex = new RegExp(eng, 'gi'); // 대소문자 구분 없이 치환
+                const regex = new RegExp(eng, 'gi');
                 korName = korName.replace(regex, kor);
             }
-            
             return korName;
         }
 
-        /**
-         * Main function to load and process data from Supabase.
-         */
         async function loadData() {
             try {
-                // Show loading
                 loadingOverlay.classList.remove('hidden');
                 emptyState.classList.add('hidden');
                 tableBody.innerHTML = '';
                 exportBtn.disabled = true;
                 currentData = [];
 
-                // 1. Fetch form_catalog_master to filter by Category 1 and get Sub Category 1 & 2 + unit_price
                 const { data: catalogData, error: catalogError } = await supabaseClient
                     .from('form_catalog_master')
                     .select('product_id, category, sub_category_1, sub_category_2, unit_price')
@@ -480,11 +329,9 @@
 
                 if (catalogError) throw catalogError;
 
-                // Define categories to exclude completely
                 const excludedMasterCategories = ['스킨부스터', '메디컬 디바이스', '로 머터리얼'];
                 const allowedCatalogProductMap = new Map();
 
-                // Build a map of allowed product IDs and their subcategories
                 catalogData.forEach(item => {
                     if (!excludedMasterCategories.includes(item.category)) {
                         allowedCatalogProductMap.set(item.product_id, {
@@ -495,46 +342,29 @@
                     }
                 });
 
-                // Ensure excluded categories override others if a product has multiple entries
                 catalogData.forEach(item => {
                     if (excludedMasterCategories.includes(item.category)) {
                         allowedCatalogProductMap.delete(item.product_id);
                     }
                 });
 
-                // 2. Fetch Products and Join with Product Prices
                 const { data, error } = await supabaseClient
                     .from('products')
                     .select(`
-                        id,
-                        brand,
-                        clean_name,
-                        main_category,
-                        sub_category,
-                        type,
-                        product_prices:product_prices!fk_product_prices_product_id (
-                            b2c_msrp,
-                            currency
-                        )
+                        id, brand, clean_name, main_category, sub_category, type,
+                        product_prices:product_prices!fk_product_prices_product_id (b2c_msrp, currency)
                     `)
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
 
-                // 3. Process and filter data
                 currentData = data.filter(product => {
-                    // Exclude products not in allowed form_catalog_master categories
                     if (!allowedCatalogProductMap.has(product.id)) return false;
 
-                    // Exclude specific keyword items
-                    const searchString = [
-                        product.clean_name, product.brand, product.main_category, product.sub_category, product.type
-                    ].filter(Boolean).join(' ').toLowerCase();
-
+                    const searchString = [product.clean_name, product.brand, product.main_category, product.sub_category, product.type].filter(Boolean).join(' ').toLowerCase();
                     const excludeKeywords = [
                         '병원', '원료', 'mts', 'skin booster', '스킨부스터', '수정광', '코어임팩2', '품절', 'echrever',
-                        'micro enzyme deep cleansing powder', // 마이크로 엔자임 딥 클렌징 파우더 제외 추가
-                        'root vitality volume shampoo 100ml' // 루트 바이탈리티 볼륨 샴푸 100ml 삭제
+                        'micro enzyme deep cleansing powder', 'root vitality volume shampoo 100ml'
                     ];
 
                     return !excludeKeywords.some(keyword => searchString.includes(keyword));
@@ -544,113 +374,49 @@
                     
                     if (product.product_prices) {
                         const prices = Array.isArray(product.product_prices) ? product.product_prices : [product.product_prices];
-                        
                         if (prices.length > 0) {
-                            // 공동구매 로직과 완벽하게 동일한 구조
                             let priceKrw = null;
                             let priceUsd = null;
-
-                            // 1순위: DB에 있는 모든 가격 정보를 순회하며 KRW와 USD를 각각 저장
                             prices.forEach(p => {
                                 if (p.b2c_msrp != null && Number(p.b2c_msrp) > 0) {
-                                    if (p.currency === 'KRW' || !p.currency) {
-                                        priceKrw = Number(p.b2c_msrp);
-                                    } else if (p.currency === 'USD') {
-                                        priceUsd = Number(p.b2c_msrp) * 1400; // 공동구매와 동일하게 1,400원 고정 환율 적용
-                                    }
+                                    if (p.currency === 'KRW' || !p.currency) priceKrw = Number(p.b2c_msrp);
+                                    else if (p.currency === 'USD') priceUsd = Number(p.b2c_msrp) * 1400;
                                 }
                             });
-
-                            // 2순위: KRW가 있으면 KRW 사용, 없으면 USD 사용
-                            if (priceKrw !== null) {
-                                msrp = priceKrw;
-                            } else if (priceUsd !== null) {
-                                msrp = priceUsd;
-                            }
+                            if (priceKrw !== null) msrp = priceKrw;
+                            else if (priceUsd !== null) msrp = priceUsd;
                         }
                     }
 
-                    // 3순위 (Fallback): product_prices 테이블에 유효한 가격이 전혀 없으면
-                    // form_catalog_master의 기본 가격(unit_price)을 사용
-                    if (msrp === 0) {
-                        msrp = Number(catInfo.fallbackUnitPrice) || 0;
-                    }
+                    if (msrp === 0) msrp = Number(catInfo.fallbackUnitPrice) || 0;
+                    if (msrp > 0 && msrp < 1000) msrp = msrp * 1400;
 
-                    // 4순위 (오류보정): 1,000원 미만의 비상식적인 가격인 경우 환율을 곱함 (DB 오기입 방지)
-                    if (msrp > 0 && msrp < 1000) {
-                        msrp = msrp * 1400;
-                    }
-
-                    // 브랜드명이 'resnovae' (대소문자 무관) 인 경우 제외
                     const isResnovae = product.brand && product.brand.toLowerCase() === 'resnovae';
                     const brandPart = product.brand && !isResnovae ? `[${product.brand}] ` : '';
-                    
-                    let namePart = product.clean_name || 'Unnamed Product';
-                    
-                    // 영문 제품명을 한글로 변환
-                    namePart = translateToKorean(namePart);
-
-                    // 혹시 제품명 자체에 [resnovae] 나 resnovae 가 포함된 경우 삭제
-                    namePart = namePart.replace(/\[?resnovae\]?/gi, '').trim();
-
+                    let namePart = translateToKorean(product.clean_name || 'Unnamed Product').replace(/\[?resnovae\]?/gi, '').trim();
                     let fullName = `${brandPart}${namePart}`.trim();
 
-                    // 카테고리/제품별 말머리(Prefix) 추가
-                    if (fullName.includes('코어 임팩트') || fullName.includes('하이퍼 샷')) {
-                        fullName = `[뷰티기기] ${fullName}`;
-                    } else if (fullName.includes('스칼프 MD')) {
-                        fullName = `[의료기기][2등급] ${fullName}`;
-                    } else {
-                        fullName = `[화장품] ${fullName}`;
-                    }
+                    if (fullName.includes('코어 임팩트') || fullName.includes('하이퍼 샷')) fullName = `[뷰티기기] ${fullName}`;
+                    else if (fullName.includes('스칼프 MD')) fullName = `[의료기기][2등급] ${fullName}`;
+                    else fullName = `[화장품] ${fullName}`;
 
-                    // === 스칼프 MD 예외 처리: 정가를 70,000원으로 강제 고정 ===
-                    if (fullName.includes('스칼프 MD')) {
-                        msrp = 70000;
-                    }
+                    if (fullName.includes('스칼프 MD')) msrp = 70000;
 
-                    // 십원 단위에서 반올림하여 100원 단위로 맞춤
                     msrp = Math.round(msrp / 100) * 100;
-                    
-                    // 약국 프로모션가를 소비자 정가의 75%로 계산
                     let promoPrice = Math.round((msrp * 0.75) / 100) * 100;
-                    
-                    // 약국 공급가를 약국 프로모션가(promoPrice)의 50%로 계산
                     let supplyPrice = Math.round((promoPrice * 0.5) / 100) * 100;
-
                     let overrideSupplyPrice = null;
 
-                    // 특가 및 예외 로직
-                    if (fullName.includes('코어 임팩트')) {
-                        overrideSupplyPrice = 120000;
-                    } else if (fullName.includes('하이퍼 샷')) {
-                        overrideSupplyPrice = 150000;
-                    } else if (fullName.includes('더마플라스트 립밤')) { 
-                        // 립밤: 취소선 없이 공급가 자체를 5000원으로 고정
-                        supplyPrice = 5000;
-                    } else if (fullName.includes('더마플라스트 크림')) { 
-                        // 크림: 취소선 없이 공급가 자체를 18000원으로 고정
-                        supplyPrice = 18000;
-                    } else if (fullName.includes('스칼프 MD')) { 
-                        // 스칼프 MD: 프로모션가는 없고 공급가는 35000원 고정
-                        promoPrice = null; 
-                        supplyPrice = 35000; 
-                    }
+                    if (fullName.includes('코어 임팩트')) { overrideSupplyPrice = 120000; } 
+                    else if (fullName.includes('하이퍼 샷')) { overrideSupplyPrice = 150000; } 
+                    else if (fullName.includes('더마플라스트 립밤')) { supplyPrice = 5000; } 
+                    else if (fullName.includes('더마플라스트 크림')) { supplyPrice = 18000; } 
+                    else if (fullName.includes('스칼프 MD')) { promoPrice = null; supplyPrice = 35000; }
 
-                    return {
-                        id: product.id,
-                        name: fullName,
-                        subCategory1: catInfo.sub1,
-                        subCategory2: catInfo.sub2,
-                        msrp: msrp,
-                        promoPrice: promoPrice,
-                        supplyPrice: supplyPrice,
-                        overrideSupplyPrice: overrideSupplyPrice
-                    };
+                    return { id: product.id, name: fullName, subCategory1: catInfo.sub1, subCategory2: catInfo.sub2, msrp, promoPrice, supplyPrice, overrideSupplyPrice };
                 }).filter(item => item.msrp > 0);
 
                 renderTable(currentData);
-
             } catch (err) {
                 console.error("Error fetching data:", err);
                 showNotification("Failed to load data. Please check console for details.", "error");
@@ -660,9 +426,6 @@
             }
         }
 
-        /**
-         * Renders the processed data into the HTML table
-         */
         function renderTable(data) {
             if (data.length === 0) {
                 emptyState.classList.remove('hidden');
@@ -673,7 +436,6 @@
             emptyState.classList.add('hidden');
             const fragment = document.createDocumentFragment();
 
-            // Group data by subCategory1 then subCategory2
             const groupedData = data.reduce((acc, item) => {
                 const cat1 = item.subCategory1;
                 const cat2 = item.subCategory2;
@@ -683,36 +445,20 @@
                 return acc;
             }, {});
 
-            const sortedCat1 = Object.keys(groupedData).sort();
-
-            sortedCat1.forEach(cat1Name => {
-                // Add 1st Level Group Header Row (Sub Category 1)
+            Object.keys(groupedData).sort().forEach(cat1Name => {
                 const groupHeader1 = document.createElement('tr');
-                groupHeader1.innerHTML = `
-                    <td colspan="4" class="py-3 px-4 text-sm font-bold text-slate-800 tracking-wider uppercase bg-slate-300 border-b border-slate-400">
-                        📁 ${cat1Name}
-                    </td>
-                `;
+                groupHeader1.innerHTML = `<td colspan="4" class="py-3 px-4 text-sm font-bold text-slate-800 tracking-wider uppercase bg-slate-300 border-b border-slate-400">📁 ${cat1Name}</td>`;
                 fragment.appendChild(groupHeader1);
 
-                const sortedCat2 = Object.keys(groupedData[cat1Name]).sort();
-
-                sortedCat2.forEach(cat2Name => {
-                    // Add 2nd Level Group Header Row (Sub Category 2)
+                Object.keys(groupedData[cat1Name]).sort().forEach(cat2Name => {
                     const groupHeader2 = document.createElement('tr');
-                    groupHeader2.innerHTML = `
-                        <td colspan="4" class="py-2 px-4 pl-8 text-xs font-bold text-slate-600 tracking-wide bg-slate-100 border-b border-slate-200">
-                            ↳ ${cat2Name}
-                        </td>
-                    `;
+                    groupHeader2.innerHTML = `<td colspan="4" class="py-2 px-4 pl-8 text-xs font-bold text-slate-600 tracking-wide bg-slate-100 border-b border-slate-200">↳ ${cat2Name}</td>`;
                     fragment.appendChild(groupHeader2);
 
-                    // Custom sorting logic
                     groupedData[cat1Name][cat2Name].sort((a, b) => {
                         const getSortRank = (itemName) => {
                             if (itemName.includes('[뷰티기기]')) return 0;
-                            
-                            if ((cat1Name === '얼굴' || cat1Name === 'Face' || cat1Name === '페이스') && cat2Name === '일반소비자용') {
+                            if ((cat1Name === '얼굴' || cat1Name === 'Face') && cat2Name === '일반소비자용') {
                                 if (itemName.includes('앰플 부스터')) return 1;
                                 if (itemName.includes('앰플')) return 2;
                                 if (itemName.includes('크림')) return 3;
@@ -721,19 +467,11 @@
                             }
                             return 99;
                         };
-
                         const rankA = getSortRank(a.name);
                         const rankB = getSortRank(b.name);
-                        
-                        if (rankA !== rankB) return rankA - rankB;
-                        return a.name.localeCompare(b.name); 
-                    });
-
-                    // Add Items
-                    groupedData[cat1Name][cat2Name].forEach((item) => {
+                        return rankA !== rankB ? rankA - rankB : a.name.localeCompare(b.name); 
+                    }).forEach((item) => {
                         const tr = document.createElement('tr');
-                        
-                        // tr 자체에만 밑줄 속성을 부여하여 렌더링 꼬임 방지
                         tr.className = 'hover:bg-slate-50 transition-colors group align-middle border-b border-slate-200';
                         
                         let supplyPriceHtml = formatCurrency(Math.round(item.supplyPrice / 100) * 100);
@@ -744,7 +482,6 @@
                             `;
                         }
 
-                        // 셀(td) 안의 border-b 클래스는 모두 제거하여 하단 줄이 하나로 통일되게 함
                         tr.innerHTML = `
                             <td class="py-3 px-4 pl-12 text-sm font-medium text-slate-800 flex items-center gap-2 h-full">
                                 <span class="w-1 h-1 rounded-full bg-slate-300 flex-shrink-0"></span>
@@ -764,32 +501,23 @@
                     });
                 });
             });
-
             tableBody.appendChild(fragment);
         }
 
-        /**
-         * Generates a CSV string and triggers a download.
-         */
         function exportToCSV() {
             if (currentData.length === 0) {
                 showNotification("No data to export.", "error");
                 return;
             }
-
-            // 헤더에서 통화 열 삭제 및 퍼센트 표기 삭제
             const headers = ['대분류', '소분류', '제품명', '소비자 정가', '약국 프로모션가', '약국 공급가'];
             let csvContent = headers.join(',') + '\n';
             
-            // 엑셀 출력 시에도 동일하게 카테고리 정렬 및 특수 정렬 적용
-            const sortedData = [...currentData].sort((a, b) => {
+            [...currentData].sort((a, b) => {
                 if (a.subCategory1 === b.subCategory1) {
                     if (a.subCategory2 === b.subCategory2) {
-                        
                         const getSortRank = (itemName, cat1, cat2) => {
                             if (itemName.includes('[뷰티기기]')) return 0;
-                            
-                            if ((cat1.toLowerCase().includes('face') || cat1 === '페이스' || cat1 === '얼굴') && cat2 === '일반소비자용') {
+                            if ((cat1.toLowerCase().includes('face') || cat1 === '얼굴') && cat2 === '일반소비자용') {
                                 if (itemName.includes('앰플 부스터')) return 1;
                                 if (itemName.includes('앰플')) return 2;
                                 if (itemName.includes('크림')) return 3;
@@ -798,36 +526,21 @@
                             }
                             return 99;
                         };
-                        
                         const rankA = getSortRank(a.name, a.subCategory1, a.subCategory2);
                         const rankB = getSortRank(b.name, b.subCategory1, b.subCategory2);
-                        
-                        if (rankA !== rankB) return rankA - rankB;
-                        
-                        return a.name.localeCompare(b.name);
+                        return rankA !== rankB ? rankA - rankB : a.name.localeCompare(b.name);
                     }
                     return a.subCategory2.localeCompare(b.subCategory2);
                 }
                 return a.subCategory1.localeCompare(b.subCategory1);
-            });
-            
-            sortedData.forEach(item => {
-                const safeCat1 = `"${(item.subCategory1 || '').replace(/"/g, '""')}"`;
-                const safeCat2 = `"${(item.subCategory2 || '').replace(/"/g, '""')}"`;
-                const safeName = `"${item.name.replace(/"/g, '""')}"`;
-                
-                // 엑셀에서는 특가가 있을 경우 특가 금액을, 없으면 기존 공급가를 기입
-                const finalSupplyPrice = item.overrideSupplyPrice !== null ? item.overrideSupplyPrice : item.supplyPrice;
-                const finalPromoPrice = item.promoPrice !== null ? item.promoPrice : '-';
-                
-                // 통화 정보(KRW)를 제외한 데이터 배열
+            }).forEach(item => {
                 const row = [
-                    safeCat1,
-                    safeCat2,
-                    safeName,
+                    `"${(item.subCategory1 || '').replace(/"/g, '""')}"`,
+                    `"${(item.subCategory2 || '').replace(/"/g, '""')}"`,
+                    `"${item.name.replace(/"/g, '""')}"`,
                     item.msrp,
-                    finalPromoPrice,
-                    finalSupplyPrice
+                    item.promoPrice !== null ? item.promoPrice : '-',
+                    item.overrideSupplyPrice !== null ? item.overrideSupplyPrice : item.supplyPrice
                 ];
                 csvContent += row.join(',') + '\n';
             });
@@ -835,10 +548,7 @@
             const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            
-            const date = new Date();
-            const dateStr = `${date.getFullYear()}${(date.getMonth()+1).toString().padStart(2,'0')}${date.getDate().toString().padStart(2,'0')}`;
-            
+            const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, '');
             link.setAttribute("href", url);
             link.setAttribute("download", `제품가격표_${dateStr}.csv`);
             document.body.appendChild(link);
@@ -847,24 +557,45 @@
             URL.revokeObjectURL(url);
         }
 
-        // Event Listeners
         loadBtn.addEventListener('click', loadData);
         exportBtn.addEventListener('click', exportToCSV);
-        printBtn.addEventListener('click', () => {
-            window.print();
-        });
+        printBtn.addEventListener('click', () => window.print());
 
-        // --- Note: loadData() is now called AFTER successful password entry, not directly on DOMContentLoaded ---
-        
-        // CSS for shake animation on incorrect password
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
+        const TARGET_PASSWORD = "2026";
+        const passwordModal = document.getElementById('passwordModal');
+        const passwordForm = document.getElementById('passwordForm');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordError = document.getElementById('passwordError');
+
+        function unlockApp() {
+            passwordModal.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            loadData(); // 인증 성공 또는 세션 유지 시 즉시 데이터 로드!
+        }
+
+        // 인증 로직 (세션 체크 후 바로 로드)
+        if (sessionStorage.getItem('isAuthenticated') === 'true') {
+            unlockApp();
+        } else {
+            setTimeout(() => passwordInput.focus(), 100);
+        }
+
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (passwordInput.value === TARGET_PASSWORD) {
+                sessionStorage.setItem('isAuthenticated', 'true');
+                unlockApp();
+            } else {
+                passwordError.classList.remove('hidden');
+                passwordInput.value = '';
+                passwordInput.focus();
+                passwordForm.classList.add('animate-[shake_0.5s_ease-in-out]');
+                setTimeout(() => passwordForm.classList.remove('animate-[shake_0.5s_ease-in-out]'), 500);
             }
-        `;
+        });
+        
+        const style = document.createElement('style');
+        style.textContent = `@keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }`;
         document.head.appendChild(style);
 
     </script>
