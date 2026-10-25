@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confidential - MEDIFAB Product Live Price List</title>
+    <title>Confidential - HYM CORP. Product Live Price List</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -65,6 +65,11 @@
         .drop-zone.dragover { border-color: #2563eb; background-color: #eff6ff; }
         .row-transition { transition: transform 0.3s ease, background-color 0.3s ease; }
 
+        /* Hidden product lines remain available in the source, not on screen or in print. */
+        #section-cosmetic, #section-medical, #section-raw, #section-raclinic { display: none !important; }
+        #section-pharmacy .unified-table { min-width: 1450px; }
+        #section-pharmacy .pharmacy-category td { background: #f3f4f6; color: #111827; font-weight: 700; letter-spacing: 0.1em; padding: 12px 16px; text-transform: uppercase; }
+
         /* Print Enhancements */
         body.print-table-mode .unified-table { min-width: 0 !important; width: 100% !important; }
         body.print-table-mode .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
@@ -93,7 +98,7 @@
             <svg class="w-12 h-12 mx-auto text-gray-900 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7z"></path>
             </svg>
-            <h2 class="text-2xl font-montserrat font-bold text-gray-900 tracking-widest mb-1">MEDIFAB</h2>
+            <h2 class="text-2xl font-montserrat font-bold text-gray-900 tracking-widest mb-1">HYM CORP.</h2>
             <p class="text-xs text-gray-400 uppercase tracking-widest mb-8">Confidential Document</p>
 
             <div class="relative">
@@ -105,6 +110,18 @@
                 Unlock
             </button>
         </div>
+    </div>
+
+
+    <div id="partner-password-modal" class="hidden fixed inset-0 z-[10001] bg-black/70 flex items-center justify-center no-print" role="dialog" aria-modal="true" aria-labelledby="partner-password-title">
+        <form onsubmit="submitPartnerPassword(event)" class="bg-white p-8 rounded shadow-xl w-full max-w-sm mx-4">
+            <h2 id="partner-password-title" class="text-lg font-montserrat font-bold mb-2">Partner Access</h2>
+            <p class="text-xs text-gray-500 mb-5">Enter this partner line's password to view KRW pricing.</p>
+            <label for="partner-password-input" class="block text-xs mb-2">Partner Password</label>
+            <input id="partner-password-input" type="password" required autocomplete="off" class="w-full border border-gray-300 p-3 rounded text-center" placeholder="Enter Password">
+            <p id="partner-password-error" role="alert" class="text-red-600 text-xs mt-2 min-h-[1rem]"></p>
+            <div class="flex gap-3 mt-4"><button type="button" onclick="closePartnerPassword()" class="w-1/2 border p-3 text-xs rounded">Cancel</button><button type="submit" class="w-1/2 bg-gray-900 text-white p-3 text-xs rounded">Unlock Partner Line</button></div>
+        </form>
     </div>
 
     <!-- Image Modal -->
@@ -121,7 +138,7 @@
                 <div class="flex items-center gap-2">
                     <span class="bg-red-600 text-[10px] px-2 py-0.5 rounded uppercase font-bold tracking-widest">Super Admin</span>
                     <h3 class="text-lg font-montserrat font-semibold" id="admin-modal-title">Add / Edit Product</h3>
-                    <button type="button" id="btn-load-draft" onclick="loadDraft()" class="hidden bg-blue-600 hover:bg-blue-500 text-white text-[10px] px-2 py-1 rounded tracking-wider uppercase transition-colors ml-3 shadow-sm">임시저장 불러오기</button>
+                    <button type="button" id="btn-load-draft" onclick="loadDraft()" class="hidden bg-blue-600 hover:bg-blue-500 text-white text-[10px] px-2 py-1 rounded tracking-wider uppercase transition-colors ml-3 shadow-sm">Load Draft</button>
                 </div>
                 <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
             </div>
@@ -286,18 +303,18 @@
                 </p>
                 <div class="flex items-center gap-4">
                     <div id="krw-rate-container" class="flex items-center gap-2 bg-white px-2 py-1 border border-gray-300">
-                        <span class="text-[10px] text-gray-500 uppercase tracking-widest">Apply Rate:</span>
+                        <span class="text-[10px] text-gray-500 uppercase tracking-widest">Exchange Rate:</span>
                         <select id="krw-rate-select" onchange="changeExchangeRate(this.value)" class="text-xs bg-transparent text-gray-900 font-medium focus:outline-none cursor-pointer">
-                            <option value="live">Live Rate</option>
+                            <option value="1000" selected>Fixed: KRW 1,000 / USD</option><option value="live">Live Exchange Rate</option>
                             <option value="1500">₩1,500</option>
                             <option value="1450">₩1,450</option>
                             <option value="1400">₩1,400</option>
                             <option value="1350">₩1,350</option>
                             <option value="1300">₩1,300</option>
                             <option value="1200">₩1,200</option>
-                        </select>
+                        </select><span id="applied-rate-label" class="text-[10px] text-gray-500">1 USD = KRW 1,000</span>
                     </div>
-                    <span class="text-xs text-gray-400 uppercase tracking-widest" id="unit-display">[Unit: KRW]</span>
+                    <span class="text-xs text-gray-400 uppercase tracking-widest" id="unit-display">[Unit: USD]</span>
                     <div class="bg-gray-200 p-1 flex inline-flex">
                         <button id="btn-usd" onclick="setCurrency('USD')" class="px-4 py-1.5 text-xs text-gray-400 hover:text-gray-900 transition-all uppercase tracking-wider">USD</button>
                         <button id="btn-krw" onclick="setCurrency('KRW')" class="px-4 py-1.5 text-xs bg-white shadow-sm text-gray-900 transition-all uppercase tracking-wider border border-gray-300">KRW</button>
@@ -306,7 +323,7 @@
             </div>
 
             <div class="border-l-4 border-gray-900 pl-6 mb-4 mt-4 no-print-border print-active-section" id="group-medifab-lines">
-                <h2 class="text-2xl font-montserrat font-bold text-gray-900 mb-8 tracking-wider">MEDIFAB COMPLETE LINES</h2>
+                <h2 class="text-2xl font-montserrat font-bold text-gray-900 mb-8 tracking-wider">HYM COMPLETE LINE</h2>
 
                 <!-- 1. Cosmetic Product Line -->
                 <div id="section-cosmetic" class="mb-8">
@@ -435,74 +452,102 @@
                 </div>
 
                 <!-- 3. Pharmacy Product Line -->
-                <div id="section-pharmacy" class="mb-8">
-                    <div class="flex justify-between items-end mb-3 cursor-pointer group select-none" onclick="toggleSection('container-pharmacy', 'icon-pharmacy')">
-                        <div class="flex items-center gap-2">
-                            <svg id="icon-pharmacy" class="w-6 h-6 text-gray-400 group-hover:text-gray-900 transition-transform duration-300 -rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            <h3 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider group-hover:text-black transition-colors">Pharmacy Product Line</h3>
-                        </div>
-                        <div class="flex gap-2" onclick="event.stopPropagation()">
-                            <button onclick="openAdminModal('pharmacy')" class="admin-only-btn hidden no-print px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-1.5 rounded shadow-sm">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                <div class="mb-8" id="section-pharmacy">
+<div class="flex justify-between items-end mb-3 cursor-pointer group select-none" onclick="toggleSection('container-pharmacy', 'icon-pharmacy')">
+<div class="flex items-center gap-2">
+<svg class="w-6 h-6 text-gray-400 group-hover:text-gray-900 transition-transform duration-300 -rotate-90" fill="none" id="icon-pharmacy" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<h3 class="text-xl text-gray-900 font-montserrat uppercase tracking-wider group-hover:text-black transition-colors">Pharmacy Product Line</h3>
+</div>
+<div class="flex gap-2" onclick="event.stopPropagation()">
+<button class="admin-only-btn hidden no-print px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-1.5 rounded shadow-sm" onclick="openAdminModal('pharmacy')">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
                                 Add Product
                             </button>
-                            <button onclick="printTableSection('section-pharmacy', 'Pharmacy_PriceList')" class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+<button class="no-print px-4 py-1.5 bg-gray-900 hover:bg-black text-white text-xs tracking-widest uppercase transition-colors flex items-center gap-2" onclick="printTableSection('section-pharmacy', 'Pharmacy_PriceList')">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
                                 Print PDF
                             </button>
-                        </div>
-                    </div>
-                    <div id="container-pharmacy" class="overflow-x-auto table-container bg-white hidden">
-                        <table class="w-full text-left border-collapse unified-table">
-                            <colgroup>
-                                <col style="width: 4%;"><col style="width: 16%;"><col style="width: 12%;">
-                                <col style="width: 7%;"><col style="width: 4%;"><col style="width: 4%;"><col style="width: 4%;"><col style="width: 4%;">
-                                <col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;">
-                                <col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;"><col style="width: 5%;">
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Img</th>
-                                    <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Item</th>
-                                    <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Ingr.</th>
-                                    <th rowspan="3" class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Type</th>
-                                    <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Pkg.</th>
-                                    <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Vol.</th>
-                                    <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">Qty</th>
-                                    <th rowspan="3" class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700">CT</th>
-                                    <th colspan="2" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Clinic</th>
-                                    <th colspan="4" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">Distributor</th>
-                                    <th colspan="3" class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700">OEM</th>
-                                </tr>
-                                <tr>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">Promo</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1,000</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">3,000</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">5,000</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">10,000</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">30,000</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">50,000</th>
-                                </tr>
-                                <tr>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">80%</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">42%</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">37%</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">34%</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">33%</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">30%</th>
-                                    <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700">27%</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pharmacy-table-body" class="text-sm bg-transparent">
-                                <tr class="loading-row"><td colspan="17" class="text-center py-10 text-black font-light text-sm italic">Fetching pharmacy data...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+</div>
+</div>
+<div class="hidden" id="container-pharmacy"><h4 class="text-sm font-montserrat font-bold uppercase tracking-widest mt-5 mb-3">Cosmetics</h4><details class="no-print mb-4 border border-gray-200 p-3"><summary class="cursor-pointer text-xs uppercase tracking-wider font-semibold text-gray-600">Cosmetics rates</summary><div class="no-print bg-gray-50 border border-gray-200 p-4 mb-3" id="cosmetic-rate-controls"><p class="text-xs text-gray-600 mb-3">Cosmetics only · Percentage of MSRP · Rounded up to KRW 100 · Saved in this browser</p><div class="flex flex-wrap gap-4"><label class="text-xs text-gray-700">Supply Price<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics Supply Price percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-supply" max="100" min="0" onchange="updateCosmeticRate('supply', this)" step="0.1" type="number" value="50"/>%</span></label><label class="text-xs text-gray-700">500<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics 500 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-500" max="100" min="0" onchange="updateCosmeticRate('500', this)" step="0.1" type="number" value="45"/>%</span></label><label class="text-xs text-gray-700">1,000<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics 1,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-1000" max="100" min="0" onchange="updateCosmeticRate('1000', this)" step="0.1" type="number" value="42"/>%</span></label><label class="text-xs text-gray-700">3,000<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics 3,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-3000" max="100" min="0" onchange="updateCosmeticRate('3000', this)" step="0.1" type="number" value="37"/>%</span></label><label class="text-xs text-gray-700">5,000<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics 5,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-5000" max="100" min="0" onchange="updateCosmeticRate('5000', this)" step="0.1" type="number" value="35"/>%</span></label></div></div></details><div class="overflow-x-auto table-container bg-white"><table class="w-full text-left border-collapse unified-table">
+<colgroup>
+<col style="width: 4%;"/><col style="width: 18%;"/><col style="width: 12%;"/>
+<col style="width: 8%;"/><col style="width: 7%;"/><col style="width: 4%;"/><col style="width: 4%;"/><col style="width: 4%;"/><col style="width: 6%;"/>
+<col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/>
+<col style="width: 5.5%;"/>
+</colgroup>
+<thead>
+<tr>
+<th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Img</th>
+<th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Item</th>
+<th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Ingr.</th>
+<th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Type</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Pkg.</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Vol.</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Qty</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT SIZE</th>
+<th class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700" colspan="2">Pharmacy</th>
+<th class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700" colspan="4">Distributor</th>
+</tr>
+<tr>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">Supply Price</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">500</th><th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1,000</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">3,000</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">5,000</th>
+</tr>
+<tr>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700" data-cosmetic-rate="supply">50%</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700" data-cosmetic-rate="500">45%</th><th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700" data-cosmetic-rate="1000">42%</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700" data-cosmetic-rate="3000">37%</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700" data-cosmetic-rate="5000">35%</th>
+</tr>
+</thead>
+<tbody class="text-sm bg-transparent" id="pharmacy-table-body">
+<tr class="loading-row"><td class="text-center py-10 text-black font-light text-sm italic" colspan="15">Fetching pharmacy data...</td></tr>
+</tbody>
+</table></div><h4 class="text-sm font-montserrat font-bold uppercase tracking-widest mt-5 mb-3">Beauty Consumables</h4><details class="no-print mb-4 border border-gray-200 p-3"><summary class="cursor-pointer text-xs uppercase tracking-wider font-semibold text-gray-600">Beauty consumables rates</summary><div class="no-print bg-gray-50 border border-gray-200 p-4 mb-3" id="consumable-rate-controls"><p class="text-xs text-gray-600 mb-3">Beauty consumables only · Percentage of MSRP · Rounded up to KRW 100 · Saved in this browser</p><div class="flex flex-wrap gap-4"><label class="text-xs text-gray-700">Supply Price<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables Supply Price percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-supply" max="100" min="0" onchange="updateConsumableRate('supply', this)" step="0.1" type="number" value="50"/>%</span></label><label class="text-xs text-gray-700">500<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables 500 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-500" max="100" min="0" onchange="updateConsumableRate('500', this)" step="0.1" type="number" value="45"/>%</span></label><label class="text-xs text-gray-700">1,000<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables 1,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-1000" max="100" min="0" onchange="updateConsumableRate('1000', this)" step="0.1" type="number" value="42"/>%</span></label><label class="text-xs text-gray-700">3,000<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables 3,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-3000" max="100" min="0" onchange="updateConsumableRate('3000', this)" step="0.1" type="number" value="37"/>%</span></label><label class="text-xs text-gray-700">5,000<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables 5,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-5000" max="100" min="0" onchange="updateConsumableRate('5000', this)" step="0.1" type="number" value="35"/>%</span></label></div></div></details><div class="overflow-x-auto table-container bg-white"><table class="w-full text-left border-collapse unified-table">
+<colgroup>
+<col style="width: 4%;"/><col style="width: 18%;"/><col style="width: 12%;"/>
+<col style="width: 8%;"/><col style="width: 7%;"/><col style="width: 4%;"/><col style="width: 4%;"/><col style="width: 4%;"/><col style="width: 6%;"/>
+<col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/>
+<col style="width: 5.5%;"/>
+</colgroup>
+<thead>
+<tr>
+<th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Img</th>
+<th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Item</th>
+<th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Ingr.</th>
+<th class="py-3 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Type</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Pkg.</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Vol.</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Qty</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT SIZE</th>
+<th class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700" colspan="2">Pharmacy</th>
+<th class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700" colspan="4">Distributor</th>
+</tr>
+<tr>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">MSRP</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">Supply Price</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">500</th><th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">1,000</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">3,000</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white uppercase tracking-widest border-b border-gray-700">5,000</th>
+</tr>
+<tr>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">100%</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white border-b border-gray-700" data-consumable-rate="supply">50%</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700" data-consumable-rate="500">45%</th><th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700" data-consumable-rate="1000">42%</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700" data-consumable-rate="3000">37%</th>
+<th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700" data-consumable-rate="5000">35%</th>
+</tr>
+</thead>
+<tbody class="text-sm bg-transparent" id="beauty-consumables-table-body"></tbody>
+</table></div></div>
+</div>
+
 
                 <!-- 4. Proprietary Raw Materials Product Line -->
                 <div id="section-raw" class="mb-4">
@@ -577,6 +622,7 @@
                         </div>
                     </div>
                     <div class="text-xs text-gray-500 mb-2 pl-8 font-light hidden" id="legend-raclinic">
+                        <span class="block font-semibold mb-1">Password Protected · Unit: KRW (₩) · Close to Lock</span>
                         <span class="font-medium">Legend:</span> MF (MEDIFAB) · TDL (Triderma Lab) · RA (RA Clinic) · D1/D2 (Distributor) · SHOP (Aesthetic Shop)
                     </div>
                     <div id="container-raclinic" class="overflow-x-auto table-container bg-white shadow-sm hidden">
@@ -634,9 +680,7 @@
                                     <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">46%</th>
                                 </tr>
                             </thead>
-                            <tbody id="raclinic-table-body" class="text-sm bg-transparent">
-                                <tr class="loading-row"><td colspan="17" class="text-center py-10 text-black font-light text-sm italic">Fetching RA Clinic data from server...</td></tr>
-                            </tbody>
+                            <tbody id="raclinic-table-body" class="text-sm bg-transparent"></tbody>
                         </table>
                     </div>
                 </div>
@@ -663,7 +707,8 @@
                         </div>
                     </div>
                     <div class="text-xs text-gray-500 mb-2 pl-8 font-light hidden" id="legend-charmacist">
-                        <span class="font-medium">Legend:</span> MF (MEDIFAB) · TDL (Triderma Lab) · CMC (Charmacist) · CMC 체인 (Charmacist Chain)
+                        <span class="block font-semibold mb-1">Password Protected · Unit: KRW (₩) · Close to Lock</span>
+                        <span class="font-medium">Legend:</span> MF (MEDIFAB) · TDL (Triderma Lab) · CMC (Charmacist) · CMC Chain (Charmacist Chain)
                     </div>
                     <div id="container-charmacist" class="overflow-x-auto table-container bg-white shadow-sm hidden">
                         <table class="w-full text-left border-collapse unified-table">
@@ -714,9 +759,7 @@
                                     <th class="py-2 px-2 text-center text-[10px] bg-gray-900 text-white font-light border-b border-gray-700">45%</th>
                                 </tr>
                             </thead>
-                            <tbody id="charmacist-table-body" class="text-sm bg-transparent">
-                                <tr class="loading-row"><td colspan="17" class="text-center py-10 text-black font-light text-sm italic">Fetching Charmacist data from server...</td></tr>
-                            </tbody>
+                            <tbody id="charmacist-table-body" class="text-sm bg-transparent"></tbody>
                         </table>
                     </div>
                 </div>
@@ -750,7 +793,7 @@
             };
 
             localStorage.setItem(draftKey, JSON.stringify(draftData));
-            showToast("임시저장 되었습니다. (로컬 브라우저)", "success");
+            showToast("Draft saved in this browser.", "success");
             checkDraft(section, editId);
         }
 
@@ -776,7 +819,7 @@
                     document.getElementById('p-price-t2').value = draftData.t2 || '';
                     document.getElementById('p-price-t3').value = draftData.t3 || '';
                     document.getElementById('p-price-t4').value = draftData.t4 || '';
-                    showToast("임시저장 데이터를 불러왔습니다.", "info");
+                    showToast("Draft loaded.", "info");
                 } catch(e) {
                     console.error("Draft parsing error", e);
                 }
@@ -1080,7 +1123,7 @@
 
             } catch (err) {
                 console.error("Save error:", err);
-                showToast(`DB 저장 오류: ${err.message}`, "error");
+                showToast(`Database save error: ${err.message}`, "error");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `<span>Save to Database</span>`;
@@ -1120,7 +1163,7 @@
             }
             
             if(crossedBoundary) {
-                showToast("카테고리 그룹 경계를 넘어 순서를 변경할 수 없습니다. 소속 변경은 Edit(수정)을 이용하세요.", "error");
+                showToast("Cannot reorder across category groups. Use Edit to change the category.", "error");
                 return;
             }
             
@@ -1146,7 +1189,7 @@
             }
             
             if(crossedBoundary) {
-                showToast("카테고리 그룹 경계를 넘어 순서를 변경할 수 없습니다. 소속 변경은 Edit(수정)을 이용하세요.", "error");
+                showToast("Cannot reorder across category groups. Use Edit to change the category.", "error");
                 return;
             }
             
@@ -1159,7 +1202,7 @@
 
         async function updateOrderFromDOM(tbody, tableName) {
             const ids = Array.from(tbody.querySelectorAll('tr[data-id]')).map(row => row.getAttribute('data-id'));
-            showToast("순서 저장 중...", "info");
+            showToast("Saving order...", "info");
             try {
                 const promises = ids.map((id, index) => supabaseClient.from(tableName).update({ sort_order: index }).eq('id', id));
                 await Promise.all(promises);
@@ -1168,9 +1211,9 @@
                 else if (tableName === 'medical_aesthetic_products') { ids.forEach((id, idx) => { let p = globalMedicalProducts.find(x => x.id === id); if(p) p.sort_order = idx; }); }
                 else if (tableName === 'raw_materials') { ids.forEach((id, idx) => { let p = globalRawMaterials.find(x => x.id === id); if(p) p.sort_order = idx; }); }
                 
-                showToast("순서가 성공적으로 변경되었습니다.", "success");
+                showToast("Order updated successfully.", "success");
             } catch (err) {
-                showToast("순서 저장 실패: " + err.message, "error");
+                showToast("Failed to save order: " + err.message, "error");
             }
         }
 
@@ -1191,7 +1234,7 @@
             if(document.getElementById('remove-existing-image')) document.getElementById('remove-existing-image').value = 'false';
             if (product.image_url) {
                 document.getElementById('preview-img').src = product.image_url;
-                document.getElementById('preview-filename').textContent = "기존 등록된 이미지";
+                document.getElementById('preview-filename').textContent = "Existing product image";
                 document.getElementById('drop-zone-prompt').classList.add('hidden');
                 document.getElementById('drop-zone-preview').classList.remove('hidden');
             } else {
@@ -1248,10 +1291,10 @@
 
         async function deleteProduct(id, tableName, productName) {
             if(!isSuperAdmin) return;
-            if(!confirm(`정말로 [${productName}] 정보를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+            if(!confirm(`Delete [${productName}]?\nThis action cannot be undone.`)) return;
             
             if (id.startsWith('RESTORED_')) {
-                showToast(`복원된 임시 제품이 숨김 처리되었습니다.`, "success");
+                showToast(`Restored temporary product hidden.`, "success");
                 globalUniqueProducts = globalUniqueProducts.filter(p => p.id !== id);
                 renderTableData();
                 return;
@@ -1304,10 +1347,44 @@
             setTimeout(() => { modal.classList.add('hidden'); document.getElementById('modal-img').src = ''; }, 300);
         }
 
+        const partnerAccess = {raclinic: false, charmacist: false};
+        let pendingPartnerAccess = null;
+        function requestPartnerAccess(key, onSuccess) {
+            if (partnerAccess[key]) return true;
+            pendingPartnerAccess = {key, onSuccess};
+            document.getElementById('partner-password-input').value = '';
+            document.getElementById('partner-password-error').textContent = '';
+            document.getElementById('partner-password-modal').classList.remove('hidden');
+            document.getElementById('partner-password-input').focus();
+            return false;
+        }
+        function closePartnerPassword() {
+            pendingPartnerAccess = null;
+            document.getElementById('partner-password-input').value = '';
+            document.getElementById('partner-password-modal').classList.add('hidden');
+        }
+        function submitPartnerPassword(event) {
+            event.preventDefault();
+            if (!pendingPartnerAccess) return;
+            if (document.getElementById('partner-password-input').value !== '245024') {
+                document.getElementById('partner-password-error').textContent = 'Incorrect password. Please try again.';
+                return;
+            }
+            const {key, onSuccess} = pendingPartnerAccess;
+            partnerAccess[key] = true;
+            closePartnerPassword();
+            if (key === 'raclinic') renderRAClinicTableData();
+            else renderCharmacistTableData();
+            onSuccess();
+        }
         function toggleSection(containerId, iconId) {
             const container = document.getElementById(containerId);
             const icon = document.getElementById(iconId);
             const legend = document.getElementById('legend-' + containerId.split('-')[1]);
+            const partnerKey = containerId.replace('container-', '');
+            if (Object.prototype.hasOwnProperty.call(partnerAccess, partnerKey) && container && container.classList.contains('hidden')) {
+                if (!requestPartnerAccess(partnerKey, () => toggleSection(containerId, iconId))) return;
+            }
             if (container && icon) {
                 if (container.classList.contains('hidden')) {
                     container.classList.remove('hidden'); icon.classList.remove('-rotate-90');
@@ -1315,6 +1392,10 @@
                 } else {
                     container.classList.add('hidden'); icon.classList.add('-rotate-90');
                     if(legend) legend.classList.add('hidden');
+                    if (Object.prototype.hasOwnProperty.call(partnerAccess, partnerKey)) {
+                        partnerAccess[partnerKey] = false;
+                        document.getElementById(partnerKey + '-table-body').innerHTML = '';
+                    }
                 }
             }
         }
@@ -1323,9 +1404,9 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let currentCurrency = 'KRW'; 
-        let liveKrwRate = 1400;
-        let appliedKrwRate = 1400;
+        let currentCurrency = 'USD'; 
+        let liveKrwRate = null;
+        let appliedKrwRate = 1000;
         let globalUniqueProducts = [];
         let globalMedicalProducts = [];
         let globalRawMaterials = [];
@@ -1402,6 +1483,7 @@
         }
 
         async function initDashboard() {
+            setCurrency('USD');
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const todayStr = new Date().toLocaleDateString('en-US', options);
             const dateEl = document.getElementById('current-date');
@@ -1542,7 +1624,17 @@
         }
 
         function changeExchangeRate(val) {
-            appliedKrwRate = val === 'live' ? liveKrwRate : parseFloat(val);
+            if (val === 'live' && !(liveKrwRate > 0)) {
+                showToast('Live exchange rate is unavailable. Please reload to retry.', 'error');
+                document.getElementById('krw-rate-select').value = String(appliedKrwRate);
+                return;
+            }
+            const nextRate = val === 'live' ? liveKrwRate : Number(val);
+            if (!Number.isFinite(nextRate) || nextRate <= 0) return;
+            appliedKrwRate = nextRate;
+            document.getElementById('krw-rate-select').value = val;
+            const label = document.getElementById('applied-rate-label');
+            if (label) label.textContent = '1 USD = KRW ' + appliedKrwRate.toLocaleString('en-US', {maximumFractionDigits: 2});
             renderTableData();
             renderMedicalTableData();
             renderPharmacyTableData();
@@ -1565,8 +1657,8 @@
                 if (currency === 'USD') {
                     btnUsd.className = "px-4 py-1.5 text-xs bg-white shadow-sm text-gray-900 transition-all uppercase tracking-wider border border-gray-300";
                     btnKrw.className = "px-4 py-1.5 text-xs text-gray-400 hover:text-gray-900 transition-all uppercase tracking-wider";
-                    rateContainer.classList.add('hidden');
-                    rateContainer.classList.remove('flex');
+                    rateContainer.classList.remove('hidden');
+                    rateContainer.classList.add('flex');
                 } else {
                     btnKrw.className = "px-4 py-1.5 text-xs bg-white shadow-sm text-gray-900 transition-all uppercase tracking-wider border border-gray-300";
                     btnUsd.className = "px-4 py-1.5 text-xs text-gray-400 hover:text-gray-900 transition-all uppercase tracking-wider";
@@ -1603,7 +1695,7 @@
             tbody.innerHTML = '';
             
             if (!globalUniqueProducts || globalUniqueProducts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 bg-red-50 text-red-600 text-sm tracking-wide">데이터를 불러오지 못했습니다. 에러: ${debugProductsError || '알 수 없음'}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 bg-red-50 text-red-600 text-sm tracking-wide">Unable to load data. Error: ${debugProductsError || 'Unknown'}</td></tr>`;
                 return;
             }
             
@@ -1875,11 +1967,69 @@
             });
         }
 
+        const cosmeticRates = {supply: 50, '500': 45, '1000': 42, '3000': 37, '5000': 35};
+        try {
+            const savedRates = JSON.parse(localStorage.getItem('hym_cosmetic_rates') || '{}');
+            Object.keys(cosmeticRates).forEach(key => {
+                if (typeof savedRates[key] === 'number' && Number.isFinite(savedRates[key]) && savedRates[key] >= 0 && savedRates[key] <= 100) cosmeticRates[key] = savedRates[key];
+            });
+        } catch (error) {}
+
+        function updateCosmeticRate(key, input) {
+            if (!Object.prototype.hasOwnProperty.call(cosmeticRates, key)) return;
+            const value = Number(input.value);
+            if (input.value.trim() === '' || !Number.isFinite(value) || value < 0 || value > 100) {
+                input.value = cosmeticRates[key];
+                showToast('Enter a percentage from 0 to 100.', 'error');
+                return;
+            }
+            cosmeticRates[key] = value;
+            try { localStorage.setItem('hym_cosmetic_rates', JSON.stringify(cosmeticRates)); }
+            catch (error) { showToast('Rate applied for this session. Browser storage is unavailable.', 'info'); }
+            renderPharmacyTableData();
+        }
+
+        const consumableRates = {supply: 50, '500': 45, '1000': 42, '3000': 37, '5000': 35};
+        try {
+            const savedRates = JSON.parse(localStorage.getItem('hym_consumable_rates') || '{}');
+            Object.keys(consumableRates).forEach(key => {
+                if (typeof savedRates[key] === 'number' && Number.isFinite(savedRates[key]) && savedRates[key] >= 0 && savedRates[key] <= 100) consumableRates[key] = savedRates[key];
+            });
+        } catch (error) {}
+
+        function updateConsumableRate(key, input) {
+            if (!Object.prototype.hasOwnProperty.call(consumableRates, key)) return;
+            const value = Number(input.value);
+            if (input.value.trim() === '' || !Number.isFinite(value) || value < 0 || value > 100) {
+                input.value = consumableRates[key];
+                showToast('Enter a percentage from 0 to 100.', 'error');
+                return;
+            }
+            consumableRates[key] = value;
+            try { localStorage.setItem('hym_consumable_rates', JSON.stringify(consumableRates)); }
+            catch (error) { showToast('Rate applied for this session. Browser storage is unavailable.', 'info'); }
+            renderPharmacyTableData();
+        }
+
         function renderPharmacyTableData() {
             const tbody = document.getElementById('pharmacy-table-body');
             if (!tbody) return;
             tbody.innerHTML = '';
-            
+            const consumableBody = document.getElementById('beauty-consumables-table-body');
+            if (!consumableBody) return;
+            consumableBody.innerHTML = '';
+            Object.keys(consumableRates).forEach(key => {
+                const input = document.getElementById('consumable-rate-' + key);
+                if (input) input.value = consumableRates[key];
+                const header = document.querySelector('[data-consumable-rate="' + key + '"]');
+                if (header) header.textContent = consumableRates[key] + '%';
+            });
+            Object.keys(cosmeticRates).forEach(key => {
+                const input = document.getElementById('cosmetic-rate-' + key);
+                if (input) input.value = cosmeticRates[key];
+                const header = document.querySelector('[data-cosmetic-rate="' + key + '"]');
+                if (header) header.textContent = cosmeticRates[key] + '%';
+            });
             const targetNames = [
                 '셀슈틱스 리투디엔 더마플라스트 크림',
                 '셀슈틱스 리투지엔 더마플라스트 립밤',
@@ -1887,8 +2037,8 @@
             ];
 
             const engNames = {
-                '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Retudien Dermaplast Cream',
-                '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Retudien Dermaplast Lip Balm'
+                '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Re2DN Dermaplast Cream',
+                '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Re2DN Dermaplast Lip Balm'
             };
 
             const engIngr = {
@@ -1898,12 +2048,39 @@
             
             const pharmacyProducts = globalUniqueProducts.filter(p => {
                 const cName = (p.clean_name || '').trim();
-                return targetNames.includes(cName);
+                return targetNames.includes(cName) || /^Cellceutix (?:Retudien|Re2DN) Dermaplast (?:Cream|Lip Balm)$/i.test(cName);
             });
+            const ampoule = {
+                id: 'HYM_PHARMACY_AMPOULE',
+                clean_name: 'Cellceutix Re2DN Dermaplast Ampoule',
+                display_name: 'Cellceutix Re2DN Dermaplast Ampoule',
+                active_ingredients: 'Porcine-derived ECM, PDRN, Volufiline',
+                form: 'Syringe',
+                volume: '3ml',
+                qty: '1ea',
+                product_prices: [{currency: 'KRW', b2c_msrp: 39000}],
+                local_catalog_item: true
+            };
+            const creamIndex = pharmacyProducts.findIndex(p => /Dermaplast Cream$/i.test(engNames[(p.clean_name || '').trim()] || p.clean_name || ''));
+            pharmacyProducts.splice(creamIndex >= 0 ? creamIndex + 1 : 0, 0, ampoule);
             
-            if (!pharmacyProducts || pharmacyProducts.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="17" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">Fetching Pharmacy data...</td></tr>`;
-                return;
+            pharmacyProducts.push({
+                id: 'HYM_PHARMACY_KOOROLL', clean_name: 'KOOROLL', display_name: 'KOOROLL',
+                type: 'Beauty Consumables', form: 'Non-woven Fabric, etc.', volume: '1ea', qty: '1ea',
+                ct_quantity: 200, product_prices: [{currency: 'KRW', b2c_msrp: 14000}],
+                local_catalog_item: true, local_consumable: true
+            });
+            const addCategory = (label) => {
+                const row = document.createElement('tr');
+                row.className = 'pharmacy-category category-header';
+                row.innerHTML = `<td colspan="15">${label}</td>`;
+                tbody.appendChild(row);
+            };
+            addCategory('Cosmetics');
+            if (pharmacyProducts.length === 2) {
+                const status = document.createElement('tr');
+                status.innerHTML = `<td colspan="15" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">${debugProductsError ? 'Unable to load cosmetics. Please reload to try again.' : 'Fetching cosmetics data...'}</td>`;
+                tbody.appendChild(status);
             }
 
             pharmacyProducts.forEach(p => {
@@ -1916,56 +2093,53 @@
                     if (msrpValue === undefined || msrpValue === null || msrpValue === '') return null;
                     let krwMsrp = nativeCurrency === 'USD' ? Number(msrpValue) * appliedKrwRate : Number(msrpValue);
                     let targetKrw = krwMsrp * ratio;
-                    let roundedKrw = Math.ceil(targetKrw / 1000) * 1000;
+                    let roundedKrw = Math.ceil(Number((targetKrw / 100).toFixed(8))) * 100;
                     
-                    if (currentCurrency === 'USD') return Math.ceil(roundedKrw / appliedKrwRate);
+                    if (currentCurrency === 'USD') return Math.round(roundedKrw / appliedKrwRate * 100) / 100;
                     return roundedKrw;
                 };
 
-                const fPrice = (val) => val ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val) : '-';
+                const fPrice = (val) => val === null || val === undefined ? '-' : new Intl.NumberFormat('en-US', { minimumFractionDigits: currentCurrency === 'USD' ? 2 : 0, maximumFractionDigits: currentCurrency === 'USD' ? 2 : 0 }).format(val);
 
                 const baseMsrp = priceData.b2c_msrp;
                 const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0);
-                const clinicPromo = getCalculatedPrice(baseMsrp, 0.80);
-                const dist1000 = getCalculatedPrice(baseMsrp, 0.45); 
-                const dist3000 = getCalculatedPrice(baseMsrp, 0.42);
-                const dist5000 = getCalculatedPrice(baseMsrp, 0.37);
-                const dist10000 = getCalculatedPrice(baseMsrp, 0.34);
-                const oem10000 = getCalculatedPrice(baseMsrp, 0.33);
-                const oem30000 = getCalculatedPrice(baseMsrp, 0.30); 
-                const oem50000 = getCalculatedPrice(baseMsrp, 0.27);
+                const rates = p.local_consumable ? consumableRates : cosmeticRates;
+                const clinicPromo = getCalculatedPrice(baseMsrp, rates.supply / 100);
+                const dist500 = getCalculatedPrice(baseMsrp, rates['500'] / 100);
+                const dist1000 = getCalculatedPrice(baseMsrp, rates['1000'] / 100);
+                const dist3000 = getCalculatedPrice(baseMsrp, rates['3000'] / 100);
+                const dist5000 = getCalculatedPrice(baseMsrp, rates['5000'] / 100);
 
                 const tr = document.createElement('tr');
                 tr.className = `hover:bg-gray-50 transition-colors text-xs`;
                 tr.setAttribute('data-id', p.id);
+                if (p.local_consumable) tr.id = 'pharmacy-kooroll';
 
                 let cName = (p.clean_name || '').trim();
-                let dispName = engNames[cName] || p.display_name || '-';
+                let dispName = (engNames[cName] || p.display_name || cName || '-').replace(/Cellceutix Retu[d]ien Dermaplast/gi, 'Cellceutix Re2DN Dermaplast');
                 let dispIngr = engIngr[p.active_ingredients] || p.active_ingredients || '-';
 
                 let mappedImg = raImageMap[cName] || raImageMap[p.display_name] || ""; 
                 const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
 
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle relative">${getOrderArrowHtml('products')}${imgHtml}</td>
-                    <td class="py-3 px-4 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'pharmacy', 'products', dispName)}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${p.local_catalog_item ? '' : getOrderArrowHtml('products')}${imgHtml}</td>
+                    <td class="py-3 px-4 text-center text-black font-medium align-middle relative group/item">${dispName}${p.local_catalog_item ? '' : getActionHtml(p.id, 'pharmacy', 'products', dispName)}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
-                    <td class="py-3 px-4 text-center text-black align-middle font-light">Cosmetic</td>
+                    <td class="py-3 px-4 text-center text-black align-middle font-light">${p.local_consumable ? 'Beauty Consumables' : 'Cosmetic'}</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.form || '-'}</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.volume || '-'}</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.qty || '-'}</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.ct_quantity || '-'}</td>
+                    <td class="py-3 px-1 text-center font-light text-black text-[10px]">${p.ct_size || '-'}</td>
                     <td class="py-3 px-3 text-center font-medium text-black">${fPrice(clinicMsrp)}</td>
                     <td class="py-3 px-3 text-center text-black">${fPrice(clinicPromo)}</td>
+                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist500)}</td>
                     <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist1000)}</td>
                     <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist3000)}</td>
                     <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist5000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist10000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(oem10000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(oem30000)}</td>
-                    <td class="py-3 px-3 text-center font-medium text-black">${fPrice(oem50000)}</td>
                 `;
-                tbody.appendChild(tr);
+                (p.local_consumable ? consumableBody : tbody).appendChild(tr);
             });
         }
 
@@ -2024,6 +2198,7 @@
             const tbody = document.getElementById('raclinic-table-body');
             if (!tbody) return;
             tbody.innerHTML = '';
+            if (!partnerAccess.raclinic) return;
             
             const raProducts = globalUniqueProducts.filter(p => p.sub_category === 'RA Clinic Exclusive');
             
@@ -2042,11 +2217,10 @@
                     if (val === undefined || val === null || val === '') return null;
                     let krwPrice = nativeCurrency === 'USD' ? Number(val) * appliedKrwRate : Number(val);
                     let roundedKrw = Math.ceil(krwPrice / 1000) * 1000;
-                    if (currentCurrency === 'USD') return Math.ceil(roundedKrw / appliedKrwRate);
                     return roundedKrw;
                 };
 
-                const fPrice = (val) => val ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val) : '-';
+                const fPrice = (val) => val === null || val === undefined ? '-' : '₩' + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val);
 
                 const clinicMsrp = getPrice(priceData.b2c_msrp);
                 const clinicPromo = getPrice(priceData.b2c_promotion);
@@ -2095,6 +2269,7 @@
             const tbody = document.getElementById('charmacist-table-body');
             if (!tbody) return;
             tbody.innerHTML = '';
+            if (!partnerAccess.charmacist) return;
             
             const pharmacyTargetNames = [
                 '셀슈틱스 리투디엔 더마플라스트 크림',
@@ -2102,8 +2277,8 @@
             ];
 
             const engNames = {
-                '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Retudien Dermaplast Cream',
-                '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Retudien Dermaplast Lip Balm'
+                '셀슈틱스 리투디엔 더마플라스트 크림': 'Cellceutix Re2DN Dermaplast Cream',
+                '셀슈틱스 리투지엔 더마플라스트 립밤': 'Cellceutix Re2DN Dermaplast Lip Balm'
             };
 
             const engIngr = {
@@ -2132,11 +2307,10 @@
                     let krwMsrp = nativeCurrency === 'USD' ? Number(msrpValue) * appliedKrwRate : Number(msrpValue);
                     let targetKrw = krwMsrp * ratio;
                     let roundedKrw = Math.ceil(targetKrw / 1000) * 1000;
-                    if (currentCurrency === 'USD') return Math.ceil(roundedKrw / appliedKrwRate);
                     return roundedKrw;
                 };
 
-                const fPrice = (val) => val ? new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val) : '-';
+                const fPrice = (val) => val === null || val === undefined ? '-' : '₩' + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(val);
 
                 const baseMsrp = priceData.b2c_msrp;
                 const clinicMsrp = getCalculatedPrice(baseMsrp, 1.0);
@@ -2180,8 +2354,12 @@
         function printTableSection(sectionId, titleName) {
             const targetSection = document.getElementById(sectionId);
             if (!targetSection) return;
+            const partnerKey = sectionId.replace('section-', '');
+            if (Object.prototype.hasOwnProperty.call(partnerAccess, partnerKey)) {
+                if (!requestPartnerAccess(partnerKey, () => printTableSection(sectionId, titleName))) return;
+            }
             
-            const tableContainer = targetSection.querySelector('.table-container');
+            const tableContainer = sectionId === 'section-pharmacy' ? document.getElementById('container-pharmacy') : targetSection.querySelector('.table-container');
             const icon = targetSection.querySelector('svg[id^="icon-"]');
             if (tableContainer && tableContainer.classList.contains('hidden')) {
                 tableContainer.classList.remove('hidden');
@@ -2229,12 +2407,16 @@
             if (type === 'landscape') {
                 style.innerHTML = `
                     @media print { 
-                        @page { size: A4 landscape; margin: 5mm; } 
-                        body { zoom: 0.65; }
+                        @page { size: A4 landscape; margin: 10mm; }
+                        body.print-table-mode #main-content > div.no-print { display: none !important; }
+                        body.print-table-mode .no-print { display: none !important; }
+                        body { zoom: 1; overflow: visible !important; }
                         #main-content { padding: 0 !important; max-width: 100% !important; width: 100% !important; }
+                        h4 { break-after: avoid; page-break-after: avoid; }
+                        details.no-print { display: none !important; }
                         .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
-                        .unified-table { min-width: 0 !important; width: 100% !important; table-layout: auto !important; }
-                        .unified-table th, .unified-table td { padding: 6px 4px !important; font-size: 8pt !important; line-height: 1.2 !important; white-space: normal !important; word-break: break-word !important; }
+                        #section-pharmacy .unified-table, .unified-table { min-width: 0 !important; width: 100% !important; table-layout: fixed !important; }
+                        .unified-table th, .unified-table td { padding: 4px 3px !important; font-size: 6.5pt !important; line-height: 1.2 !important; white-space: normal !important; word-break: break-word !important; }
                         .unified-table tr { page-break-inside: avoid !important; break-inside: avoid !important; }
                         .unified-table thead { display: table-header-group !important; }
                         h2 { font-size: 16pt !important; margin-bottom: 12px !important; color: #000 !important; }
@@ -2247,3 +2429,13 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
