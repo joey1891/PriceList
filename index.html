@@ -2351,6 +2351,18 @@
             });
         }
 
+        function closePrintPreview() {
+            const modal = document.getElementById('print-preview-modal');
+            if (modal) modal.remove();
+        }
+
+        function confirmPrintPreview() {
+            const frame = document.getElementById('print-preview-frame');
+            if (!frame || !frame.contentWindow) return;
+            frame.contentWindow.focus();
+            frame.contentWindow.print();
+        }
+
         function printTableSection(sectionId, titleName) {
             const targetSection = document.getElementById(sectionId);
             if (!targetSection) return;
@@ -2366,36 +2378,38 @@
                 if (icon) icon.classList.remove('-rotate-90');
             }
 
-            document.body.classList.add('print-table-mode');
-            applyPrintStyle('landscape');
-
-            const allDirectChildren = document.querySelectorAll('#main-content > div');
-            allDirectChildren.forEach(child => child.classList.add('no-print'));
-            
-            const parentGroup = targetSection.closest('.border-l-4');
-            if(parentGroup) {
-                parentGroup.classList.remove('no-print');
-                parentGroup.classList.add('print-active-section');
-            } else {
-                targetSection.classList.remove('no-print');
-                targetSection.classList.add('print-active-section');
-            }
-            
-            const originalTitle = document.title;
-            const quoteDate = new Date().toISOString().split('T')[0];
-            document.title = `${titleName}_${quoteDate}`;
-            
-            window.print();
-            
-            setTimeout(() => {
-                document.title = originalTitle;
-                document.body.classList.remove('print-table-mode');
-                allDirectChildren.forEach(child => child.classList.remove('no-print'));
-                if(parentGroup) parentGroup.classList.remove('print-active-section');
-                else targetSection.classList.remove('print-active-section');
-                const styleEl = document.getElementById('dynamic-print-style');
-                if (styleEl) styleEl.remove();
-            }, 1000);
+            closePrintPreview();
+            const content = targetSection.cloneNode(true);
+            content.querySelectorAll('.no-print, details, button, .admin-action-btn, .admin-only-btn, svg[id^="icon-"]').forEach(node => node.remove());
+            content.querySelectorAll('[onclick], [onchange]').forEach(node => { node.removeAttribute('onclick'); node.removeAttribute('onchange'); });
+            content.querySelectorAll('.hidden').forEach(node => node.classList.remove('hidden'));
+            const headStyles = Array.from(document.querySelectorAll('head style, head link[rel="stylesheet"]')).map(node => node.outerHTML).join('');
+            const currency = Object.prototype.hasOwnProperty.call(partnerAccess, partnerKey) ? 'KRW' : currentCurrency;
+            const caption = currency === 'USD' ? `Unit: USD · 1 USD = KRW ${appliedKrwRate.toLocaleString('en-US')} · VAT Excluded` : 'Unit: KRW · VAT Excluded';
+            const pageStyles = `
+                @page { size: A4 landscape; margin: 15mm; }
+                html { background: #e5e7eb; }
+                body { box-sizing: border-box; background: white; color: #111827; margin: 12px auto; padding: 15mm; width: 297mm; min-height: 210mm; overflow: visible; }
+                #section-pharmacy .unified-table, .unified-table { width: 100% !important; min-width: 0 !important; table-layout: fixed !important; }
+                .table-container { max-height: none !important; overflow: visible !important; border: none !important; }
+                .unified-table th, .unified-table td { padding: 4px 3px !important; font-size: 6.5pt !important; line-height: 1.25 !important; word-break: break-word !important; }
+                .unified-table thead { position: static !important; display: table-header-group; }
+                tr { break-inside: avoid; page-break-inside: avoid; }
+                h3, h4 { break-after: avoid; page-break-after: avoid; }
+                .no-print, details, button { display: none !important; }
+                .print-caption { font-size: 10px; margin-bottom: 16px; }
+                @media print { html {background:white;} body { width: auto; min-height: 0; margin: 0; padding: 0; } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+            `;
+            const modal = document.createElement('div');
+            modal.id = 'print-preview-modal';
+            modal.className = 'fixed inset-0 z-[10002] bg-gray-900/90 flex flex-col no-print';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-label', 'Print Preview');
+            modal.innerHTML = `<div class="bg-white px-6 py-4 flex flex-wrap justify-between items-center gap-3"><div><h2 class="font-montserrat font-bold text-gray-900">Print Preview</h2><p class="text-xs text-gray-500 mt-1">A4 Landscape · Margins: 15 mm on all sides · Final pagination is shown in your browser's print dialog.</p></div><div class="flex gap-3"><button type="button" onclick="closePrintPreview()" class="border border-gray-300 px-5 py-2 text-xs rounded">Close</button><button type="button" onclick="confirmPrintPreview()" class="bg-gray-900 text-white px-5 py-2 text-xs rounded">Print / Save PDF</button></div></div><iframe id="print-preview-frame" title="A4 Print Preview" class="w-full flex-1 border-0 bg-gray-200"></iframe>`;
+            document.body.appendChild(modal);
+            const frame = document.getElementById('print-preview-frame');
+            frame.srcdoc = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${titleName}</title><script src="https://cdn.tailwindcss.com"><\/script>${headStyles}<style>${pageStyles}</style></head><body><p class="print-caption">HYM CORP. · ${caption}</p>${content.outerHTML}</body></html>`;
         }
 
         function applyPrintStyle(type) {
@@ -2407,7 +2421,7 @@
             if (type === 'landscape') {
                 style.innerHTML = `
                     @media print { 
-                        @page { size: A4 landscape; margin: 10mm; }
+                        @page { size: A4 landscape; margin: 15mm; }
                         body.print-table-mode #main-content > div.no-print { display: none !important; }
                         body.print-table-mode .no-print { display: none !important; }
                         body { zoom: 1; overflow: visible !important; }
@@ -2429,6 +2443,7 @@
     </script>
 </body>
 </html>
+
 
 
 
