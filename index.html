@@ -471,10 +471,10 @@
 </div>
 <div class="hidden" id="container-pharmacy"><h4 class="text-sm font-montserrat font-bold uppercase tracking-widest mt-5 mb-3">Cosmetics</h4><details class="no-print mb-4 border border-gray-200 p-3"><summary class="cursor-pointer text-xs uppercase tracking-wider font-semibold text-gray-600">Cosmetics rates</summary><div class="no-print bg-gray-50 border border-gray-200 p-4 mb-3" id="cosmetic-rate-controls"><p class="text-xs text-gray-600 mb-3">Cosmetics only · Percentage of MSRP · Rounded up to KRW 100 · Saved in this browser</p><div class="flex flex-wrap gap-4"><label class="text-xs text-gray-700">Supply Price<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics Supply Price percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-supply" max="100" min="0" onchange="updateCosmeticRate('supply', this)" step="0.1" type="number" value="50"/>%</span></label><label class="text-xs text-gray-700">500<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics 500 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-500" max="100" min="0" onchange="updateCosmeticRate('500', this)" step="0.1" type="number" value="45"/>%</span></label><label class="text-xs text-gray-700">1,000<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics 1,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-1000" max="100" min="0" onchange="updateCosmeticRate('1000', this)" step="0.1" type="number" value="42"/>%</span></label><label class="text-xs text-gray-700">3,000<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics 3,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-3000" max="100" min="0" onchange="updateCosmeticRate('3000', this)" step="0.1" type="number" value="37"/>%</span></label><label class="text-xs text-gray-700">5,000<span class="flex items-center gap-1 mt-1"><input aria-label="Cosmetics 5,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="cosmetic-rate-5000" max="100" min="0" onchange="updateCosmeticRate('5000', this)" step="0.1" type="number" value="35"/>%</span></label></div></div></details><div class="overflow-x-auto table-container bg-white"><table class="w-full text-left border-collapse unified-table">
 <colgroup>
-<col style="width: 4%;"/><col style="width: 18%;"/><col style="width: 12%;"/>
-<col style="width: 8%;"/><col style="width: 7%;"/><col style="width: 4%;"/><col style="width: 4%;"/><col style="width: 4%;"/><col style="width: 6%;"/>
-<col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/>
-<col style="width: 5.5%;"/>
+<col style="width: 4.0000%;"/><col style="width: 16.0000%;"/><col style="width: 11.0000%;"/>
+<col style="width: 7.0000%;"/><col style="width: 7.0000%;"/><col style="width: 4.0000%;"/><col style="width: 4.0000%;"/><col style="width: 4.0000%;"/><col style="width: 6.0000%;"/><col style="width: 5.0000%;"/>
+<col style="width: 5.3333%;"/><col style="width: 5.3333%;"/><col style="width: 5.3333%;"/><col style="width: 5.3333%;"/><col style="width: 5.3333%;"/>
+<col style="width: 5.3333%;"/>
 </colgroup>
 <thead>
 <tr>
@@ -486,7 +486,7 @@
 <th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Vol.</th>
 <th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Qty</th>
 <th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT</th>
-<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT SIZE</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT SIZE</th><th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">WEIGHT</th>
 <th class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700" colspan="2">Pharmacy</th>
 <th class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700" colspan="4">Distributor</th>
 </tr>
@@ -506,14 +506,14 @@
 </tr>
 </thead>
 <tbody class="text-sm bg-transparent" id="pharmacy-table-body">
-<tr class="loading-row"><td class="text-center py-10 text-black font-light text-sm italic" colspan="15">Fetching pharmacy data...</td></tr>
+<tr class="loading-row"><td class="text-center py-10 text-black font-light text-sm italic" colspan="16">Fetching pharmacy data...</td></tr>
 </tbody>
 </table></div><h4 class="text-sm font-montserrat font-bold uppercase tracking-widest mt-5 mb-3">Beauty Consumables</h4><details class="no-print mb-4 border border-gray-200 p-3"><summary class="cursor-pointer text-xs uppercase tracking-wider font-semibold text-gray-600">Beauty consumables rates</summary><div class="no-print bg-gray-50 border border-gray-200 p-4 mb-3" id="consumable-rate-controls"><p class="text-xs text-gray-600 mb-3">Beauty consumables only · Percentage of MSRP · Rounded up to KRW 100 · Saved in this browser</p><div class="flex flex-wrap gap-4"><label class="text-xs text-gray-700">Supply Price<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables Supply Price percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-supply" max="100" min="0" onchange="updateConsumableRate('supply', this)" step="0.1" type="number" value="50"/>%</span></label><label class="text-xs text-gray-700">500<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables 500 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-500" max="100" min="0" onchange="updateConsumableRate('500', this)" step="0.1" type="number" value="45"/>%</span></label><label class="text-xs text-gray-700">1,000<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables 1,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-1000" max="100" min="0" onchange="updateConsumableRate('1000', this)" step="0.1" type="number" value="42"/>%</span></label><label class="text-xs text-gray-700">3,000<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables 3,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-3000" max="100" min="0" onchange="updateConsumableRate('3000', this)" step="0.1" type="number" value="37"/>%</span></label><label class="text-xs text-gray-700">5,000<span class="flex items-center gap-1 mt-1"><input aria-label="Beauty consumables 5,000 percentage" class="w-20 border border-gray-300 px-2 py-2 text-gray-900 bg-white rounded" id="consumable-rate-5000" max="100" min="0" onchange="updateConsumableRate('5000', this)" step="0.1" type="number" value="35"/>%</span></label></div></div></details><div class="overflow-x-auto table-container bg-white"><table class="w-full text-left border-collapse unified-table">
 <colgroup>
-<col style="width: 4%;"/><col style="width: 18%;"/><col style="width: 12%;"/>
-<col style="width: 8%;"/><col style="width: 7%;"/><col style="width: 4%;"/><col style="width: 4%;"/><col style="width: 4%;"/><col style="width: 6%;"/>
-<col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/><col style="width: 5.5%;"/>
-<col style="width: 5.5%;"/>
+<col style="width: 4.0000%;"/><col style="width: 16.0000%;"/><col style="width: 11.0000%;"/>
+<col style="width: 7.0000%;"/><col style="width: 7.0000%;"/><col style="width: 4.0000%;"/><col style="width: 4.0000%;"/><col style="width: 4.0000%;"/><col style="width: 6.0000%;"/><col style="width: 5.0000%;"/>
+<col style="width: 5.3333%;"/><col style="width: 5.3333%;"/><col style="width: 5.3333%;"/><col style="width: 5.3333%;"/><col style="width: 5.3333%;"/>
+<col style="width: 5.3333%;"/>
 </colgroup>
 <thead>
 <tr>
@@ -525,7 +525,7 @@
 <th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Vol.</th>
 <th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">Qty</th>
 <th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT</th>
-<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT SIZE</th>
+<th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">CT SIZE</th><th class="py-3 px-2 text-[10px] tracking-wider text-center bg-gray-900 text-white uppercase align-middle border-b border-gray-700" rowspan="3">WEIGHT</th>
 <th class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700" colspan="2">Pharmacy</th>
 <th class="py-2 px-4 text-xs tracking-wider text-center bg-gray-900 text-white uppercase border-b border-gray-700" colspan="4">Distributor</th>
 </tr>
@@ -1062,7 +1062,7 @@
                         type: type,
                         volume: volume,
                         ct_quantity: ctQty ? parseInt(ctQty, 10) : null,
-                        qty: '1EA'
+                        qty: existingProduct ? (existingProduct.qty || '1ea') : '1ea'
                     };
                     
                     if (imageUrl) {
@@ -1077,7 +1077,7 @@
                         const { error: prodErr } = await supabaseClient.from('products').update(payload).eq('id', editId);
                         if (prodErr) throw prodErr;
                     } else {
-                        payload.id = 'PRD_' + Date.now() + '_' + Math.floor(Math.random()*1000); // 낫널 제약 방지
+                        payload.id = crypto.randomUUID(); // 낫널 제약 방지
                         const { data: insertedProd, error: prodErr } = await supabaseClient.from('products').insert([payload]).select();
                         if (prodErr) throw prodErr;
                         if (insertedProd && insertedProd.length > 0) prodId = insertedProd[0].id;
@@ -1102,13 +1102,13 @@
                                 const { error: priceErr } = await supabaseClient.from('product_prices').update(pricePayload).eq('product_id', prodId);
                                 if (priceErr) throw priceErr;
                             } else {
-                                pricePayload.id = 'PRC_' + Date.now();
+                                pricePayload.id = crypto.randomUUID();
                                 pricePayload.product_id = prodId;
                                 const { error: priceErr } = await supabaseClient.from('product_prices').insert([pricePayload]);
                                 if (priceErr) throw priceErr;
                             }
                         } else {
-                            pricePayload.id = 'PRC_' + Date.now();
+                            pricePayload.id = crypto.randomUUID();
                             pricePayload.product_id = prodId;
                             const { error: priceErr } = await supabaseClient.from('product_prices').insert([pricePayload]);
                             if (priceErr) throw priceErr;
@@ -1492,6 +1492,8 @@
             // 페이지 로드 시 실시간 환율을 가장 먼저 호출합니다.
             await fetchLiveExchangeRate();
 
+            globalUniqueProducts = [];
+            debugProductsError = '';
             try {
                 const { data: rawProducts, error: prodErr } = await supabaseClient
                     .from('products')
@@ -1500,13 +1502,15 @@
                     .order('created_at', { ascending: true });
                     
                 if (prodErr) debugProductsError = prodErr.message;
-                const { data: rawPrices } = await supabaseClient.from('product_prices').select('*');
+                const { data: rawPrices, error: priceErr } = await supabaseClient.from('product_prices').select('*');
+                if (prodErr) throw prodErr;
+                if (priceErr) throw priceErr;
                 const { data: rawMasterData } = await supabaseClient.from('form_catalog_master').select('*');
 
                 if (rawProducts && rawProducts.length > 0) {
                     rawProducts.forEach(product => {
                         product.product_prices = (rawPrices || []).filter(pr => pr.product_id === product.id);
-                        if (rawMasterData && product.product_prices.length > 0) {
+                        if (rawMasterData && product.product_prices.length > 0 && !['cellceutix re2dn dermaplast ampoule', 'kooroll'].includes((product.clean_name || '').trim().toLowerCase())) {
                             const masterMatch = rawMasterData.find(m => m.id === product.id || m.product_id === product.id || m.clean_name === product.clean_name);
                             if (masterMatch) {
                                 if (masterMatch.b2c_msrp !== undefined) product.product_prices[0].b2c_msrp = masterMatch.b2c_msrp;
@@ -1539,7 +1543,7 @@
                              main_category: 'Skincare',
                              sub_category: 'Cosmetic',
                              volume: '30ml',
-                             qty: '1EA',
+                             qty: existingProduct ? (existingProduct.qty || '1ea') : '1ea',
                              ct_quantity: 72,
                              product_prices: [{
                                  currency: 'KRW',
@@ -2046,47 +2050,41 @@
                 '돼지유래 ECM, 보르피린': 'Porcine-derived ECM, Volufiline'
             };
             
+            const isConsumable = p => (p.sub_category || '').trim().toLowerCase() === 'beauty consumables'
+                || (p.type || '').trim().toLowerCase() === 'beauty consumables'
+                || (p.clean_name || '').trim().toUpperCase() === 'KOOROLL';
             const pharmacyProducts = globalUniqueProducts.filter(p => {
-                const cName = (p.clean_name || '').trim();
-                return targetNames.includes(cName) || /^Cellceutix (?:Retudien|Re2DN) Dermaplast (?:Cream|Lip Balm)$/i.test(cName);
-            });
-            const ampoule = {
-                id: 'HYM_PHARMACY_AMPOULE',
-                clean_name: 'Cellceutix Re2DN Dermaplast Ampoule',
-                display_name: 'Cellceutix Re2DN Dermaplast Ampoule',
-                active_ingredients: 'Porcine-derived ECM, PDRN, Volufiline',
-                form: 'Syringe',
-                volume: '3ml',
-                qty: '1ea',
-                product_prices: [{currency: 'KRW', b2c_msrp: 39000}],
-                local_catalog_item: true
-            };
-            const creamIndex = pharmacyProducts.findIndex(p => /Dermaplast Cream$/i.test(engNames[(p.clean_name || '').trim()] || p.clean_name || ''));
-            pharmacyProducts.splice(creamIndex >= 0 ? creamIndex + 1 : 0, 0, ampoule);
-            
-            pharmacyProducts.push({
-                id: 'HYM_PHARMACY_KOOROLL', clean_name: 'KOOROLL', display_name: 'KOOROLL',
-                type: 'Beauty Consumables', form: 'Non-woven Fabric, etc.', volume: '1ea', qty: '1ea',
-                ct_quantity: 200, product_prices: [{currency: 'KRW', b2c_msrp: 14000}],
-                local_catalog_item: true, local_consumable: true
-            });
+                const name = (p.clean_name || '').trim();
+                return targetNames.includes(name) || isConsumable(p)
+                    || (p.main_category || '').trim().toLowerCase() === 'pharmacy'
+                    || /^Cellceutix (?:Retudien|Re2DN) Dermaplast (?:Cream|Lip Balm|Ampoule)$/i.test(name);
+            }).map(p => ({...p, local_consumable: isConsumable(p)}));
+            const ampouleIndex = pharmacyProducts.findIndex(p => /^Cellceutix Re2DN Dermaplast Ampoule$/i.test((p.clean_name || '').trim()));
+            if (ampouleIndex >= 0) {
+                const [ampoule] = pharmacyProducts.splice(ampouleIndex, 1);
+                const creamIndex = pharmacyProducts.findIndex(p => /Dermaplast Cream$/i.test(engNames[(p.clean_name || '').trim()] || p.clean_name || ''));
+                pharmacyProducts.splice(creamIndex >= 0 ? creamIndex + 1 : 0, 0, ampoule);
+            }
             const addCategory = (label) => {
                 const row = document.createElement('tr');
                 row.className = 'pharmacy-category category-header';
-                row.innerHTML = `<td colspan="15">${label}</td>`;
+                row.innerHTML = `<td colspan="16">${label}</td>`;
                 tbody.appendChild(row);
             };
             addCategory('Cosmetics');
-            if (pharmacyProducts.length === 2) {
+            if (!pharmacyProducts.some(p => !p.local_consumable)) {
                 const status = document.createElement('tr');
-                status.innerHTML = `<td colspan="15" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">${debugProductsError ? 'Unable to load cosmetics. Please reload to try again.' : 'Fetching cosmetics data...'}</td>`;
+                status.innerHTML = `<td colspan="16" class="text-center py-10 bg-gray-50 text-gray-500 text-sm tracking-wide">${debugProductsError ? 'Unable to load cosmetics. Please reload to try again.' : 'No cosmetics data available. Check database registration and read access.'}</td>`;
                 tbody.appendChild(status);
             }
 
+            if (!pharmacyProducts.some(p => p.local_consumable)) {
+                consumableBody.innerHTML = '<tr><td colspan="16" class="text-center py-8 text-xs text-gray-500">No beauty consumables data available. Check database registration and read access.</td></tr>';
+            }
             pharmacyProducts.forEach(p => {
                 let pricesArray = p.product_prices || [];
                 if (!Array.isArray(pricesArray)) pricesArray = [pricesArray];
-                const priceData = pricesArray[0] || {};
+                const priceData = pricesArray.find(price => (price.currency || '').trim().toUpperCase() === 'KRW') || pricesArray[0] || {};
                 const nativeCurrency = (priceData.currency || 'KRW').trim().toUpperCase();
 
                 const getCalculatedPrice = (msrpValue, ratio) => {
@@ -2119,12 +2117,12 @@
                 let dispName = (engNames[cName] || p.display_name || cName || '-').replace(/Cellceutix Retu[d]ien Dermaplast/gi, 'Cellceutix Re2DN Dermaplast');
                 let dispIngr = engIngr[p.active_ingredients] || p.active_ingredients || '-';
 
-                let mappedImg = raImageMap[cName] || raImageMap[p.display_name] || ""; 
+                let mappedImg = p.image_url || raImageMap[cName] || raImageMap[p.display_name] || ""; 
                 const imgHtml = mappedImg ? `<img src="${mappedImg}" class="product-img mx-auto cursor-pointer hover:opacity-80" onclick="openImageModal('${mappedImg}')">` : `<div class="placeholder-img mx-auto w-8 h-8 bg-gray-100 text-gray-400">N/A</div>`;
 
                 tr.innerHTML = `
-                    <td class="py-2 px-2 text-center align-middle relative">${p.local_catalog_item ? '' : getOrderArrowHtml('products')}${imgHtml}</td>
-                    <td class="py-3 px-4 text-center text-black font-medium align-middle relative group/item">${dispName}${p.local_catalog_item ? '' : getActionHtml(p.id, 'pharmacy', 'products', dispName)}</td>
+                    <td class="py-2 px-2 text-center align-middle relative">${getOrderArrowHtml('products')}${imgHtml}</td>
+                    <td class="py-3 px-4 text-center text-black font-medium align-middle relative group/item">${dispName}${getActionHtml(p.id, 'pharmacy', 'products', dispName)}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light leading-tight">${dispIngr}</td>
                     <td class="py-3 px-4 text-center text-black align-middle font-light">${p.local_consumable ? 'Beauty Consumables' : 'Cosmetic'}</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.form || '-'}</td>
@@ -2132,6 +2130,7 @@
                     <td class="py-3 px-2 text-center font-light text-black">${p.qty || '-'}</td>
                     <td class="py-3 px-2 text-center font-light text-black">${p.ct_quantity || '-'}</td>
                     <td class="py-3 px-1 text-center font-light text-black text-[10px]">${p.ct_size || '-'}</td>
+                    <td class="py-3 px-1 text-center font-light text-black text-[10px]">${p.carton_weight_kg !== null && p.carton_weight_kg !== undefined && p.carton_weight_kg !== '' ? p.carton_weight_kg + 'kg' : '-'}</td>
                     <td class="py-3 px-3 text-center font-medium text-black">${fPrice(clinicMsrp)}</td>
                     <td class="py-3 px-3 text-center text-black">${fPrice(clinicPromo)}</td>
                     <td class="py-3 px-3 text-center font-medium text-black">${fPrice(dist500)}</td>
@@ -2443,6 +2442,9 @@
     </script>
 </body>
 </html>
+
+
+
 
 
 
