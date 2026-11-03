@@ -327,12 +327,13 @@
 
                     const catInfo = allowedCatalogProductMap.get(product.id);
                     
-                    // DB에서 삭제하지 않고 HTML에서 얼굴/두피 폴더의 일반소비자용 제품 숨김 처리
-                    const isFaceOrScalp = (catInfo.sub1 === '얼굴' || catInfo.sub1 === 'Face' || catInfo.sub1 === '두피' || catInfo.sub1 === 'Scalp');
+                    // 두피 폴더 전체 숨김, 얼굴 폴더의 일반소비자용 숨김 처리
+                    const isFace = (catInfo.sub1 === '얼굴' || catInfo.sub1 === 'Face');
+                    const isScalp = (catInfo.sub1 === '두피' || catInfo.sub1 === 'Scalp');
                     const isHomeCare = (catInfo.sub2 === '일반소비자용' || catInfo.sub2 === 'Home Care');
-                    if (isFaceOrScalp && isHomeCare) {
-                        return false; 
-                    }
+                    
+                    if (isScalp) return false;
+                    if (isFace && isHomeCare) return false; 
 
                     const searchString = [product.clean_name, product.brand, product.main_category, product.sub_category, product.type].filter(Boolean).join(' ').toLowerCase();
                     const excludeKeywords = [
@@ -369,12 +370,28 @@
                     const brandPart = product.brand && !isResnovae ? `[${product.brand}] ` : '';
                     let namePart = translateToKorean(product.clean_name || 'Unnamed Product').replace(/\[?resnovae\]?/gi, '').trim();
                     
-                    // 셀슈틱스 리투디엔 앰플의 경우 중복되는 '셀슈틱스' 텍스트 제거
-                    if (namePart.includes('셀슈틱스 리투디엔')) {
-                        namePart = namePart.replace('셀슈틱스 리투디엔', '리투디엔');
-                    }
+                    // [이름 수정 규칙 적용]
+                    // 1. 리투지엔 -> 리투디엔 오타 수정
+                    namePart = namePart.replace(/리투지엔/g, '리투디엔');
 
                     let fullName = `${brandPart}${namePart}`.trim();
+
+                    // 2. [구혜선] 대괄호 및 중복 제거
+                    fullName = fullName.replace(/\[구혜선\]\s*/g, '');
+                    if (fullName.includes('쿠롤') && !fullName.includes('구혜선 쿠롤')) {
+                        fullName = fullName.replace('쿠롤', '구혜선 쿠롤');
+                    }
+                    fullName = fullName.replace(/구혜선\s+구혜선/g, '구혜선');
+
+                    // 3. [셀슈틱스] 대괄호 제거 및 누락된 셀슈틱스 추가
+                    fullName = fullName.replace(/\[셀슈틱스\]\s*/g, '셀슈틱스 ');
+                    if (fullName.includes('리투디엔') && !fullName.includes('셀슈틱스')) {
+                        fullName = fullName.replace('리투디엔', '셀슈틱스 리투디엔');
+                    }
+                    fullName = fullName.replace(/셀슈틱스\s+셀슈틱스/g, '셀슈틱스');
+                    
+                    // 잉여 공백 정리
+                    fullName = fullName.replace(/\s+/g, ' ').trim();
 
                     // Prefix assignment
                     if (fullName.includes('코어 임팩트') || fullName.includes('하이퍼 샷')) fullName = `[뷰티기기] ${fullName}`;
@@ -400,8 +417,16 @@
                         overrideMsrp = 305000;
                         supplyPrice = overrideMsrp * 0.5; 
                     } 
-                    else if (fullName.includes('리투디엔')) {
+                    else if (fullName.includes('리투디엔') && fullName.includes('앰플')) {
                         overrideMsrp = 39000;
+                        supplyPrice = overrideMsrp * 0.5;
+                    }
+                    else if (fullName.includes('리투디엔') && fullName.includes('립밤')) {
+                        overrideMsrp = 13000;
+                        supplyPrice = overrideMsrp * 0.5;
+                    }
+                    else if (fullName.includes('리투디엔') && fullName.includes('크림')) {
+                        overrideMsrp = 49000;
                         supplyPrice = overrideMsrp * 0.5;
                     }
                     else if (fullName.includes('쿠롤')) {
