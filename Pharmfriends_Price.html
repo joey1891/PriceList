@@ -19,81 +19,58 @@
 
         /* Print Styles */
         @media print {
-            /* Reset body background */
             body { 
                 background: white !important; 
                 margin: 0;
                 padding: 0;
                 font-size: 11pt;
             }
-
-            /* Setup A4 Page */
             @page {
                 size: A4 portrait;
                 margin: 15mm;
             }
-
-            /* Main container adjustments */
             #appContainer {
                 display: block !important;
                 min-height: auto;
             }
-            
             main {
                 padding: 0 !important;
                 margin: 0 !important;
                 max-width: none !important;
             }
-
-            /* 인쇄 전용 헤더 스타일 - 크고 깔끔하게 */
             header {
                 position: static !important;
                 box-shadow: none !important;
-                border-bottom: 3px solid #1e293b !important; /* 굵은 밑줄 */
+                border-bottom: 3px solid #1e293b !important;
                 margin-bottom: 20px !important;
                 padding: 10px 0 20px 0 !important;
             }
-            
-            /* 제목 텍스트 크기 키우기 */
             header h1 {
                 font-size: 24pt !important;
                 color: #0f172a !important;
             }
-
-            /* Table container adjustments - CRITICAL FOR PRINTING MULTIPLE PAGES */
             .bg-white.rounded-xl.shadow-sm.border.overflow-hidden {
                 border: none !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
                 overflow: visible !important;
             }
-
             .overflow-x-auto { 
                 overflow: visible !important; 
                 max-height: none !important;
             }
-
             table {
                 width: 100% !important;
                 min-width: 100% !important;
                 border-collapse: collapse !important;
                 page-break-inside: auto !important;
             }
-
             tr { 
                 page-break-inside: avoid !important; 
                 page-break-after: auto !important; 
             }
-            
-            thead { 
-                display: table-header-group !important; 
-            }
-            
-            tbody { 
-                display: table-row-group !important; 
-            }
-
-            /* Keep colors for print */
+            thead { display: table-header-group !important; }
+            tbody { display: table-row-group !important; }
             th {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -101,13 +78,10 @@
                 border-bottom: 2px solid #cbd5e1 !important;
                 position: static !important;
             }
+            th.bg-emerald-50\/50 { background-color: #ecfdf5 !important; }
+            th.bg-purple-50\/50 { background-color: #f3e8ff !important; }
+            th.bg-indigo-50\/50 { background-color: #e0e7ff !important; }
 
-            th.bg-blue-50\\/50 { background-color: #eff6ff !important; }
-            th.bg-emerald-50\\/50 { background-color: #ecfdf5 !important; }
-            th.bg-purple-50\\/50 { background-color: #f3e8ff !important; }
-            th.bg-indigo-50\\/50 { background-color: #e0e7ff !important; }
-
-            /* Background colors for group headers */
             tr td.bg-slate-300 {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -118,30 +92,10 @@
                 print-color-adjust: exact !important;
                 background-color: #f1f5f9 !important;
             }
-
-            /* Price column colors */
-            td.bg-blue-50\\/30 {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                background-color: #eff6ff !important;
-            }
-            td.bg-emerald-50\\/30 {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                background-color: #ecfdf5 !important;
-            }
-            td.bg-purple-50\\/30 {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                background-color: #f3e8ff !important;
-            }
-            td.bg-indigo-50\\/30 {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                background-color: #e0e7ff !important;
-            }
+            td.bg-emerald-50\/30 { background-color: #ecfdf5 !important; }
+            td.bg-purple-50\/30 { background-color: #f3e8ff !important; }
+            td.bg-indigo-50\/30 { background-color: #e0e7ff !important; }
             
-            .text-blue-700 { color: #1d4ed8 !important; }
             .text-emerald-700 { color: #047857 !important; }
             .text-purple-700 { color: #7e22ce !important; }
             .text-indigo-700 { color: #4338ca !important; }
@@ -177,7 +131,7 @@
         </div>
     </div>
 
-    <!-- Main App Container (Hidden initially) -->
+    <!-- Main App Container -->
     <div id="appContainer" class="hidden flex-col min-h-screen w-full">
         <!-- Header -->
         <header class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-10 print:static print:border-b-4 print:border-slate-800">
@@ -186,7 +140,6 @@
                     <i data-lucide="pill" class="text-blue-600 h-8 w-8 print:text-slate-800"></i>
                     <h1 class="text-2xl font-bold text-slate-800 tracking-tight">제품가격표</h1>
                 </div>
-                <!-- 인쇄 모드에서는 이 영역(버튼들)을 숨김 (print:hidden 속성 사용) -->
                 <div class="flex gap-2 sm:gap-3 print:hidden">
                     <button id="loadBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 font-medium py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2 text-sm">
                         <i data-lucide="refresh-cw" class="h-4 w-4"></i>
@@ -256,7 +209,6 @@
         // Supabase Configuration
         const supabaseUrl = 'https://rayhgqcpupwmwpymtkwg.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
-        
         const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         let currentData = [];
@@ -337,6 +289,7 @@
                 exportBtn.disabled = true;
                 currentData = [];
 
+                // 1. Fetch form_catalog_master
                 const { data: catalogData, error: catalogError } = await supabaseClient
                     .from('form_catalog_master')
                     .select('product_id, category, sub_category_1, sub_category_2, unit_price')
@@ -357,12 +310,7 @@
                     }
                 });
 
-                catalogData.forEach(item => {
-                    if (excludedMasterCategories.includes(item.category)) {
-                        allowedCatalogProductMap.delete(item.product_id);
-                    }
-                });
-
+                // 2. Fetch products & product_prices
                 const { data, error } = await supabaseClient
                     .from('products')
                     .select(`
@@ -373,8 +321,18 @@
 
                 if (error) throw error;
 
+                // 3. Process and filter Data
                 currentData = data.filter(product => {
                     if (!allowedCatalogProductMap.has(product.id)) return false;
+
+                    const catInfo = allowedCatalogProductMap.get(product.id);
+                    
+                    // DB에서 삭제하지 않고 HTML에서 얼굴/두피 폴더의 일반소비자용 제품 숨김 처리
+                    const isFaceOrScalp = (catInfo.sub1 === '얼굴' || catInfo.sub1 === 'Face' || catInfo.sub1 === '두피' || catInfo.sub1 === 'Scalp');
+                    const isHomeCare = (catInfo.sub2 === '일반소비자용' || catInfo.sub2 === 'Home Care');
+                    if (isFaceOrScalp && isHomeCare) {
+                        return false; 
+                    }
 
                     const searchString = [product.clean_name, product.brand, product.main_category, product.sub_category, product.type].filter(Boolean).join(' ').toLowerCase();
                     const excludeKeywords = [
@@ -410,10 +368,18 @@
                     const isResnovae = product.brand && product.brand.toLowerCase() === 'resnovae';
                     const brandPart = product.brand && !isResnovae ? `[${product.brand}] ` : '';
                     let namePart = translateToKorean(product.clean_name || 'Unnamed Product').replace(/\[?resnovae\]?/gi, '').trim();
+                    
+                    // 셀슈틱스 리투디엔 앰플의 경우 중복되는 '셀슈틱스' 텍스트 제거
+                    if (namePart.includes('셀슈틱스 리투디엔')) {
+                        namePart = namePart.replace('셀슈틱스 리투디엔', '리투디엔');
+                    }
+
                     let fullName = `${brandPart}${namePart}`.trim();
 
+                    // Prefix assignment
                     if (fullName.includes('코어 임팩트') || fullName.includes('하이퍼 샷')) fullName = `[뷰티기기] ${fullName}`;
                     else if (fullName.includes('스칼프 MD')) fullName = `[의료기기][2등급] ${fullName}`;
+                    else if (fullName.includes('쿠롤')) fullName = `[뷰티툴] ${fullName}`;
                     else fullName = `[화장품] ${fullName}`;
 
                     if (fullName.includes('스칼프 MD')) msrp = 70000;
@@ -424,6 +390,7 @@
                     let overrideMsrp = null;
                     let overrideSupplyPrice = null;
 
+                    // Hardcoded Overrides
                     if (fullName.includes('코어 임팩트')) { 
                         overrideMsrp = 394800;
                         supplyPrice = overrideMsrp * 0.5; 
@@ -433,6 +400,15 @@
                         overrideMsrp = 305000;
                         supplyPrice = overrideMsrp * 0.5; 
                     } 
+                    else if (fullName.includes('리투디엔')) {
+                        overrideMsrp = 39000;
+                        supplyPrice = overrideMsrp * 0.5;
+                    }
+                    else if (fullName.includes('쿠롤')) {
+                        overrideMsrp = 14000;
+                        supplyPrice = overrideMsrp * 0.5;
+                        catInfo.sub1 = '뷰티툴'; // 뷰티툴 카테고리 강제 할당
+                    }
                     else if (fullName.includes('멜라노 컷 브라이트닝 앰플')) {
                         overrideMsrp = 32400;
                         supplyPrice = overrideMsrp * 0.5;
@@ -476,14 +452,15 @@
                         name: fullName, 
                         subCategory1: catInfo.sub1, 
                         subCategory2: catInfo.sub2, 
-                        msrp, 
+                        msrp: overrideMsrp !== null ? overrideMsrp : msrp,
+                        originalMsrp: msrp, 
                         overrideMsrp,
                         supplyPrice, 
                         overrideSupplyPrice,
                         commissionPrice,
                         netSupplyPrice
                     };
-                }).filter(item => item.msrp > 0);
+                }).filter(item => item.msrp > 0 || (item.overrideMsrp !== null && item.overrideMsrp > 0)); // 방어 로직 적용
 
                 renderTable(currentData);
             } catch (err) {
@@ -545,10 +522,14 @@
                         
                         let msrpHtml = formatCurrency(Math.round(item.msrp / 100) * 100);
                         if (item.overrideMsrp !== null && item.overrideMsrp !== undefined) {
-                            msrpHtml = `
-                                <div class="line-through text-slate-400 text-xs font-normal opacity-80 mb-0.5">${formatCurrency(Math.round(item.msrp / 100) * 100)}</div>
-                                <div class="font-bold text-slate-700">${formatCurrency(item.overrideMsrp)}</div>
-                            `;
+                            if (item.originalMsrp > 0 && item.originalMsrp !== item.overrideMsrp) {
+                                msrpHtml = `
+                                    <div class="line-through text-slate-400 text-xs font-normal opacity-80 mb-0.5">${formatCurrency(Math.round(item.originalMsrp / 100) * 100)}</div>
+                                    <div class="font-bold text-slate-700">${formatCurrency(item.overrideMsrp)}</div>
+                                `;
+                            } else {
+                                msrpHtml = `<div class="font-bold text-slate-700">${formatCurrency(item.overrideMsrp)}</div>`;
+                            }
                         }
 
                         let supplyPriceHtml = formatCurrency(item.supplyPrice);
