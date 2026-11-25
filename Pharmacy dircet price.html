@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>약국 공급 제품 비교표 (A4 페이지 분할 & Supabase DB 연동)</title>
+    <!-- Tailwind CSS 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS SDK 로드 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Pretendard 웹폰트 로드 -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        /* 커스텀 스크롤바 */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* 불릿 리스트 스타일 */
+        .custom-list li {
+            position: relative;
+            padding-left: 12px;
+            margin-bottom: 4px;
+        }
+        .custom-list li:last-child {
+            margin-bottom: 0;
+        }
+        .custom-list li::before {
+            content: "▪";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: #334155;
+            font-size: 0.75rem;
+        }
+        /* 표의 모든 셀 테두리 굵기를 1px(#9ca3af)로 완벽히 통일 */
+        .comparison-table {
+            border-collapse: collapse;
+            border: 1px solid #9ca3af;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #9ca3af !important;
+        }
+        /* 첫 열(구분) 좌측 고정 시에도 다른 셀과 완전히 동일한 1px 선 굵기 유지 */
+        .sticky-col-header,
+        .sticky-col-cell {
+            position: sticky;
+            left: 0;
+            z-index: 20;
+            border: 1px solid #9ca3af !important;
+            outline: 1px solid #9ca3af;
+            outline-offset: -1px;
+        }
+        .sticky-col-cell {
+            z-index: 10;
+        }
+        /* 관리자 편집 모드 활성화 시 편집 가능 요소 하이라이트 */
+        body.admin-mode [data-editable="true"] {
+            outline: 1.5px dashed #3b82f6;
+            outline-offset: -3px;
+            background-color: rgba(239, 246, 255, 0.45);
+            cursor: text;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+        }
+        body.admin-mode [data-editable="true"]:focus {
+            outline: 2px solid #2563eb;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        /* 드래그 앤 드롭 오버레이 */
+        .drop-zone {
+            position: relative;
+        }
+        .drop-overlay {
+            display: none;
+        }
+        body.admin-mode .drop-zone .drop-overlay {
+            display: flex;
+        }
+        .drop-zone.drag-over .drop-overlay {
+            background-color: rgba(37, 99, 235, 0.85);
+            border-color: #ffffff;
+        }
+        /* A4 페이지 카드 시각적 구분 */
+        .a4-page-sheet {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 28px;
+            overflow: hidden;
+        }
+        .a4-page-sheet:last-child {
+            margin-bottom: 0;
+        }
+        /* 인쇄 시 A4 가로 1페이지당 5개씩 정확히 페이지 나누기 */
+        @page {
+            size: A4 landscape;
+            margin: 8mm;
+        }
+        @media print {
+            body {
+                background-color: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .a4-page-sheet {
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                margin-bottom: 0 !important;
+                page-break-after: always;
+                break-after: page;
+            }
+            .a4-page-sheet:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+            .table-container {
+                overflow: visible !important;
+            }
+            .comparison-table {
+                min-width: 100% !important;
+                width: 100% !important;
+                font-size: 11px !important;
+            }
+            .drop-zone {
+                width: 130px !important;
+                height: 130px !important;
+            }
+            [data-editable="true"] {
+                outline: none !important;
+                background-color: transparent !important;
+            }
+        }
+    </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8 min-h-screen flex flex-col items-center justify-start">
+
+    <!-- 알림 토스트 메시지 박스 -->
+    <div id="toast-box" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none no-print">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 text-sm font-medium border border-slate-700">
+            <span id="toast-icon" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span id="toast-text">저장되었습니다.</span>
+        </div>
+    </div>
+
+    <!-- 확인 모달 (초기화용) -->
+    <div id="reset-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-100">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">초기 데이터(6개 제품)로 복원할까요?</h3>
+            <p class="text-sm text-gray-600 mb-6 leading-relaxed">수정하신 이미지, 가격, 정책 문구가 모두 기본 6개 제품 상태로 되돌아갑니다.</p>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeResetModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition cursor-pointer">취소</button>
+                <button onclick="confirmResetData()" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 transition cursor-pointer">초기화 실행</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 관리자 비밀번호 확인 모달 -->
+    <div id="password-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-2xl border border-gray-100">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </span>
+                <h3 class="text-base font-bold text-gray-900">관리자 인증</h3>
+            </div>
+            <p class="text-xs text-gray-500 mb-4">편집 모드로 전환하려면 비밀번호를 입력하세요.</p>
+            <form onsubmit="verifyAdminPassword(event)">
+                <input type="password" id="admin-password-input" placeholder="비밀번호 입력" autocomplete="off"
+                    class="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-1.5" />
+                <p id="password-error-msg" class="text-xs text-rose-600 font-medium mb-3 hidden">비밀번호가 일치하지 않습니다.</p>
+                <div class="flex justify-end gap-2 mt-3">
+                    <button type="button" onclick="closePasswordModal()" class="px-3.5 py-2 rounded-lg text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition cursor-pointer">취소</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 transition cursor-pointer">확인</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 상단 고정 헤더 바 -->
+    <div class="w-full max-w-[1440px] mb-4 rounded-xl overflow-hidden shadow-md border border-slate-700 no-print">
+        <div class="bg-slate-800 text-white px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-sm">
+            <div class="flex flex-wrap items-center gap-2.5">
+                <span id="mode-indicator" class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                <span class="font-semibold text-base">약국 입점 및 공급 조건 안내표</span>
+                <span id="page-count-badge" class="bg-slate-700 text-slate-200 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                    총 6개 제품 · A4 2페이지
+                </span>
+                <span id="db-status-badge" class="bg-slate-700 text-slate-200 text-[11px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+                    <span id="db-status-dot" class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="db-status-text">DB 연결 중...</span>
+                </span>
+                <span id="admin-badge" class="hidden bg-blue-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-full tracking-wide">관리자 편집 중</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- 관리자 모드 전환 버튼 -->
+                <button id="toggle-admin-btn" onclick="toggleAdminMode()" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <span id="toggle-admin-text">관리자 편집 모드</span>
+                </button>
+
+                <!-- 관리자 전용 액션 버튼 그룹 -->
+                <div id="admin-actions" class="hidden flex-wrap items-center gap-1.5">
+                    <button onclick="addNewProduct()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>제품 추가</span>
+                    </button>
+                    <button id="save-db-btn" onclick="saveAllToSupabase(true)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1 cursor-pointer shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>DB에 저장</span>
+                    </button>
+                    <button onclick="exportHTMLFile()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1 cursor-pointer" title="수정된 내용이 반영된 HTML 파일 다운로드">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        HTML 내보내기
+                    </button>
+                    <button onclick="openResetModal()" class="bg-slate-700 hover:bg-rose-600 text-slate-200 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer">
+                        초기화
+                    </button>
+                </div>
+
+                <!-- 인쇄 버튼 -->
+                <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    A4 인쇄 / PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- 관리자 모드 가이드 배너 -->
+        <div id="admin-guide-banner" class="hidden bg-blue-50 border-t border-blue-200 px-4 py-2.5 text-xs sm:text-sm text-blue-900 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="bg-blue-600 text-white font-bold px-2 py-0.5 rounded text-[11px]">A4 자동 분할</span>
+                <span>한 페이지당 최대 <b>5개 제품</b>씩 표시되며, 6개 이상부터는 자동으로 다음 A4 페이지로 넘어갑니다. 이미지 칸에 사진을 드래그 앤 드롭하면 DB에 즉시 저장됩니다.</span>
+            </div>
+            <span class="text-blue-700 font-medium text-xs">* [+ 제품 추가]로 계속 확장 가능</span>
+        </div>
+    </div>
+
+    <!-- A4 페이지들이 동적으로 렌더링되는 컨테이너 -->
+    <div id="pages-container" class="w-full max-w-[1440px]"></div>
+
+    <script>
+        // Supabase 프로젝트 연결 정보
+        const SUPABASE_URL = 'https://rayhgqcpupwmwpymtkwg.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJheWhncWNwdXB3bXdweW10a3dnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkyNjc2MTEsImV4cCI6MjA4NDg0MzYxMX0.Ng4K86amltnarVwbQ8FVfw1rTJK03NTE5g3QDoLMFTc';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const TABLE_NAME = 'pharmacy_product_sheets';
+        const STORAGE_BUCKET = 'product-images';
+        const LOCAL_CACHE_KEY = 'pharmacy_product_comparison_cache_v3';
+        const ADMIN_PASSWORD = '2026';
+        const ITEMS_PER_PAGE = 5; // A4 한 페이지당 제품 수
+
+        let isAdminMode = false;
+
+        // 기본 일러스트/목업 SVG/HTML 생성기 (이미지가 아직 업로드되지 않은 기본 슬롯용)
+        function getDefaultArtwork(slot) {
+            if (slot === 1) {
+                return `
+                <div class="w-full h-full bg-[#f5efe6] rounded-md border border-stone-200 p-2 flex items-center justify-between gap-1.5 shadow-inner relative overflow-hidden">
+                    <div class="w-[58%] h-full bg-white rounded border border-gray-200 shadow-sm flex flex-col justify-between p-2 text-left relative">
+                        <div>
+                            <div class="text-[8px] text-gray-400 font-semibold tracking-tight">medinovae</div>
+                            <div class="text-[9px] font-extrabold text-slate-800 leading-tight mt-0.5">CHITOGENIX™<br>Spot Relief Patch</div>
+                            <div class="text-[6.5px] text-gray-500 mt-0.5">메디노베 키토제닉스 스팟 릴리프 패치</div>
+                        </div>
+                        <div class="w-14 h-14 mx-auto rounded-full bg-gradient-to-tr from-amber-100 to-orange-50 border border-amber-200/60 flex items-center justify-center relative">
+                            <div class="w-7 h-7 rounded-full bg-white/80 border border-dashed border-amber-400"></div>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <span class="text-[7px] bg-slate-100 text-slate-600 px-1 rounded">진정/케어</span>
+                            <span class="text-[9px] font-bold text-slate-700">8ea</span>
+                        </div>
+                    </div>
+                    <div class="w-[40%] h-[92%] bg-slate-200/70 rounded border border-slate-300 p-1 grid grid-cols-2 gap-1 items-center justify-items-center">
+                        ${Array(8).fill('<div class="w-5 h-5 rounded-full bg-white/90 border border-gray-300 flex items-center justify-center"><div class="w-2.5 h-2.5 rounded-full bg-gray-100"></div></div>').join('')}
+                    </div>
+                </div>`;
+            }
+            if (slot === 2) {
+                return `
+                <div class="w-full h-full bg-white rounded-md flex items-center justify-center gap-3 p-1">
+                    <div class="w-16 h-40 bg-gradient-to-b from-[#391c82] via-[#4a259e] to-[#2e156b] rounded-sm shadow-md p-2 flex flex-col justify-between text-left text-white relative">
+                        <div>
+                            <div class="text-[11px] font-extrabold tracking-tight leading-none">Re2DN</div>
+                            <div class="text-[8px] font-semibold text-purple-200 mt-1">dECM<br><span class="text-[7px] text-pink-300">10,000ppm</span></div>
+                        </div>
+                        <div class="my-auto mx-auto w-3 h-14 bg-purple-300/30 border border-purple-200/50 rounded-full flex items-center justify-center">
+                            <span class="text-[5px] -rotate-90 whitespace-nowrap tracking-wider">Re2DN</span>
+                        </div>
+                        <div class="border-t border-purple-400/40 pt-1">
+                            <div class="text-[6.5px] text-purple-200 leading-tight">PDRN<br>Volufiline</div>
+                            <div class="text-[6px] text-purple-300 mt-1">CellCeutix</div>
+                        </div>
+                    </div>
+                    <div class="w-10 h-40 flex flex-col items-center justify-between py-0.5">
+                        <div class="w-2.5 h-6 bg-purple-200 border border-purple-400 rounded-t-sm"></div>
+                        <div class="w-4 h-20 bg-purple-100/80 border border-purple-400 rounded-sm flex items-center justify-center relative shadow-sm">
+                            <div class="w-2.5 h-16 bg-purple-500/20 rounded-xs flex items-center justify-center">
+                                <span class="text-[6px] font-bold text-purple-900 rotate-90">Re2DN</span>
+                            </div>
+                        </div>
+                        <div class="w-7 h-1.5 bg-purple-600 rounded-full"></div>
+                        <div class="w-2 h-9 bg-purple-300 border-x border-purple-500"></div>
+                        <div class="w-6 h-1.5 bg-purple-700 rounded-full"></div>
+                    </div>
+                </div>`;
+            }
+            if (slot === 3) {
+                return `
+                <div class="w-full h-full bg-white rounded-md flex items-center justify-center p-1 relative">
+                    <div class="w-20 h-38 bg-gradient-to-br from-[#3d1e8a] to-[#26115c] rounded-sm shadow-md p-2 flex flex-col justify-between text-left text-white -translate-x-3">
+                        <div>
+                            <div class="text-[9px] font-extrabold leading-tight tracking-tight">REGEN<br>TRIX™</div>
+                            <div class="text-[7px] text-pink-300 font-semibold mt-1">5,000ppm<br><span class="text-white">PDRN</span><br>3,000ppm</div>
+                        </div>
+                        <div class="text-[6px] text-purple-200 border-t border-purple-400/30 pt-1">
+                            Panthenol<br>Ceramide
+                        </div>
+                        <div class="text-[6px] text-purple-300">CellCeutix</div>
+                    </div>
+                    <div class="w-12 h-32 bg-white border border-gray-300 rounded-t-sm rounded-b-lg shadow-md flex flex-col justify-between items-center p-1.5 rotate-[14deg] translate-x-3 translate-y-2">
+                        <div class="w-full h-1.5 bg-purple-800 rounded-xs"></div>
+                        <div class="text-[6px] font-bold text-purple-900 rotate-90 whitespace-nowrap my-auto">REGENTRIX 5,000ppm</div>
+                        <div class="w-6 h-4 bg-gray-100 border-t border-gray-300 rounded-b-sm"></div>
+                    </div>
+                </div>`;
+            }
+            if (slot === 4) {
+                return `
+                <div class="w-full h-full bg-white rounded-md flex flex-col items-center justify-center p-1 relative">
+                    <div class="w-20 h-7 bg-white border border-gray-300 rounded-full shadow-sm flex items-center justify-between px-2 rotate-[28deg] -translate-y-1 translate-x-3 z-10">
+                        <span class="text-[6px] font-bold text-purple-900">REGENTRIX</span>
+                        <div class="w-4 h-4 bg-purple-100 rounded-r-full border-l border-gray-300"></div>
+                    </div>
+                    <div class="w-28 h-28 bg-gradient-to-b from-[#452299] to-[#2b1366] rounded-sm shadow-md p-2 flex flex-col justify-between text-white relative overflow-hidden">
+                        <div class="flex justify-between items-start z-10">
+                            <span class="text-[7px] font-extrabold rotate-90 origin-top-left translate-x-2">REGENTRIX™</span>
+                            <span class="text-[6px] text-pink-200">1,000ppm</span>
+                        </div>
+                        <div class="w-16 h-12 mx-auto rounded bg-gradient-to-r from-rose-300 via-pink-400 to-rose-300 flex items-center justify-center shadow-inner">
+                            <div class="w-11 h-5 bg-rose-500/80 rounded-full blur-[0.5px] border border-pink-200"></div>
+                        </div>
+                        <div class="text-[6px] text-left text-purple-200 leading-tight z-10">
+                            Volufiline 5,000ppm
+                        </div>
+                    </div>
+                </div>`;
+            }
+            if (slot === 5) {
+                return `
+                <div class="w-full h-full bg-gradient-to-br from-rose-500 via-pink-500 to-rose-400 rounded-md shadow-sm p-2.5 flex flex-col justify-between text-white relative overflow-hidden">
+                    <div class="text-left z-10">
+                        <div class="inline-block bg-black/80 text-white text-[11px] font-black px-1.5 py-0.5 rounded-xs leading-tight mb-0.5">펼치고,</div><br>
+                        <div class="inline-block bg-black/80 text-white text-[11px] font-black px-1.5 py-0.5 rounded-xs leading-tight mb-0.5">말리고,</div><br>
+                        <div class="inline-block bg-black/80 text-white text-[11px] font-black px-1.5 py-0.5 rounded-xs leading-tight">가볍게</div>
+                    </div>
+                    <div class="flex items-end justify-between z-10 mt-1">
+                        <div class="text-left">
+                            <span class="text-[7px] bg-white/90 text-rose-700 font-bold px-1 py-0.5 rounded">접히는 특허 헤어롤</span>
+                            <div class="flex items-center gap-1 mt-1">
+                                <div class="w-6 h-5 bg-zinc-800 border border-rose-300 rounded-xs"></div>
+                                <div class="w-4 h-6 bg-zinc-800 border border-rose-300 rounded-full"></div>
+                            </div>
+                        </div>
+                        <div class="text-[9px] font-black tracking-wider bg-black/40 px-1.5 py-0.5 rounded">KOOROLL</div>
+                    </div>
+                    <div class="w-24 h-24 rounded-full bg-rose-300/30 absolute -right-4 -top-4"></div>
+                </div>`;
+            }
+            if (slot === 6) {
+                // 첨부해주신 '전설의 패치 프리미엄 이알 (LAOMÉTE)' 패키지 디자인 일러스트
+                return `
+                <div class="w-full h-full bg-[#f4f4f6] rounded-md border border-gray-200 p-1.5 flex items-center justify-between gap-1 relative overflow-hidden">
+                    <!-- 좌측 화이트/골드 패키지 박스 -->
+                    <div class="w-[66%] h-full bg-white rounded border border-gray-300 shadow-sm p-1.5 flex flex-col justify-between text-left relative">
+                        <div>
+                            <div class="text-[12px] font-black italic tracking-tighter leading-none bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-700 bg-clip-text text-transparent">LEGEND</div>
+                            <div class="text-[5.5px] font-bold text-gray-700 tracking-tight mt-0.5">과학으로 증명된 컨디션 관리</div>
+                        </div>
+                        <div class="my-auto flex items-center justify-between gap-1">
+                            <!-- 테이핑 일러스트 모식도 -->
+                            <div class="w-9 h-12 rounded bg-amber-50/70 border border-amber-200/80 flex flex-col items-center justify-center p-0.5">
+                                <div class="w-5 h-1.5 bg-amber-500/80 rounded-xs mb-1"></div>
+                                <div class="w-4 h-1.5 bg-amber-500/80 rounded-xs mb-1"></div>
+                                <div class="w-6 h-2 bg-amber-600/80 rounded-xs"></div>
+                            </div>
+                            <div class="flex-1 text-right">
+                                <span class="inline-block bg-sky-600 text-white text-[5.5px] font-bold px-1 py-0.5 rounded-xs leading-tight">준대형 20매 +<br>증정 소형 12매</span>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-200 pt-1">
+                            <div class="text-[6px] font-semibold text-amber-700 tracking-wider">LAOMÉTE</div>
+                            <div class="flex items-center gap-1 mt-0.5">
+                                <span class="text-[9px] font-black text-gray-900 leading-none">전설의 패치</span>
+                                <span class="bg-gray-800 text-white text-[5.5px] font-bold px-1 py-0.5 rounded-xs">프리미엄 이알</span>
+                            </div>
+                            <div class="text-[5.5px] text-gray-500 mt-0.5">약국용 · 총 32매입</div>
+                        </div>
+                    </div>
+                    <!-- 우측 베이지 도트 패턴 패치 시트 -->
+                    <div class="w-[32%] h-[90%] bg-[#cbb389] rounded border border-amber-700/30 p-1 grid grid-cols-2 gap-1 shadow-xs">
+                        <div class="bg-[#d7c29e] rounded-xs border border-white/40 flex items-center justify-center"><span class="text-[4.5px] text-white/90 -rotate-45 font-bold">Premium</span></div>
+                        <div class="bg-[#d7c29e] rounded-xs border border-white/40 flex items-center justify-center"><span class="text-[4.5px] text-white/90 -rotate-45 font-bold">Premium</span></div>
+                        <div class="bg-[#d7c29e] rounded-xs border border-white/40 flex items-center justify-center"><span class="text-[4.5px] text-white/90 -rotate-45 font-bold">Premium</span></div>
+                        <div class="bg-[#d7c29e] rounded-xs border border-white/40 flex items-center justify-center"><span class="text-[4.5px] text-white/90 -rotate-45 font-bold">Premium</span></div>
+                        <div class="bg-[#d7c29e] rounded-xs border border-white/40 flex items-center justify-center"><span class="text-[4.5px] text-white/90 -rotate-45 font-bold">Premium</span></div>
+                        <div class="bg-[#d7c29e] rounded-xs border border-white/40 flex items-center justify-center"><span class="text-[4.5px] text-white/90 -rotate-45 font-bold">Premium</span></div>
+                    </div>
+                </div>`;
+            }
+            // 7번 이후 새로 추가되는 제품용 기본 플레이스홀더
+            return `
+            <div class="w-full h-full bg-slate-50 rounded-md border border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-1 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span class="text-xs font-medium">제품 이미지</span>
+            </div>`;
+        }
+
+        // 초기 기본 제품 데이터 6개 (1~5번: 1페이지, 6번 '전설의 패치': 2페이지)
+        function getInitialDefaultProducts() {
+            return [
+                {
+                    slot_index: 1,
+                    product_name: '메디노베 키토제닉스 스팟<br>릴리프 패치 (여드름 패치)',
+                    image_url: null,
+                    supply_price: '<div class="font-medium">8,000원</div><div class="text-gray-700">(50%)</div>',
+                    retail_price: '<div class="font-medium">16,000원</div><div class="text-gray-700">(온라인 최저가)</div>',
+                    moq: '20개',
+                    return_policy: '<ul class="custom-list"><li>6개월 내 반품 가능</li></ul>',
+                    payment_policy: '<ul class="custom-list"><li>익월 말 결제 - 세금계산서 발행 및 계좌송금</li></ul>',
+                    online_policy: '<ul class="custom-list"><li>온라인 운영 X, 형식적 운영 중</li></ul>',
+                    sales_points: '<ul class="custom-list"><li>키토산+ECM 성분 사용한 유일 제품</li><li>마이크로니들 패치 기술 적용</li></ul>',
+                    marketing_support: '<ul class="custom-list"><li>와블러/집기/포스터 지원</li><li>약사/직원 교육 세미나 초청</li></ul>'
+                },
+                {
+                    slot_index: 2,
+                    product_name: '셀슈틱스 리투디엔 재생 앰플<br>(h-dECM+PDRN+보르피린)',
+                    image_url: null,
+                    supply_price: '<div class="font-medium">19,500원</div><div class="text-gray-700">(50%)</div>',
+                    retail_price: '<div class="font-medium">39,000원</div><div class="text-gray-700">(온라인 최저가)</div>',
+                    moq: '20개',
+                    return_policy: '<ul class="custom-list"><li>6개월 내 반품 가능</li></ul>',
+                    payment_policy: '<ul class="custom-list"><li>익월 말 결제 - 세금계산서 발행 및 계좌송금</li></ul>',
+                    online_policy: '<ul class="custom-list"><li>온라인 운영 X, 형식적 운영 중</li></ul>',
+                    sales_points: '<ul class="custom-list"><li>가수분해 탈세포 ECM 사용</li><li>h-dECM+PDRN+보르피린 배합한 유일 제품</li></ul>',
+                    marketing_support: '<ul class="custom-list"><li>와블러/집기/포스터 지원</li><li>약사/직원 교육 세미나 초청</li></ul>'
+                },
+                {
+                    slot_index: 3,
+                    product_name: '셀슈틱스 리투디엔 재생 크림<br>(h-dECM+PDRN)',
+                    image_url: null,
+                    supply_price: '<div class="font-medium">24,500원</div><div class="text-gray-700">(50%)</div>',
+                    retail_price: '<div class="font-medium">49,000원</div><div class="text-gray-700">(온라인 최저가)</div>',
+                    moq: '20개',
+                    return_policy: '<ul class="custom-list"><li>6개월 내 반품 가능</li></ul>',
+                    payment_policy: '<ul class="custom-list"><li>익월 말 결제 - 세금계산서 발행 및 계좌송금</li></ul>',
+                    online_policy: '<ul class="custom-list"><li>온라인 운영 X, 형식적 운영 중</li></ul>',
+                    sales_points: '<ul class="custom-list"><li>가수분해 탈세포 ECM 사용</li><li>h-dECM+PDRN을 배합한 유일 제품</li></ul>',
+                    marketing_support: '<ul class="custom-list"><li>와블러/집기/포스터 지원</li><li>약사/직원 교육 세미나 초청</li></ul>'
+                },
+                {
+                    slot_index: 4,
+                    product_name: '셀슈틱스 리투디엔 립밤<br>(h-dECM+보르피린,<br>필러/도톰 립밤)',
+                    image_url: null,
+                    supply_price: '<div class="font-medium">6,500원</div><div class="text-gray-700">(50%)</div>',
+                    retail_price: '<div class="font-medium">13,000원</div><div class="text-gray-700">(온라인 최저가)</div>',
+                    moq: '20개',
+                    return_policy: '<ul class="custom-list"><li>6개월 내 반품 가능</li></ul>',
+                    payment_policy: '<ul class="custom-list"><li>익월 말 결제 - 세금계산서 발행 및 계좌송금</li></ul>',
+                    online_policy: '<ul class="custom-list"><li>온라인 운영 X, 형식적 운영 중</li></ul>',
+                    sales_points: '<ul class="custom-list"><li>바르는 필러 / 도톰 립밤</li><li>안젤리나 졸리 입술 립밤</li></ul>',
+                    marketing_support: '<ul class="custom-list"><li>와블러/집기/포스터 지원</li><li>약사/직원 교육 세미나 초청</li></ul>'
+                },
+                {
+                    slot_index: 5,
+                    product_name: '쿠롤<br>(구혜선 헤어롤)',
+                    image_url: null,
+                    supply_price: '<div class="font-medium">7,500원</div><div class="text-gray-700">(54%)</div>',
+                    retail_price: '<div class="font-medium">14,000원</div><div class="text-gray-700">(온라인 최저가)</div>',
+                    moq: '50개',
+                    return_policy: '유통기한 없음. 반품 불가.',
+                    payment_policy: '<ul class="custom-list"><li>익월 말 결제 - 세금계산서 발행 및 계좌송금</li></ul>',
+                    online_policy: '구혜선 직접 운영<br>(프로모션 시 협의 후<br>약국과 같이 진행)',
+                    sales_points: '<ul class="custom-list"><li>접히는 헤어롤</li><li>친환경 소재</li><li>휴대 편의</li></ul>',
+                    marketing_support: '<ul class="custom-list"><li>리플렛 / 포스터 지원 가능</li><li>대형약국의 경우 구혜선 방문, 인스타 업로드 가능</li></ul>'
+                },
+                {
+                    slot_index: 6,
+                    product_name: '전설의 패치<br>프리미엄 이알 (32매)',
+                    image_url: null,
+                    supply_price: '<div class="font-medium">협의 공급가</div><div class="text-gray-700">(약국용 전용)</div>',
+                    retail_price: '<div class="font-medium">가격 입력</div><div class="text-gray-700">(온라인 최저가)</div>',
+                    moq: '20개',
+                    return_policy: '<ul class="custom-list"><li>6개월 내 반품 가능</li></ul>',
+                    payment_policy: '<ul class="custom-list"><li>익월 말 결제 - 세금계산서 발행 및 계좌송금</li></ul>',
+                    online_policy: '<ul class="custom-list"><li>온라인 가격 준수</li></ul>',
+                    sales_points: '<ul class="custom-list"><li>약국용 프리미엄 컨디션 패치 (총 32매입)</li><li>준대형 20매(5.9×4.2cm) + 소형 12매(2.8×2.7cm)</li><li>등산·운동·근무 시 뭉치고 뻐근한 부위 간편 부착</li></ul>',
+                    marketing_support: '<ul class="custom-list"><li>약국 전용 POP / 포스터 지원</li></ul>'
+                }
+            ];
+        }
+
+        let productsData = getInitialDefaultProducts();
+
+        // 페이지 초기화
+        window.addEventListener('DOMContentLoaded', async () => {
+            renderAllPages();
+            await loadFromSupabase();
+        });
+
+        // A4 5개 단위로 페이지를 나누어 전체 표 렌더링
+        function renderAllPages() {
+            const container = document.getElementById('pages-container');
+            if (!container) return;
+
+            // slot_index 순 정렬
+            productsData.sort((a, b) => a.slot_index - b.slot_index);
+
+            const totalProducts = productsData.length;
+            const totalPages = Math.max(1, Math.ceil(totalProducts / ITEMS_PER_PAGE));
+
+            // 상단 배지 업데이트
+            const badge = document.getElementById('page-count-badge');
+            if (badge) {
+                badge.textContent = `총 ${totalProducts}개 제품 · A4 ${totalPages}페이지`;
+            }
+
+            let html = '';
+
+            for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+                const start = pageIdx * ITEMS_PER_PAGE;
+                const pageItems = productsData.slice(start, start + ITEMS_PER_PAGE);
+                const emptySlotsCount = ITEMS_PER_PAGE - pageItems.length;
+
+                html += `
+                <div class="a4-page-sheet" data-page="${pageIdx + 1}">
+                    <!-- 페이지 번호 표시줄 (인쇄 시 숨김) -->
+                    <div class="bg-slate-50 border-b border-gray-200 px-4 py-2 flex items-center justify-between text-xs text-slate-600 no-print">
+                        <span class="font-bold text-slate-800">A4 페이지 ${pageIdx + 1} / ${totalPages}</span>
+                        <span>표시 제품: ${start + 1}번 ~ ${start + pageItems.length}번 (페이지당 최대 5개)</span>
+                    </div>
+
+                    <div class="table-container overflow-x-auto w-full">
+                        <table class="comparison-table w-full min-w-[1100px] text-sm md:text-[15px] leading-snug text-gray-900">
+                            <colgroup>
+                                <col class="w-[11%]">
+                                <col class="w-[17.8%]">
+                                <col class="w-[17.8%]">
+                                <col class="w-[17.8%]">
+                                <col class="w-[17.8%]">
+                                <col class="w-[17.8%]">
+                            </colgroup>
+
+                            <thead>
+                                <tr class="bg-[#f2f2f2] font-bold text-center text-gray-900">
+                                    <th class="py-4 px-2 sticky-col-header bg-[#f2f2f2]">구분</th>
+                                    ${pageItems.map(item => `
+                                        <th class="py-3.5 px-3 relative group">
+                                            ${isAdminMode && productsData.length > 1 ? `
+                                                <button onclick="deleteProduct(${item.slot_index})" title="이 제품 삭제" class="no-print absolute top-1 right-1 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded px-1.5 py-0.5 text-[10px] font-bold transition cursor-pointer">
+                                                    삭제
+                                                </button>
+                                            ` : ''}
+                                            <div data-editable="true" data-slot="${item.slot_index}" data-field="product_name" ${isAdminMode ? 'contenteditable="true"' : ''}>
+                                                ${item.product_name}
+                                            </div>
+                                        </th>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<th class="py-3.5 px-3 bg-slate-50/60 text-slate-300 font-normal text-xs">-</th>').join('')}
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <!-- 1. 제품 이미지 행 -->
+                                <tr class="bg-white">
+                                    <th class="py-4 px-2 font-normal text-center sticky-col-cell bg-white">
+                                        제품<br>이미지
+                                    </th>
+                                    ${pageItems.map(item => `
+                                        <td class="p-3 text-center align-middle">
+                                            <div class="drop-zone w-44 h-44 mx-auto rounded-md overflow-hidden" data-img-slot="${item.slot_index}">
+                                                <div id="img-content-${item.slot_index}" class="w-full h-full">
+                                                    ${item.image_url
+                                                        ? `<img src="${item.image_url}" alt="제품 이미지 ${item.slot_index}" class="w-full h-full object-contain bg-white rounded-md" onerror="this.onerror=null; this.src='https://placehold.co/300x300/f1f5f9/64748b?text=No+Image';">`
+                                                        : getDefaultArtwork(item.slot_index)
+                                                    }
+                                                </div>
+                                                <div onclick="triggerFileInput(${item.slot_index})" class="drop-overlay absolute inset-0 bg-slate-900/65 hover:bg-blue-600/80 border-2 border-dashed border-white rounded-md flex-col items-center justify-center text-white p-2 cursor-pointer transition no-print">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                    </svg>
+                                                    <span class="text-[11px] font-bold leading-tight">사진 드래그 & 드롭<br>또는 클릭 업로드</span>
+                                                </div>
+                                                <input type="file" id="file-input-${item.slot_index}" accept="image/*" class="hidden" onchange="handleFileSelect(event, ${item.slot_index})">
+                                            </div>
+                                        </td>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<td class="p-3 bg-slate-50/30"></td>').join('')}
+                                </tr>
+
+                                <!-- 2. 약국 공급가 (부가세 포함) -->
+                                <tr class="bg-white hover:bg-slate-50/70 transition-colors">
+                                    <th class="py-3.5 px-2 font-normal text-center sticky-col-cell bg-white">
+                                        약국 공급가<br>(부가세 포함)
+                                    </th>
+                                    ${pageItems.map(item => `
+                                        <td data-editable="true" data-slot="${item.slot_index}" data-field="supply_price" ${isAdminMode ? 'contenteditable="true"' : ''} class="py-3.5 px-3 text-center">
+                                            ${item.supply_price || ''}
+                                        </td>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<td class="py-3.5 px-3 bg-slate-50/30"></td>').join('')}
+                                </tr>
+
+                                <!-- 3. 판매가 -->
+                                <tr class="bg-white hover:bg-slate-50/70 transition-colors">
+                                    <th class="py-3.5 px-2 font-normal text-center sticky-col-cell bg-white">
+                                        판매가
+                                    </th>
+                                    ${pageItems.map(item => `
+                                        <td data-editable="true" data-slot="${item.slot_index}" data-field="retail_price" ${isAdminMode ? 'contenteditable="true"' : ''} class="py-3.5 px-3 text-center">
+                                            ${item.retail_price || ''}
+                                        </td>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<td class="py-3.5 px-3 bg-slate-50/30"></td>').join('')}
+                                </tr>
+
+                                <!-- 4. 최소 주문 수량 -->
+                                <tr class="bg-white hover:bg-slate-50/70 transition-colors">
+                                    <th class="py-3.5 px-2 font-normal text-center sticky-col-cell bg-white">
+                                        최소 주문<br>수량
+                                    </th>
+                                    ${pageItems.map(item => `
+                                        <td data-editable="true" data-slot="${item.slot_index}" data-field="moq" ${isAdminMode ? 'contenteditable="true"' : ''} class="py-3.5 px-3 text-center">
+                                            ${item.moq || ''}
+                                        </td>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<td class="py-3.5 px-3 bg-slate-50/30"></td>').join('')}
+                                </tr>
+
+                                <!-- 5. 반품 정책 -->
+                                <tr class="bg-white hover:bg-slate-50/70 transition-colors">
+                                    <th class="py-3.5 px-2 font-normal text-center sticky-col-cell bg-white">
+                                        반품 정책
+                                    </th>
+                                    ${pageItems.map(item => `
+                                        <td data-editable="true" data-slot="${item.slot_index}" data-field="return_policy" ${isAdminMode ? 'contenteditable="true"' : ''} class="py-3.5 px-3.5 text-left align-middle">
+                                            ${item.return_policy || ''}
+                                        </td>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<td class="py-3.5 px-3.5 bg-slate-50/30"></td>').join('')}
+                                </tr>
+
+                                <!-- 6. 결제 정책 -->
+                                <tr class="bg-white hover:bg-slate-50/70 transition-colors">
+                                    <th class="py-3.5 px-2 font-normal text-center sticky-col-cell bg-white">
+                                        결제 정책
+                                    </th>
+                                    ${pageItems.map(item => `
+                                        <td data-editable="true" data-slot="${item.slot_index}" data-field="payment_policy" ${isAdminMode ? 'contenteditable="true"' : ''} class="py-3.5 px-3.5 text-left align-middle">
+                                            ${item.payment_policy || ''}
+                                        </td>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<td class="py-3.5 px-3.5 bg-slate-50/30"></td>').join('')}
+                                </tr>
+
+                                <!-- 7. 온라인 정책 -->
+                                <tr class="bg-white hover:bg-slate-50/70 transition-colors">
+                                    <th class="py-4 px-2 font-normal text-center sticky-col-cell bg-white">
+                                        온라인 정책
+                                    </th>
+                                    ${pageItems.map(item => `
+                                        <td data-editable="true" data-slot="${item.slot_index}" data-field="online_policy" ${isAdminMode ? 'contenteditable="true"' : ''} class="py-4 px-3.5 text-left align-middle">
+                                            ${item.online_policy || ''}
+                                        </td>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<td class="py-4 px-3.5 bg-slate-50/30"></td>').join('')}
+                                </tr>
+
+                                <!-- 8. 판매 포인트 -->
+                                <tr class="bg-white hover:bg-slate-50/70 transition-colors">
+                                    <th class="py-4 px-2 font-normal text-center sticky-col-cell bg-white">
+                                        판매 포인트
+                                    </th>
+                                    ${pageItems.map(item => `
+                                        <td data-editable="true" data-slot="${item.slot_index}" data-field="sales_points" ${isAdminMode ? 'contenteditable="true"' : ''} class="py-4 px-3.5 text-left align-middle">
+                                            ${item.sales_points || ''}
+                                        </td>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<td class="py-4 px-3.5 bg-slate-50/30"></td>').join('')}
+                                </tr>
+
+                                <!-- 9. 마케팅 지원 -->
+                                <tr class="bg-white hover:bg-slate-50/70 transition-colors">
+                                    <th class="py-4 px-2 font-normal text-center sticky-col-cell bg-white">
+                                        마케팅 지원
+                                    </th>
+                                    ${pageItems.map(item => `
+                                        <td data-editable="true" data-slot="${item.slot_index}" data-field="marketing_support" ${isAdminMode ? 'contenteditable="true"' : ''} class="py-4 px-3.5 text-left align-middle">
+                                            ${item.marketing_support || ''}
+                                        </td>
+                                    `).join('')}
+                                    ${Array(emptySlotsCount).fill('<td class="py-4 px-3.5 bg-slate-50/30"></td>').join('')}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
+            }
+
+            container.innerHTML = html;
+
+            // 이벤트 바인딩 재연결
+            setupDragAndDrop();
+            setupAutoSaveOnEdit();
+        }
+
+        // 화면에서 수정된 텍스트를 productsData 배열로 동기화
+        function syncDomToState() {
+            document.querySelectorAll('[data-editable="true"]').forEach(el => {
+                const slot = parseInt(el.getAttribute('data-slot'), 10);
+                const field = el.getAttribute('data-field');
+                const target = productsData.find(p => p.slot_index === slot);
+                if (target && field) {
+                    target[field] = el.innerHTML.trim();
+                }
+            });
+        }
+
+        // 새 제품 추가 (5개 초과 시 자동으로 다음 A4 페이지 생성)
+        async function addNewProduct() {
+            syncDomToState();
+            const maxSlot = productsData.reduce((max, p) => Math.max(max, p.slot_index), 0);
+            const nextSlot = maxSlot + 1;
+
+            productsData.push({
+                slot_index: nextSlot,
+                product_name: `신규 제품 ${nextSlot}<br>(제품명을 입력하세요)`,
+                image_url: null,
+                supply_price: '<div class="font-medium">0원</div><div class="text-gray-700">(50%)</div>',
+                retail_price: '<div class="font-medium">0원</div><div class="text-gray-700">(온라인 최저가)</div>',
+                moq: '20개',
+                return_policy: '<ul class="custom-list"><li>6개월 내 반품 가능</li></ul>',
+                payment_policy: '<ul class="custom-list"><li>익월 말 결제 - 세금계산서 발행 및 계좌송금</li></ul>',
+                online_policy: '<ul class="custom-list"><li>온라인 운영 X, 형식적 운영 중</li></ul>',
+                sales_points: '<ul class="custom-list"><li>주요 판매 포인트를 입력하세요</li></ul>',
+                marketing_support: '<ul class="custom-list"><li>와블러/포스터 지원</li></ul>'
+            });
+
+            renderAllPages();
+            await saveAllToSupabase(false);
+
+            const targetPage = Math.ceil(productsData.length / ITEMS_PER_PAGE);
+            showToast(`${nextSlot}번 제품이 추가되었습니다. (A4 ${targetPage}페이지)`);
+
+            // 새로 추가된 페이지로 부드럽게 스크롤
+            const pageEl = document.querySelector(`.a4-page-sheet[data-page="${targetPage}"]`);
+            if (pageEl) pageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // 특정 제품 삭제 및 슬롯 번호 재정렬
+        async function deleteProduct(slotIndex) {
+            if (productsData.length <= 1) {
+                showToast('최소 1개 이상의 제품은 유지되어야 합니다.', 'warn');
+                return;
+            }
+            syncDomToState();
+            productsData = productsData.filter(p => p.slot_index !== slotIndex);
+            // 슬롯 번호 1부터 순차 재정렬
+            productsData.forEach((p, idx) => {
+                p.slot_index = idx + 1;
+            });
+
+            renderAllPages();
+
+            try {
+                // DB에서 기존 행 정리 후 재저장
+                await supabaseClient.from(TABLE_NAME).delete().gte('slot_index', 1);
+                await saveAllToSupabase(false);
+                showToast('제품이 삭제되고 페이지가 재정렬되었습니다.');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // DB 연결 상태 배지 업데이트
+        function updateDbStatus(state, text) {
+            const dot = document.getElementById('db-status-dot');
+            const label = document.getElementById('db-status-text');
+            if (!dot || !label) return;
+
+            label.textContent = text;
+            dot.className = 'w-1.5 h-1.5 rounded-full';
+
+            if (state === 'connected') {
+                dot.classList.add('bg-emerald-400');
+            } else if (state === 'error') {
+                dot.classList.add('bg-rose-400');
+            } else {
+                dot.classList.add('bg-amber-400', 'animate-pulse');
+            }
+        }
+
+        // 토스트 알림 표시
+        let toastTimeout;
+        function showToast(message, type = 'success') {
+            const box = document.getElementById('toast-box');
+            const icon = document.getElementById('toast-icon');
+            const text = document.getElementById('toast-text');
+
+            text.textContent = message;
+            icon.className = type === 'warn'
+                ? 'w-2.5 h-2.5 rounded-full bg-amber-400'
+                : 'w-2.5 h-2.5 rounded-full bg-emerald-400';
+
+            box.classList.remove('translate-y-20', 'opacity-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                box.classList.add('translate-y-20', 'opacity-0');
+            }, 2800);
+        }
+
+        // 관리자 모드 켜기/끄기 (켜기 전 비밀번호 인증)
+        function toggleAdminMode() {
+            if (!isAdminMode) {
+                openPasswordModal();
+                return;
+            }
+            applyAdminModeState(false);
+        }
+
+        // 비밀번호 모달 제어
+        function openPasswordModal() {
+            const modal = document.getElementById('password-modal');
+            const input = document.getElementById('admin-password-input');
+            const errMsg = document.getElementById('password-error-msg');
+            input.value = '';
+            errMsg.classList.add('hidden');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => input.focus(), 50);
+        }
+
+        function closePasswordModal() {
+            const modal = document.getElementById('password-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function verifyAdminPassword(e) {
+            e.preventDefault();
+            const input = document.getElementById('admin-password-input');
+            const errMsg = document.getElementById('password-error-msg');
+
+            if (input.value === ADMIN_PASSWORD) {
+                closePasswordModal();
+                applyAdminModeState(true);
+            } else {
+                errMsg.classList.remove('hidden');
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        // 관리자 편집 모드 상태 반영
+        function applyAdminModeState(enable) {
+            if (!enable) {
+                syncDomToState();
+            }
+            isAdminMode = enable;
+            const body = document.body;
+            const btn = document.getElementById('toggle-admin-btn');
+            const btnText = document.getElementById('toggle-admin-text');
+            const badge = document.getElementById('admin-badge');
+            const actions = document.getElementById('admin-actions');
+            const banner = document.getElementById('admin-guide-banner');
+            const indicator = document.getElementById('mode-indicator');
+
+            if (isAdminMode) {
+                body.classList.add('admin-mode');
+                btn.classList.replace('bg-blue-600', 'bg-slate-600');
+                btn.classList.replace('hover:bg-blue-500', 'hover:bg-slate-500');
+                btnText.textContent = '편집 종료 (미리보기)';
+                badge.classList.remove('hidden');
+                actions.classList.remove('hidden');
+                actions.classList.add('flex');
+                banner.classList.remove('hidden');
+                indicator.classList.replace('bg-emerald-400', 'bg-blue-400');
+
+                renderAllPages();
+                showToast('관리자 편집 모드가 활성화되었습니다.');
+            } else {
+                body.classList.remove('admin-mode');
+                btn.classList.replace('bg-slate-600', 'bg-blue-600');
+                btn.classList.replace('hover:bg-slate-500', 'hover:bg-blue-500');
+                btnText.textContent = '관리자 편집 모드';
+                badge.classList.add('hidden');
+                actions.classList.add('hidden');
+                actions.classList.remove('flex');
+                banner.classList.add('hidden');
+                indicator.classList.replace('bg-blue-400', 'bg-emerald-400');
+
+                renderAllPages();
+                saveAllToSupabase(false);
+            }
+        }
+
+        // 텍스트 수정 시 디바운스 자동 DB 저장
+        function setupAutoSaveOnEdit() {
+            let saveTimer;
+            document.querySelectorAll('[data-editable="true"]').forEach(el => {
+                el.addEventListener('input', () => {
+                    clearTimeout(saveTimer);
+                    saveTimer = setTimeout(() => {
+                        saveAllToSupabase(false);
+                    }, 1200);
+                });
+            });
+        }
+
+        // 파일 선택창 열기
+        function triggerFileInput(slot) {
+            if (!isAdminMode) return;
+            const input = document.getElementById(`file-input-${slot}`);
+            if (input) input.click();
+        }
+
+        // 파일 인풋 변경 핸들러
+        function handleFileSelect(event, slot) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadImageToSupabase(file, slot);
+            }
+            event.target.value = '';
+        }
+
+        // 드래그 앤 드롭 이벤트 등록
+        function setupDragAndDrop() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                const slot = parseInt(zone.getAttribute('data-img-slot'), 10);
+
+                ['dragenter', 'dragover'].forEach(evtName => {
+                    zone.addEventListener(evtName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (isAdminMode) {
+                            zone.classList.add('drag-over');
+                        }
+                    });
+                });
+
+                ['dragleave', 'drop'].forEach(evtName => {
+                    zone.addEventListener(evtName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        zone.classList.remove('drag-over');
+                    });
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    if (!isAdminMode) {
+                        showToast('상단의 [관리자 편집 모드]를 먼저 켜주세요.', 'warn');
+                        return;
+                    }
+                    const files = e.dataTransfer.files;
+                    if (files && files.length > 0) {
+                        uploadImageToSupabase(files[0], slot);
+                    }
+                });
+            });
+        }
+
+        // 이미지 파일을 Supabase Storage에 업로드하고 Public URL을 DB에 반영
+        async function uploadImageToSupabase(file, slot) {
+            if (!file.type.startsWith('image/')) {
+                showToast('이미지 파일(JPG, PNG, WEBP 등)만 업로드할 수 있습니다.', 'warn');
+                return;
+            }
+
+            syncDomToState();
+            const container = document.getElementById(`img-content-${slot}`);
+            const prevHtml = container ? container.innerHTML : '';
+
+            if (container) {
+                container.innerHTML = `
+                    <div class="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-blue-600 gap-2">
+                        <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-xs font-semibold">DB 업로드 중...</span>
+                    </div>
+                `;
+            }
+
+            try {
+                const ext = file.name.split('.').pop() || 'png';
+                const fileName = `slot_${slot}_${Date.now()}.${ext}`;
+
+                const { error: uploadError } = await supabaseClient.storage
+                    .from(STORAGE_BUCKET)
+                    .upload(fileName, file, {
+                        cacheControl: '3600',
+                        upsert: true
+                    });
+
+                if (uploadError) throw uploadError;
+
+                const { data: urlData } = supabaseClient.storage
+                    .from(STORAGE_BUCKET)
+                    .getPublicUrl(fileName);
+
+                const publicUrl = urlData.publicUrl;
+                const target = productsData.find(p => p.slot_index === slot);
+                if (target) {
+                    target.image_url = publicUrl;
+                }
+
+                renderAllPages();
+                await saveAllToSupabase(false);
+                showToast(`제품 ${slot} 이미지가 Supabase DB에 저장되었습니다.`);
+            } catch (err) {
+                console.error('Supabase 이미지 업로드 오류:', err);
+                if (container) container.innerHTML = prevHtml;
+                showToast('업로드 실패: Supabase SQL(버킷/권한)이 실행되었는지 확인해주세요.', 'warn');
+            }
+        }
+
+        // 현재 표의 전체 제품 데이터를 Supabase DB(pharmacy_product_sheets)에 저장
+        async function saveAllToSupabase(notify = true) {
+            syncDomToState();
+            const saveBtn = document.getElementById('save-db-btn');
+            if (saveBtn && notify) {
+                saveBtn.disabled = true;
+                saveBtn.classList.add('opacity-60');
+            }
+            updateDbStatus('loading', 'DB 저장 중...');
+
+            try {
+                const rows = productsData.map(item => ({
+                    slot_index: item.slot_index,
+                    product_name: item.product_name,
+                    image_url: item.image_url || null,
+                    supply_price: item.supply_price || '',
+                    retail_price: item.retail_price || '',
+                    moq: item.moq || '',
+                    return_policy: item.return_policy || '',
+                    payment_policy: item.payment_policy || '',
+                    online_policy: item.online_policy || '',
+                    sales_points: item.sales_points || '',
+                    marketing_support: item.marketing_support || '',
+                    updated_at: new Date().toISOString()
+                }));
+
+                localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify(rows));
+
+                const { error } = await supabaseClient
+                    .from(TABLE_NAME)
+                    .upsert(rows, { onConflict: 'slot_index' });
+
+                if (error) throw error;
+
+                updateDbStatus('connected', 'Supabase DB 연동됨');
+                if (notify) showToast('모든 변경사항이 Supabase DB에 저장되었습니다.');
+            } catch (err) {
+                console.error('Supabase 저장 오류:', err);
+                updateDbStatus('error', 'DB 저장 오류 (SQL 확인 필요)');
+                if (notify) {
+                    showToast('DB 저장 실패: 안내된 SQL문을 Supabase SQL Editor에서 실행해주세요.', 'warn');
+                }
+            } finally {
+                if (saveBtn && notify) {
+                    saveBtn.disabled = false;
+                    saveBtn.classList.remove('opacity-60');
+                }
+            }
+        }
+
+        // 페이지 로드 시 Supabase DB에서 데이터 불러오기
+        async function loadFromSupabase() {
+            updateDbStatus('loading', 'DB 불러오는 중...');
+            try {
+                const { data, error } = await supabaseClient
+                    .from(TABLE_NAME)
+                    .select('*')
+                    .order('slot_index', { ascending: true });
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    // 기존 DB에 5개만 들어있던 경우 6번째 '전설의 패치'가 없으면 자동 추가
+                    const hasSlot6 = data.some(d => d.slot_index === 6);
+                    if (!hasSlot6 && data.length === 5) {
+                        const default6 = getInitialDefaultProducts().find(p => p.slot_index === 6);
+                        data.push(default6);
+                    }
+                    productsData = data;
+                    renderAllPages();
+                    updateDbStatus('connected', 'Supabase DB 연동됨');
+                } else {
+                    updateDbStatus('connected', 'Supabase DB 연동됨 (초기 데이터)');
+                    await saveAllToSupabase(false);
+                }
+            } catch (err) {
+                console.warn('Supabase 로드 실패:', err);
+                updateDbStatus('error', 'DB 미연결 (SQL 실행 필요)');
+                const cached = localStorage.getItem(LOCAL_CACHE_KEY);
+                if (cached) {
+                    try {
+                        productsData = JSON.parse(cached);
+                        renderAllPages();
+                    } catch (e) {}
+                }
+            }
+        }
+
+        // 초기화 모달 제어
+        function openResetModal() {
+            const modal = document.getElementById('reset-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeResetModal() {
+            const modal = document.getElementById('reset-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function confirmResetData() {
+            localStorage.removeItem(LOCAL_CACHE_KEY);
+            productsData = getInitialDefaultProducts();
+            renderAllPages();
+            closeResetModal();
+
+            try {
+                await supabaseClient.from(TABLE_NAME).delete().gte('slot_index', 1);
+                await saveAllToSupabase(false);
+                showToast('기본 6개 제품 상태로 복원 및 DB 반영이 완료되었습니다.');
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // 수정된 내용 그대로 독립된 HTML 파일로 다운로드
+        function exportHTMLFile() {
+            syncDomToState();
+            const wasAdmin = isAdminMode;
+            if (wasAdmin) {
+                isAdminMode = false;
+                renderAllPages();
+            }
+
+            const cloneDoc = document.documentElement.cloneNode(true);
+            const cloneBody = cloneDoc.querySelector('body');
+            cloneBody.classList.remove('admin-mode');
+
+            const adminBadge = cloneDoc.querySelector('#admin-badge');
+            if (adminBadge) adminBadge.classList.add('hidden');
+            const adminActions = cloneDoc.querySelector('#admin-actions');
+            if (adminActions) {
+                adminActions.classList.add('hidden');
+                adminActions.classList.remove('flex');
+            }
+            const guideBanner = cloneDoc.querySelector('#admin-guide-banner');
+            if (guideBanner) guideBanner.classList.add('hidden');
+            const toggleBtnText = cloneDoc.querySelector('#toggle-admin-text');
+            if (toggleBtnText) toggleBtnText.textContent = '관리자 편집 모드';
+
+            const htmlContent = '<!DOCTYPE html>\n' + cloneDoc.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '약국_공급_제품_비교표.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            if (wasAdmin) {
+                isAdminMode = true;
+                renderAllPages();
+            }
+            showToast('수정 내용이 반영된 HTML 파일이 다운로드되었습니다.');
+        }
+    </script>
+</body>
+</html>
